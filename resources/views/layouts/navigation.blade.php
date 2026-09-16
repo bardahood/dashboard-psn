@@ -23,6 +23,11 @@
                             {{ __('Matriks Sandingan') }}
                         </x-nav-link>
                     @endcan
+                    @can('pengendalian.manage')
+                        <x-nav-link :href="route('admin.kunjungan-pengendalian.index')" :active="request()->routeIs('admin.kunjungan-pengendalian.*')">
+                            {{ __('Kunjungan Pengendalian') }}
+                        </x-nav-link>
+                    @endcan
                     <x-nav-link :href="route('beranda')" :active="false">
                         {{ __('Lihat Situs Publik') }}
                     </x-nav-link>
@@ -87,6 +92,11 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.matriks-sandingan')" :active="request()->routeIs('admin.matriks-sandingan')">
                     {{ __('Matriks Sandingan') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('pengendalian.manage')
+                <x-responsive-nav-link :href="route('admin.kunjungan-pengendalian.index')" :active="request()->routeIs('admin.kunjungan-pengendalian.*')">
+                    {{ __('Kunjungan Pengendalian') }}
                 </x-responsive-nav-link>
             @endcan
         </div>

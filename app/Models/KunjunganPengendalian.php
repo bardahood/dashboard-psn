@@ -81,4 +81,73 @@ class KunjunganPengendalian extends Model
     {
         return $this->hasMany(KunjunganPengendalianDokumentasi::class, 'kunjungan_id');
     }
+
+    protected const SKOR_KESESUAIAN = ['Sesuai' => 100, 'Sebagian' => 60, 'Tidak Sesuai' => 20];
+
+    protected const SKOR_EVALUASI_RISIKO = ['Sesuai/Lebih Baik' => 100, 'Memburuk' => 30];
+
+    protected const SKOR_KEPATUHAN = ['Sesuai' => 100, 'Tidak Sesuai' => 40];
+
+    /**
+     * Skor keseluruhan hasil kunjungan Pengendalian (0-100) -- rata-rata dari:
+     * kepatuhan frekuensi pelaporan, kesesuaian capaian fisik per RO,
+     * kesesuaian realisasi anggaran per RO, dan evaluasi risiko residual.
+     * Komponen yang datanya belum diisi tidak ikut dihitung (bukan dianggap 0),
+     * karena instrumen ini bisa diisi bertahap per bagian.
+     *
+     * Catatan: bobot & ambang batas berikut adalah interpretasi kami atas
+     * instruksi "replikasi formula Excel" pada prompt pengembangan (dokumen
+     * Excel instrumen aslinya tidak turut dilampirkan) -- tim konsultan dapat
+     * menyesuaikan bobot ini bila berbeda dari formula baku yang dimaksud.
+     */
+    public function skorKeseluruhan(): ?float
+    {
+        $skorKomponen = [];
+
+        if ($this->kepatuhan_frekuensi_pelaporan) {
+            $skorKomponen[] = self::SKOR_KEPATUHAN[$this->kepatuhan_frekuensi_pelaporan] ?? null;
+        }
+
+        foreach ($this->fisik as $f) {
+            if ($f->kesesuaian) {
+                $skorKomponen[] = self::SKOR_KESESUAIAN[$f->kesesuaian] ?? null;
+            }
+        }
+
+        foreach ($this->anggaran as $a) {
+            if ($a->kesesuaian) {
+                $skorKomponen[] = self::SKOR_KESESUAIAN[$a->kesesuaian] ?? null;
+            }
+        }
+
+        foreach ($this->risiko as $r) {
+            if ($r->evaluasi_risiko) {
+                $skorKomponen[] = self::SKOR_EVALUASI_RISIKO[$r->evaluasi_risiko] ?? null;
+            }
+        }
+
+        $skorKomponen = array_filter($skorKomponen, fn ($v) => $v !== null);
+
+        return count($skorKomponen) > 0 ? round(array_sum($skorKomponen) / count($skorKomponen), 1) : null;
+    }
+
+    /**
+     * Rekomendasi status pengendalian otomatis berdasarkan skor keseluruhan --
+     * disarankan sebagai draf awal, tetap dapat diubah manual oleh Tim
+     * Pengendalian pada Bagian I (Kesimpulan & Pengesahan).
+     */
+    public function rekomendasiOtomatis(): ?string
+    {
+        $skor = $this->skorKeseluruhan();
+
+        if ($skor === null) {
+            return null;
+        }
+
+        return match (true) {
+            $skor >= 80 => 'Aktif Dikendalikan Sesuai Rencana',
+            $skor >= 50 => 'Perlu Perhatian',
+            default => 'Kritis/Perlu Eskalasi',
+        };
+    }
 }

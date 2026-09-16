@@ -14,6 +14,10 @@
         ['label' => 'Info Memo', 'route' => 'admin.psn.profil', 'params' => [$psn, 'info_memo']],
         ['label' => 'Catatan Monev', 'route' => 'admin.psn.profil', 'params' => [$psn, 'catatan_monev']],
     ];
+
+    if (auth()->user()->can('pengendalian.manage')) {
+        $tabs[] = ['label' => 'Kunjungan Pengendalian', 'route' => 'admin.kunjungan-pengendalian.index', 'params' => ['psn_id' => $psn->id]];
+    }
     $currentType = $type ?? null;
 @endphp
 

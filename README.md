@@ -39,10 +39,16 @@ Seeder (`database/seeders/`) mengisi seluruh data referensi dari Bagian 8 skema 
   - `AnnualTargetManager` — pola master + target/realisasi tahunan (2025–2030) yang dipakai bersama oleh Indikator Output/Outcome, Penerima Manfaat, dan Kontribusi Trisula Pembangunan; % realisasi dihitung otomatis
   - `SubResourceManager` — CRUD generik config-driven untuk Dasar Hukum, Stakeholder Mapping, Kebutuhan Regulasi, Isu Lainnya, Evaluasi Status, Info Memo, dan Catatan Monev
 - Cache 15 menit pada halaman publik & Executive Dashboard sesuai Bagian 8 prompt
-- Test otomatis: relasi model & CHECK constraint (`PsnRelationsTest`), middleware role (`AdminAccessTest`), dan komponen Livewire (`LivewireSubResourceTest`) — 36 test, seluruhnya hijau
 
-**Belum dikerjakan (Sprint 3–5, sesuai urutan Bagian 9 prompt — jangan dikerjakan sebelum Sprint 1–2 stabil di lingkungan nyata):**
-- Wizard Livewire Instrumen Kunjungan Lapangan Pengendalian (Bagian A–I) dan Perencanaan (14 kriteria dinamis dari `ref_kriteria_perencanaan`) beserta kalkulasi skor otomatis
+**Selesai (Sprint 3, sesuai Bagian 9 prompt):**
+- **Wizard Instrumen Kunjungan Lapangan Pengendalian** (`KunjunganPengendalianWizard`, `/admin/kunjungan-pengendalian`) — 9 langkah mengikuti Bagian A–I formulir:
+  - A Identitas (pilih PSN, saran otomatis kepatuhan frekuensi pelaporan dari `Psn::cekKepatuhanFrekuensiPelaporan()`), B Kelembagaan (5 peran, dibandingkan otomatis dgn instansi tercatat pada profil PSN), C Fisik & D Anggaran per RO (kesesuaian **dihitung otomatis** di model — `KunjunganPengendalianFisik`/`Anggaran::hitungKesesuaian()`, toleransi deviasi ≤5%=Sesuai, 5–20%=Sebagian, >20%=Tidak Sesuai), E Risiko (evaluasi Sesuai/Lebih Baik vs Memburuk dihitung dari perbandingan level Risiko Residual Harapan vs Aktual di `KunjunganPengendalianRisiko::hitungEvaluasiRisiko()`), F Regulasi, G Evaluasi, H Dokumentasi (unggah file ke `storage/app/public` via Livewire `WithFileUploads`), I Kesimpulan & Pengesahan (menampilkan **skor & rekomendasi status pengendalian otomatis** dari `KunjunganPengendalian::skorKeseluruhan()`/`rekomendasiOtomatis()`, tetap dapat ditimpa manual)
+  - Setiap bagian tersimpan langsung ke tabel masing-masing begitu diisi (bisa dikerjakan bertahap lintas sesi/kunjungan lapangan)
+  - **Catatan penting**: bobot & ambang batas formula skor adalah interpretasi kami atas instruksi "replikasi formula Excel" pada prompt — dokumen Excel instrumen aslinya tidak turut dilampirkan ke sesi ini, jadi tim konsultan perlu memverifikasi/menyesuaikan bobot ini terhadap formula baku bila berbeda
+- Test otomatis: relasi model & CHECK constraint (`PsnRelationsTest`), middleware role (`AdminAccessTest`), komponen Livewire sub-profil (`LivewireSubResourceTest`), dan wizard Pengendalian termasuk skenario unggah file (`KunjunganPengendalianWizardTest`) — 40 test, seluruhnya hijau
+
+**Belum dikerjakan (Sprint 4–5, sesuai urutan Bagian 9 prompt — jangan dikerjakan sebelum Sprint 3 stabil di lingkungan nyata):**
+- Wizard Instrumen Kunjungan Lapangan **Perencanaan** (14 kriteria dinamis dari `ref_kriteria_perencanaan`, gate Kriteria Utama, skor berbobot Pendukung 35%/Kesiapan 35%/Lokasi 15%/Trisula 15%)
 - Reporting PDF/Excel (Laporan Presiden/Semester)
 - Command `psn:sync-psi` (skeleton sinkronisasi API PSI, endpoint belum tersedia dari Dit. PSI)
 - Audit log otomatis via Model Observer

@@ -161,4 +161,33 @@ class Psn extends Model
     {
         return $this->hasMany(KunjunganPerencanaan::class, 'psn_id');
     }
+
+    /**
+     * Cek kepatuhan frekuensi pelaporan RO/Proyek milik PSN ini terhadap
+     * aturan Project Profile Final: PKPN wajib diisi bulanan, PSN boleh
+     * bulanan atau triwulanan (lihat komentar kolom psn.tipe_hierarki dan
+     * Bagian 15 ilustrasi Project Profile). Dipakai sebagai saran otomatis
+     * pada Bagian A Instrumen Kunjungan Pengendalian -- tetap dapat diubah
+     * manual oleh verifikator berdasarkan temuan lapangan.
+     */
+    public function cekKepatuhanFrekuensiPelaporan(): ?string
+    {
+        if (! $this->tipe_hierarki) {
+            return null;
+        }
+
+        $tipePeriodeTahunIni = RoTargetPeriode::whereIn('ro_id', $this->roProyek()->pluck('id'))
+            ->where('tahun', now()->year)
+            ->pluck('tipe_periode');
+
+        if ($tipePeriodeTahunIni->isEmpty()) {
+            return null;
+        }
+
+        if ($this->tipe_hierarki === 'PKPN') {
+            return $tipePeriodeTahunIni->every(fn ($tipe) => $tipe === 'BULANAN') ? 'Sesuai' : 'Tidak Sesuai';
+        }
+
+        return 'Sesuai';
+    }
 }

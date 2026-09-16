@@ -35,4 +35,37 @@ class KunjunganPengendalianRisiko extends Model
     {
         return $this->belongsTo(RisikoPsn::class, 'risiko_id');
     }
+
+    public const LEVEL_RANK = ['Rendah' => 1, 'Sedang' => 2, 'Tinggi' => 3, 'Sangat Tinggi' => 4];
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $model) {
+            $model->evaluasi_risiko = $model->hitungEvaluasiRisiko();
+        });
+    }
+
+    /**
+     * Bandingkan risiko residual Harapan (risiko_psn.risiko_residual_harapan,
+     * ditetapkan saat perencanaan) vs Aktual (temuan verifikasi lapangan).
+     * Level risiko lebih rendah atau sama dengan harapan = "Sesuai/Lebih Baik",
+     * lebih tinggi dari harapan = "Memburuk".
+     */
+    public function hitungEvaluasiRisiko(): ?string
+    {
+        $harapan = $this->relationLoaded('risiko') ? $this->risiko?->risiko_residual_harapan : $this->risiko()->value('risiko_residual_harapan');
+
+        if (! $harapan || ! $this->risiko_residual_aktual) {
+            return null;
+        }
+
+        $rankHarapan = self::LEVEL_RANK[$harapan] ?? null;
+        $rankAktual = self::LEVEL_RANK[$this->risiko_residual_aktual] ?? null;
+
+        if ($rankHarapan === null || $rankAktual === null) {
+            return null;
+        }
+
+        return $rankAktual <= $rankHarapan ? 'Sesuai/Lebih Baik' : 'Memburuk';
+    }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\KunjunganPengendalianController;
 use App\Http\Controllers\Admin\MatriksSandinganController;
 use App\Http\Controllers\Admin\PsnController;
 use App\Models\Psn;
@@ -19,6 +20,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/psn/{psn}/profil/{type}', fn (Psn $psn, string $type) => view('admin.psn.profil', compact('psn', 'type')))->name('psn.profil');
 
     Route::get('/matriks-sandingan', [MatriksSandinganController::class, 'index'])->name('matriks-sandingan');
+
+    Route::middleware('permission:pengendalian.manage')->prefix('kunjungan-pengendalian')->name('kunjungan-pengendalian.')->group(function () {
+        Route::get('/', [KunjunganPengendalianController::class, 'index'])->name('index');
+        Route::get('/create', [KunjunganPengendalianController::class, 'create'])->name('create');
+        Route::get('/{kunjungan}/edit', [KunjunganPengendalianController::class, 'edit'])->name('edit');
+    });
 });
 
 // Breeze redirects ke route('dashboard') setelah login/registrasi -- alias ke Executive Dashboard admin.
