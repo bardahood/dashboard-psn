@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KunjunganPengendalianController;
+use App\Http\Controllers\Admin\KunjunganPerencanaanController;
 use App\Http\Controllers\Admin\MatriksSandinganController;
 use App\Http\Controllers\Admin\PsnController;
 use App\Models\Psn;
@@ -25,6 +26,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/', [KunjunganPengendalianController::class, 'index'])->name('index');
         Route::get('/create', [KunjunganPengendalianController::class, 'create'])->name('create');
         Route::get('/{kunjungan}/edit', [KunjunganPengendalianController::class, 'edit'])->name('edit');
+    });
+
+    Route::middleware('permission:perencanaan.manage')->prefix('kunjungan-perencanaan')->name('kunjungan-perencanaan.')->group(function () {
+        Route::get('/', [KunjunganPerencanaanController::class, 'index'])->name('index');
+        Route::get('/create', [KunjunganPerencanaanController::class, 'create'])->name('create');
+        Route::get('/{kunjungan}/edit', [KunjunganPerencanaanController::class, 'edit'])->name('edit');
     });
 });
 

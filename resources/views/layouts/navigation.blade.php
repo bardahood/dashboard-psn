@@ -28,6 +28,11 @@
                             {{ __('Kunjungan Pengendalian') }}
                         </x-nav-link>
                     @endcan
+                    @can('perencanaan.manage')
+                        <x-nav-link :href="route('admin.kunjungan-perencanaan.index')" :active="request()->routeIs('admin.kunjungan-perencanaan.*')">
+                            {{ __('Kunjungan Perencanaan') }}
+                        </x-nav-link>
+                    @endcan
                     <x-nav-link :href="route('beranda')" :active="false">
                         {{ __('Lihat Situs Publik') }}
                     </x-nav-link>
@@ -97,6 +102,11 @@
             @can('pengendalian.manage')
                 <x-responsive-nav-link :href="route('admin.kunjungan-pengendalian.index')" :active="request()->routeIs('admin.kunjungan-pengendalian.*')">
                     {{ __('Kunjungan Pengendalian') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('perencanaan.manage')
+                <x-responsive-nav-link :href="route('admin.kunjungan-perencanaan.index')" :active="request()->routeIs('admin.kunjungan-perencanaan.*')">
+                    {{ __('Kunjungan Perencanaan') }}
                 </x-responsive-nav-link>
             @endcan
         </div>

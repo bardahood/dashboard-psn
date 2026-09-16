@@ -109,4 +109,108 @@ class KunjunganPerencanaan extends Model
     {
         return $this->hasMany(KunjunganIndeksBukti::class, 'kunjungan_id');
     }
+
+    protected const SKOR_SESUAI = ['Sesuai' => 100, 'Sebagian' => 60, 'Tidak Sesuai' => 20];
+
+    protected const SKOR_YA_TIDAK = ['Ya' => 100, 'Sebagian' => 60, 'Tidak' => 20];
+
+    /**
+     * Kriteria Utama (U1-U3) sebagai PENGGUGUR -- jika ada jawaban "Tidak",
+     * rekomendasi otomatis = "Ditolak" terlepas skor komponen lain (Bagian 7.2
+     * prompt pengembangan).
+     */
+    public function gateUtamaGagal(): bool
+    {
+        return $this->verifikasiKriteria()
+            ->whereHas('kriteria', fn ($q) => $q->where('kelompok', 'Utama'))
+            ->where('nilai_hasil_verifikasi', 'Tidak')
+            ->exists();
+    }
+
+    protected function rataSkor0Sampai3(string $kelompok): ?float
+    {
+        $nilai = $this->verifikasiKriteria()
+            ->whereHas('kriteria', fn ($q) => $q->where('kelompok', $kelompok))
+            ->whereNotNull('nilai_hasil_verifikasi')
+            ->pluck('nilai_hasil_verifikasi')
+            ->filter(fn ($v) => is_numeric($v))
+            ->map(fn ($v) => ((float) $v / 3) * 100);
+
+        return $nilai->isEmpty() ? null : round($nilai->avg(), 1);
+    }
+
+    public function skorPendukung(): ?float
+    {
+        return $this->rataSkor0Sampai3('Pendukung');
+    }
+
+    public function skorKesiapan(): ?float
+    {
+        return $this->rataSkor0Sampai3('Kesiapan');
+    }
+
+    public function skorLokasi(): ?float
+    {
+        $nilai = $this->verifikasiLokasi->pluck('sesuai')->filter()->map(fn ($v) => self::SKOR_SESUAI[$v] ?? null)->filter(fn ($v) => $v !== null);
+
+        return $nilai->isEmpty() ? null : round($nilai->avg(), 1);
+    }
+
+    public function skorTrisula(): ?float
+    {
+        $nilai = $this->verifikasiTrisula->pluck('kondisi_awal_terverifikasi')->filter()->map(fn ($v) => self::SKOR_YA_TIDAK[$v] ?? null)->filter(fn ($v) => $v !== null);
+
+        return $nilai->isEmpty() ? null : round($nilai->avg(), 1);
+    }
+
+    /**
+     * Skor keseluruhan berbobot: Pendukung 35% + Kesiapan 35% + Lokasi 15% +
+     * Trisula 15% (Bagian 7.2 prompt pengembangan). Bobot komponen yang belum
+     * ada datanya didistribusikan ulang secara proporsional ke komponen lain
+     * yang sudah terisi, agar instrumen bisa dinilai bertahap.
+     *
+     * Catatan: seperti pada instrumen Pengendalian, bobot & ambang batas ini
+     * adalah interpretasi kami atas instruksi "replikasi formula Excel" --
+     * dokumen Excel instrumen aslinya tidak turut dilampirkan ke sesi ini.
+     */
+    public function skorKeseluruhan(): ?float
+    {
+        $komponen = [
+            'pendukung' => [0.35, $this->skorPendukung()],
+            'kesiapan' => [0.35, $this->skorKesiapan()],
+            'lokasi' => [0.15, $this->skorLokasi()],
+            'trisula' => [0.15, $this->skorTrisula()],
+        ];
+
+        $tersedia = array_filter($komponen, fn ($k) => $k[1] !== null);
+
+        if (empty($tersedia)) {
+            return null;
+        }
+
+        $totalBobot = array_sum(array_column($tersedia, 0));
+        $totalSkor = array_sum(array_map(fn ($k) => $k[0] * $k[1], $tersedia));
+
+        return round($totalSkor / $totalBobot, 1);
+    }
+
+    public function rekomendasiOtomatis(): ?string
+    {
+        if ($this->gateUtamaGagal()) {
+            return 'Ditolak';
+        }
+
+        $skor = $this->skorKeseluruhan();
+
+        if ($skor === null) {
+            return null;
+        }
+
+        return match (true) {
+            $skor >= 80 => 'Layak Dilanjutkan',
+            $skor >= 65 => 'Layak dengan Catatan',
+            $skor >= 50 => 'Perlu Perbaikan Dokumen',
+            default => 'Belum Layak',
+        };
+    }
 }
