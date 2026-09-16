@@ -10,6 +10,8 @@
 
     <div class="py-8">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            @include('admin.psn._profil-tabs')
+
             <div class="bg-white shadow rounded-lg p-6">
                 <h1 class="text-xl font-bold text-gray-900">{{ $psn->nama_psn }}</h1>
                 <div class="mt-3 flex flex-wrap gap-2 text-xs">

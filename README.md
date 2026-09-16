@@ -33,16 +33,22 @@ Seeder (`database/seeders/`) mengisi seluruh data referensi dari Bagian 8 skema 
 - Autentikasi (Breeze) + RBAC (spatie/laravel-permission) 6 role sesuai Bagian 6 prompt, dengan `PsnPolicy` yang membatasi role **K/L Pelaksana** hanya pada PSN miliknya sendiri (pengusul/pengelola/kontraktor/supervisi + `psn_penanggung_jawab`)
 - Halaman publik: Beranda, Daftar PSN (filter klaster/provinsi/status), Detail PSN, Statistik (Chart.js)
 - Admin: Executive Dashboard, CRUD Data PSN (tabel `psn` inti), Matriks Sandingan Sumber (dari view `v_psn_sandingan_sumber`)
+- **CRUD profil lengkap PSN** via komponen Livewire (`app/Livewire/Admin/`), diakses lewat tab pada halaman Detail PSN:
+  - `RoProyekManager` — hierarki RO induk → Aktivitas turunan (penanda RO Kunci/Critical Path) + target/realisasi per periode (`ro_target_periode`, tahunan/triwulanan/bulanan)
+  - `RisikoManager` — register risiko (`risiko_psn`) + pelaporan rutin triwulanan (`risiko_status_periode`), sengaja dipisah dari snapshot verifikasi kunjungan pengendalian sesuai prinsip kunci skema
+  - `AnnualTargetManager` — pola master + target/realisasi tahunan (2025–2030) yang dipakai bersama oleh Indikator Output/Outcome, Penerima Manfaat, dan Kontribusi Trisula Pembangunan; % realisasi dihitung otomatis
+  - `SubResourceManager` — CRUD generik config-driven untuk Dasar Hukum, Stakeholder Mapping, Kebutuhan Regulasi, Isu Lainnya, Evaluasi Status, Info Memo, dan Catatan Monev
 - Cache 15 menit pada halaman publik & Executive Dashboard sesuai Bagian 8 prompt
-- Test otomatis (`tests/Feature/PsnRelationsTest.php`, `AdminAccessTest.php`) untuk relasi model & middleware role
+- Test otomatis: relasi model & CHECK constraint (`PsnRelationsTest`), middleware role (`AdminAccessTest`), dan komponen Livewire (`LivewireSubResourceTest`) — 36 test, seluruhnya hijau
 
 **Belum dikerjakan (Sprint 3–5, sesuai urutan Bagian 9 prompt — jangan dikerjakan sebelum Sprint 1–2 stabil di lingkungan nyata):**
-- CRUD untuk sub-profil PSN lengkap (dasar hukum, stakeholder, indikator, penerima manfaat, trisula, RO/Aktivitas, risiko, kebutuhan regulasi) — model & relasi sudah siap, tinggal dibuatkan form
 - Wizard Livewire Instrumen Kunjungan Lapangan Pengendalian (Bagian A–I) dan Perencanaan (14 kriteria dinamis dari `ref_kriteria_perencanaan`) beserta kalkulasi skor otomatis
 - Reporting PDF/Excel (Laporan Presiden/Semester)
 - Command `psn:sync-psi` (skeleton sinkronisasi API PSI, endpoint belum tersedia dari Dit. PSI)
 - Audit log otomatis via Model Observer
 - Tier 2: peta sebaran (Leaflet), manajemen dokumen, filter lanjutan
+
+**Catatan integrasi Breeze + Livewire:** `resources/js/app.js` sengaja **tidak** meng-import/menjalankan Alpine.js sendiri karena Livewire 3 (`@livewireScripts`) sudah membundel dan menjalankan Alpine miliknya sendiri secara otomatis. Menjalankan dua instance Alpine sekaligus akan merusak sinkronisasi `wire:model` (gejala: form edit Livewire tidak ter-prefill, tapi tidak ada error yang terlihat) — jangan menambahkan `import Alpine from 'alpinejs'; Alpine.start();` kembali ke `app.js`.
 
 ## Menjalankan Test
 
