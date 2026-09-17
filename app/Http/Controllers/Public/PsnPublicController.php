@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Psn;
+use App\Models\RefInstansi;
 use App\Models\RefKlaster;
 use App\Models\RefProvinsi;
 use App\Models\RefStatusPsn;
@@ -31,6 +32,9 @@ class PsnPublicController extends Controller
         if ($request->filled('status_psn_id')) {
             $query->where('status_psn_id', $request->integer('status_psn_id'));
         }
+        if ($request->filled('instansi_id')) {
+            $query->whereHas('penanggungJawab', fn ($q) => $q->where('instansi_id', $request->integer('instansi_id')));
+        }
         if ($request->filled('q')) {
             $query->whereFullText('nama_psn', $request->string('q'));
         }
@@ -40,8 +44,9 @@ class PsnPublicController extends Controller
         $klaster = RefKlaster::orderBy('nama_klaster')->get();
         $provinsi = RefProvinsi::orderBy('nama_provinsi')->get();
         $status = RefStatusPsn::orderBy('urutan')->get();
+        $instansi = RefInstansi::orderBy('nama_instansi')->get();
 
-        return view('public.psn.index', compact('daftarPsn', 'klaster', 'provinsi', 'status'));
+        return view('public.psn.index', compact('daftarPsn', 'klaster', 'provinsi', 'status', 'instansi'));
     }
 
     /**

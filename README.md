@@ -65,8 +65,14 @@ Seeder (`database/seeders/`) mengisi seluruh data referensi dari Bagian 8 skema 
 - **Tier 2 — Peta Sebaran PSN** (`/peta`, publik): marker per-provinsi (agregat, karena skema tidak menyimpan koordinat presisi lokasi) menggunakan Leaflet.js + `ProvinsiCoordinates` (koordinat 38 provinsi), `PetaController` meng-cache hasil agregasi 15 menit; klik marker menampilkan daftar PSN pada provinsi tsb dengan tautan ke halaman detail publik
 - Test otomatis: relasi model & CHECK constraint (`PsnRelationsTest`), middleware role (`AdminAccessTest`), komponen Livewire sub-profil (`LivewireSubResourceTest`), wizard Pengendalian termasuk unggah file (`KunjunganPengendalianWizardTest`), wizard Perencanaan termasuk visibilitas kriteria kondisional & gate Kriteria Utama (`KunjunganPerencanaanWizardTest`), audit log & sinkronisasi PSI (`AuditLogAndSyncPsiTest`), export laporan PDF/Excel (`LaporanExportTest`), peta sebaran (`PetaTest`), dan import Matrik Sandingan (`MatriksSandinganImporterTest`) — 54 test, seluruhnya hijau
 
-**Belum dikerjakan (sisa Sprint 5, sesuai urutan Bagian 9 prompt):**
-- Tier 2: manajemen dokumen (repositori dokumen terpusat lintas PSN), filter lanjutan pada halaman publik/admin (multi-kriteria, simpan filter)
+**Selesai (Sprint 5, Tier 2 penutup, sesuai Bagian 9 prompt):**
+- **Manajemen Dokumen** (`DokumenController`, `/admin/dokumen`) — repositori lintas PSN atas seluruh bukti dukung yang diunggah pada Bagian H Instrumen Kunjungan Pengendalian (`kunjungan_pengendalian_dokumentasi`), agar dapat ditelusuri per-PSN/kategori tanpa membuka wizard satu per satu. Tidak menambah tabel baru (existing-first) — hanya menyandingkan data yang sudah ada
+- **Filter lanjutan**:
+  - Admin **Matriks Sandingan** (`/admin/matriks-sandingan`): filter per klaster, per provinsi, dan checkbox **"hanya tampilkan yang ada gap"** (PSN yang bolong di salah satu dari 4 sumber) — inti kegunaan halaman rekonsiliasi sumber setelah 388 PSN riil diimpor
+  - **Daftar PSN publik** (`/psn`): tambahan filter **K/L Penanggung Jawab** (join ke `psn_penanggung_jawab`/`ref_instansi`), melengkapi filter klaster/provinsi/status yang sudah ada sejak Sprint 1
+- Test otomatis: repositori dokumen & otorisasinya (`DokumenManagementTest`), filter lanjutan Matriks Sandingan & Daftar PSN (`FilterLanjutanTest`) — total 58 test, seluruhnya hijau
+
+**Belum dikerjakan:** tidak ada sisa item Tier 1/Tier 2 dari Bagian 9 prompt. Seluruh Tier 3 (predictive analytics/AI forecasting, simulasi lanjutan) sengaja tidak dikerjakan sesuai batasan scope eksplisit pada prompt.
 
 **Catatan lingkungan pengembangan:** Chart.js dan Leaflet.js dimuat lewat CDN (`cdn.jsdelivr.net`) — pada sandbox pengembangan ini akses keluar ke CDN tsb diblokir sehingga chart/peta tidak bisa diverifikasi tampil secara visual di sini, namun payload data JSON yang dikirim ke browser (`markers`, dataset chart) sudah diverifikasi benar; pada lingkungan produksi dengan akses internet normal, chart & peta akan tampil seperti biasa.
 

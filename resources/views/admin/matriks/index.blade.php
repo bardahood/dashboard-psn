@@ -9,10 +9,29 @@
                 Sandingan ketersediaan data PSN di 4 sumber: RKP Pemutakhiran 2026, Data PEKS3, Data PSI, dan Permenko.
             </p>
 
-            <form method="GET" class="bg-white rounded-lg shadow p-4 flex gap-3">
+            <form method="GET" class="bg-white rounded-lg shadow p-4 flex flex-wrap items-center gap-3">
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama PSN..."
-                       class="flex-1 rounded-md border-gray-300 text-sm">
-                <button class="rounded-md bg-gray-700 text-white text-sm font-medium px-4 hover:bg-gray-600">Cari</button>
+                       class="flex-1 min-w-[200px] rounded-md border-gray-300 text-sm">
+                <select name="klaster" class="rounded-md border-gray-300 text-sm">
+                    <option value="">Semua Klaster</option>
+                    @foreach ($klaster as $k)
+                        <option value="{{ $k }}" @selected(request('klaster') === $k)>{{ $k }}</option>
+                    @endforeach
+                </select>
+                <select name="provinsi" class="rounded-md border-gray-300 text-sm">
+                    <option value="">Semua Provinsi</option>
+                    @foreach ($provinsi as $p)
+                        <option value="{{ $p }}" @selected(request('provinsi') === $p)>{{ $p }}</option>
+                    @endforeach
+                </select>
+                <label class="flex items-center gap-2 text-sm text-gray-600">
+                    <input type="checkbox" name="hanya_gap" value="1" @checked(request()->boolean('hanya_gap')) class="rounded border-gray-300">
+                    Hanya tampilkan yang ada gap
+                </label>
+                <button class="rounded-md bg-gray-700 text-white text-sm font-medium px-4 py-2 hover:bg-gray-600">Filter</button>
+                @if (request()->anyFilled(['q', 'klaster', 'provinsi', 'hanya_gap']))
+                    <a href="{{ route('admin.matriks-sandingan') }}" class="text-sm text-gray-500 hover:underline">Reset</a>
+                @endif
             </form>
 
             <div class="bg-white rounded-lg shadow overflow-x-auto">

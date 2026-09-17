@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DokumenController;
 use App\Http\Controllers\Admin\KunjunganPengendalianController;
 use App\Http\Controllers\Admin\KunjunganPerencanaanController;
 use App\Http\Controllers\Admin\LaporanController;
@@ -38,6 +39,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     });
 
     Route::middleware('permission:audit.view')->get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log');
+
+    Route::middleware('permission:pengendalian.manage')->get('/dokumen', [DokumenController::class, 'index'])->name('dokumen');
 
     Route::middleware('permission:sinkronisasi.manage')->prefix('sinkronisasi-psi')->group(function () {
         Route::get('/', [SinkronisasiPsiController::class, 'index'])->name('sinkronisasi-psi');

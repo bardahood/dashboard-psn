@@ -25,7 +25,16 @@
                 <option value="{{ $s->id }}" @selected(request('status_psn_id') == $s->id)>{{ $s->nama_status }}</option>
             @endforeach
         </select>
+        <select name="instansi_id" class="col-span-1 sm:col-span-3 rounded-md border-gray-300 text-sm">
+            <option value="">Semua K/L Penanggung Jawab</option>
+            @foreach ($instansi as $i)
+                <option value="{{ $i->id }}" @selected(request('instansi_id') == $i->id)>{{ $i->nama_instansi }}</option>
+            @endforeach
+        </select>
         <button class="rounded-md bg-blue-800 text-white text-sm font-medium py-2 hover:bg-blue-700">Filter</button>
+        @if (request()->anyFilled(['q', 'klaster_id', 'provinsi_id', 'status_psn_id', 'instansi_id']))
+            <a href="{{ route('psn.index') }}" class="text-sm text-gray-500 self-center hover:underline">Reset filter</a>
+        @endif
     </form>
 
     <div class="bg-white rounded-lg shadow overflow-x-auto">
