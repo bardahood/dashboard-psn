@@ -72,6 +72,15 @@ Seeder (`database/seeders/`) mengisi seluruh data referensi dari Bagian 8 skema 
   - **Daftar PSN publik** (`/psn`): tambahan filter **K/L Penanggung Jawab** (join ke `psn_penanggung_jawab`/`ref_instansi`), melengkapi filter klaster/provinsi/status yang sudah ada sejak Sprint 1
 - Test otomatis: repositori dokumen & otorisasinya (`DokumenManagementTest`), filter lanjutan Matriks Sandingan & Daftar PSN (`FilterLanjutanTest`) — total 58 test, seluruhnya hijau
 
+**Selesai (Manajemen Pengguna & Hak Akses, Bagian 5.2 & 6 prompt):**
+- **`/admin/pengguna`** (`PenggunaController`, permission `pengguna.manage`) — CRUD `ref_pic` + `hak_akses` + assign role spatie/laravel-permission dalam satu form (tambah & ubah pengguna), lengkap dengan pilihan instansi, role, level akses legacy (`Admin`/`Editor`/`Viewer`), dan status aktif
+- **Tanpa tombol hapus secara sengaja** — mencabut akses dilakukan dengan menonaktifkan (`hak_akses.is_active = false`), bukan menghapus data, karena `pic_id` direferensikan sebagai histori oleh banyak tabel lain (audit_log, kunjungan lapangan, dst)
+- **Middleware `akun.aktif`** (`CekHakAksesAktif`, berlaku di seluruh route `/admin/*`) memeriksa `hak_akses.is_active` tiap request — PIC yang seluruh hak_akses-nya non-aktif otomatis di-logout dengan HTTP 403, sesuai instruksi eksplisit Bagian 6 prompt ("`hak_akses.is_active` dicek di middleware — nonaktifkan akses tanpa hapus histori")
+- Guard tambahan: Super Admin tidak bisa menonaktifkan akunnya sendiri (mencegah terkunci total dari sistem)
+- Seeder menambahkan 1 akun contoh nonaktif (`nonaktif@bappenas.go.id`) untuk mendemonstrasikan middleware ini langsung setelah `migrate --seed`
+- Detail lengkap kredensial & matriks permission ada di **[`AKSES.md`](AKSES.md)**
+- Test otomatis: `ManajemenPenggunaTest` (CRUD, guard self-deactivation, blokir middleware, gating permission) — total 64 test, seluruhnya hijau
+
 **Belum dikerjakan:** tidak ada sisa item Tier 1/Tier 2 dari Bagian 9 prompt. Seluruh Tier 3 (predictive analytics/AI forecasting, simulasi lanjutan) sengaja tidak dikerjakan sesuai batasan scope eksplisit pada prompt.
 
 **Catatan lingkungan pengembangan:** Chart.js dan Leaflet.js dimuat lewat CDN (`cdn.jsdelivr.net`) — pada sandbox pengembangan ini akses keluar ke CDN tsb diblokir sehingga chart/peta tidak bisa diverifikasi tampil secara visual di sini, namun payload data JSON yang dikirim ke browser (`markers`, dataset chart) sudah diverifikasi benar; pada lingkungan produksi dengan akses internet normal, chart & peta akan tampil seperti biasa.

@@ -7,12 +7,13 @@ use App\Http\Controllers\Admin\KunjunganPengendalianController;
 use App\Http\Controllers\Admin\KunjunganPerencanaanController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\MatriksSandinganController;
+use App\Http\Controllers\Admin\PenggunaController;
 use App\Http\Controllers\Admin\PsnController;
 use App\Http\Controllers\Admin\SinkronisasiPsiController;
 use App\Models\Psn;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'akun.aktif'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('psn', PsnController::class);
@@ -36,6 +37,14 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/', [KunjunganPerencanaanController::class, 'index'])->name('index');
         Route::get('/create', [KunjunganPerencanaanController::class, 'create'])->name('create');
         Route::get('/{kunjungan}/edit', [KunjunganPerencanaanController::class, 'edit'])->name('edit');
+    });
+
+    Route::middleware('permission:pengguna.manage')->prefix('pengguna')->name('pengguna.')->group(function () {
+        Route::get('/', [PenggunaController::class, 'index'])->name('index');
+        Route::get('/create', [PenggunaController::class, 'create'])->name('create');
+        Route::post('/', [PenggunaController::class, 'store'])->name('store');
+        Route::get('/{pengguna}/edit', [PenggunaController::class, 'edit'])->name('edit');
+        Route::put('/{pengguna}', [PenggunaController::class, 'update'])->name('update');
     });
 
     Route::middleware('permission:audit.view')->get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log');

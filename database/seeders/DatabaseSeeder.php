@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\HakAkses;
 use App\Models\RefInstansi;
 use App\Models\RefPic;
 use App\Models\User;
@@ -15,14 +16,21 @@ class DatabaseSeeder extends Seeder
      * langsung dicoba/didemokan tanpa perlu membuat user manual dulu.
      * Password sama untuk semua ("password", default Laravel factory) --
      * WAJIB diganti sebelum dipakai di lingkungan produksi, lihat AKSES.md.
+     *
+     * `level_akses` mengisi tabel legacy `hak_akses` (Bagian 6: "CRUD ref_pic
+     * + hak_akses, assign role") -- ini TIDAK menggantikan role
+     * spatie/laravel-permission yang benar-benar menentukan permission;
+     * `hak_akses.is_active=false` pada akun terakhir mendemonstrasikan
+     * middleware `akun.aktif` yang memblokir & mem-logout akun nonaktif.
      */
     private const AKUN_DEMO = [
-        ['nama' => 'Super Admin', 'email' => 'admin@bappenas.go.id', 'role' => 'Super Admin'],
-        ['nama' => 'Admin Pengendalian', 'email' => 'admin.pengendalian@bappenas.go.id', 'role' => 'Admin Pengendalian'],
-        ['nama' => 'Admin Perencanaan', 'email' => 'admin.perencanaan@bappenas.go.id', 'role' => 'Admin Perencanaan'],
-        ['nama' => 'Verifikator Lapangan', 'email' => 'verifikator@bappenas.go.id', 'role' => 'Verifikator Lapangan'],
-        ['nama' => 'PIC K/L Pelaksana', 'email' => 'kl.pelaksana@bappenas.go.id', 'role' => 'K/L Pelaksana', 'instansi' => 'Menteri Pekerjaan Umum'],
-        ['nama' => 'Viewer Internal', 'email' => 'viewer@bappenas.go.id', 'role' => 'Viewer Internal'],
+        ['nama' => 'Super Admin', 'email' => 'admin@bappenas.go.id', 'role' => 'Super Admin', 'level_akses' => 'Admin'],
+        ['nama' => 'Admin Pengendalian', 'email' => 'admin.pengendalian@bappenas.go.id', 'role' => 'Admin Pengendalian', 'level_akses' => 'Editor'],
+        ['nama' => 'Admin Perencanaan', 'email' => 'admin.perencanaan@bappenas.go.id', 'role' => 'Admin Perencanaan', 'level_akses' => 'Editor'],
+        ['nama' => 'Verifikator Lapangan', 'email' => 'verifikator@bappenas.go.id', 'role' => 'Verifikator Lapangan', 'level_akses' => 'Editor'],
+        ['nama' => 'PIC K/L Pelaksana', 'email' => 'kl.pelaksana@bappenas.go.id', 'role' => 'K/L Pelaksana', 'level_akses' => 'Editor', 'instansi' => 'Menteri Pekerjaan Umum'],
+        ['nama' => 'Viewer Internal', 'email' => 'viewer@bappenas.go.id', 'role' => 'Viewer Internal', 'level_akses' => 'Viewer'],
+        ['nama' => 'Contoh Akun Nonaktif', 'email' => 'nonaktif@bappenas.go.id', 'role' => 'Viewer Internal', 'level_akses' => 'Viewer', 'aktif' => false],
     ];
 
     /**
@@ -60,6 +68,13 @@ class DatabaseSeeder extends Seeder
                 'pic_id' => $pic->id,
             ]);
             $user->assignRole($akun['role']);
+
+            HakAkses::create([
+                'pic_id' => $pic->id,
+                'instansi_id' => $instansiId,
+                'level_akses' => $akun['level_akses'],
+                'is_active' => $akun['aktif'] ?? true,
+            ]);
         }
     }
 }

@@ -32,6 +32,7 @@ Password **semua akun** di bawah ini sama: `password`.
 | Verifikator Lapangan | `verifikator@bappenas.go.id` | `password` | Mengisi Instrumen Kunjungan Pengendalian & Perencanaan |
 | K/L Pelaksana | `kl.pelaksana@bappenas.go.id` | `password` | Terhubung ke instansi **Menteri Pekerjaan Umum** — hanya bisa mengubah PSN yang instansi ini terlibat (pengusul/pengelola/kontraktor/supervisi/penanggung jawab) |
 | Viewer Internal | `viewer@bappenas.go.id` | `password` | Akses baca (`psn.view`) + Audit Log, tanpa hak ubah data |
+| *(contoh nonaktif)* | `nonaktif@bappenas.go.id` | `password` | `hak_akses.is_active = false` — mendemonstrasikan penolakan login oleh middleware `akun.aktif` (lihat bagian Manajemen Pengguna) |
 
 Akun-akun ini dibuat ulang setiap `php artisan migrate:fresh --seed`
 dijalankan (idempotent terhadap skema, bukan menambah duplikat karena tabel
@@ -61,32 +62,43 @@ Livewire (`Gate::authorize`).
 | `sinkronisasi.manage` | ✓ | | | | | |
 | `audit.view` | ✓ | | | | | ✓ |
 
-Catatan: `pengguna.manage` sudah terdaftar sebagai permission (dimiliki
-Super Admin) tetapi **belum ada halaman admin untuk manajemen user**
-(tambah/nonaktifkan user, ubah role) pada versi ini — masih di luar scope
-Tier 1/2 prompt pengembangan. Untuk sementara, penambahan user baru atau
-perubahan role dilakukan lewat `php artisan tinker` (lihat bawah) atau
-menambah entri pada `DatabaseSeeder::AKUN_DEMO` lalu `migrate:fresh --seed`
-ulang di lingkungan non-produksi.
+## Manajemen Pengguna (`/admin/pengguna`, permission `pengguna.manage`)
 
-## Menambah/Mengubah User Secara Manual
+Halaman admin **Manajemen Pengguna & Hak Akses** (Bagian 5.2 & 6 prompt
+pengembangan) menyediakan CRUD `ref_pic` + `hak_akses` + assign role dalam
+satu form, tanpa perlu `tinker`:
 
-Contoh membuat user baru dan menetapkan role lewat `php artisan tinker`:
+- **Tambah Pengguna** — mengisi nama, email, password, instansi (opsional),
+  role (spatie/laravel-permission — yang benar-benar menentukan permission
+  aplikasi), level akses legacy (`Admin`/`Editor`/`Viewer`, kolom
+  `hak_akses.level_akses` bawaan skema PSI), dan status aktif.
+- **Ubah Pengguna** — field sama, password dikosongkan jika tidak ingin
+  diganti.
+- **Tidak ada tombol hapus** secara sengaja: mencabut akses seorang
+  pengguna dilakukan dengan **menonaktifkan** (uncheck "Akun aktif"), bukan
+  menghapus user/PIC — karena banyak tabel lain mereferensikan `pic_id`
+  sebagai histori (audit_log, kunjungan lapangan, dsb) yang harus tetap utuh.
+  Middleware `akun.aktif` (`app/Http/Middleware/CekHakAksesAktif.php`,
+  didaftarkan pada seluruh route `/admin/*`) memeriksa `hak_akses.is_active`
+  pada setiap request; jika PIC yang login memiliki hak_akses dan semuanya
+  non-aktif, sesi langsung di-logout dan mendapat HTTP 403 "Akun Anda telah
+  dinonaktifkan. Hubungi administrator." — coba sendiri dengan akun contoh
+  `nonaktif@bappenas.go.id` pada tabel di atas.
+- Super Admin **tidak bisa menonaktifkan akunnya sendiri** (guard di
+  `PenggunaController::update()`) untuk mencegah terkunci total dari sistem.
+
+Bila butuh cara terprogram (mis. bulk-import user), pola yang sama berlaku
+lewat `php artisan tinker`:
 
 ```php
-$pic = \App\Models\RefPic::create([
-    'nama_pic' => 'Nama Pengguna',
-    'email' => 'user.baru@bappenas.go.id',
-]);
-
+$pic = \App\Models\RefPic::create(['nama_pic' => 'Nama Pengguna', 'email' => 'user.baru@bappenas.go.id']);
 $user = \App\Models\User::create([
-    'name' => 'Nama Pengguna',
-    'email' => 'user.baru@bappenas.go.id',
+    'name' => 'Nama Pengguna', 'email' => 'user.baru@bappenas.go.id',
     'password' => \Illuminate\Support\Facades\Hash::make('GANTI_PASSWORD_INI'),
     'pic_id' => $pic->id,
 ]);
-
-$user->assignRole('Admin Pengendalian'); // atau role lain sesuai RoleSeeder
+$user->assignRole('Admin Pengendalian'); // role sesuai RoleSeeder
+\App\Models\HakAkses::create(['pic_id' => $pic->id, 'level_akses' => 'Editor', 'is_active' => true]);
 ```
 
 Untuk role **K/L Pelaksana**, tautkan `ref_pic.instansi_id` ke `ref_instansi`

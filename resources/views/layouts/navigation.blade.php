@@ -38,6 +38,11 @@
                             {{ __('Dokumen') }}
                         </x-nav-link>
                     @endcan
+                    @can('pengguna.manage')
+                        <x-nav-link :href="route('admin.pengguna.index')" :active="request()->routeIs('admin.pengguna.*')">
+                            {{ __('Pengguna') }}
+                        </x-nav-link>
+                    @endcan
                     @can('audit.view')
                         <x-nav-link :href="route('admin.audit-log')" :active="request()->routeIs('admin.audit-log')">
                             {{ __('Audit Log') }}
@@ -132,6 +137,11 @@
             @can('pengendalian.manage')
                 <x-responsive-nav-link :href="route('admin.dokumen')" :active="request()->routeIs('admin.dokumen')">
                     {{ __('Dokumen') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('pengguna.manage')
+                <x-responsive-nav-link :href="route('admin.pengguna.index')" :active="request()->routeIs('admin.pengguna.*')">
+                    {{ __('Pengguna') }}
                 </x-responsive-nav-link>
             @endcan
             @can('audit.view')

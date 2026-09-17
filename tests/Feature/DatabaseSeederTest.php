@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\HakAkses;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -22,6 +23,7 @@ class DatabaseSeederTest extends TestCase
             'verifikator@bappenas.go.id' => 'Verifikator Lapangan',
             'kl.pelaksana@bappenas.go.id' => 'K/L Pelaksana',
             'viewer@bappenas.go.id' => 'Viewer Internal',
+            'nonaktif@bappenas.go.id' => 'Viewer Internal',
         ];
 
         foreach ($peta as $email => $role) {
@@ -30,12 +32,16 @@ class DatabaseSeederTest extends TestCase
             $this->assertTrue($user->hasRole($role), "User {$email} harus punya role {$role}");
         }
 
-        $this->assertSame(6, User::count());
+        $this->assertSame(7, User::count());
 
         // Password default semua akun demo harus "password" agar bisa langsung login.
         $this->assertTrue(auth()->attempt(['email' => 'admin@bappenas.go.id', 'password' => 'password']));
 
         $klPelaksana = User::where('email', 'kl.pelaksana@bappenas.go.id')->first();
         $this->assertSame('Menteri Pekerjaan Umum', $klPelaksana->pic->instansi->nama_instansi);
+
+        // Akun contoh nonaktif harus punya hak_akses.is_active = false (demo middleware akun.aktif).
+        $nonaktif = User::where('email', 'nonaktif@bappenas.go.id')->first();
+        $this->assertFalse(HakAkses::where('pic_id', $nonaktif->pic_id)->first()->is_active);
     }
 }
