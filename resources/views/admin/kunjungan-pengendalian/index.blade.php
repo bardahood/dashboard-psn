@@ -7,10 +7,15 @@
                     <span class="text-sm font-normal text-gray-500">— {{ \Illuminate\Support\Str::limit($psnTerpilih->nama_psn, 50) }}</span>
                 @endif
             </h2>
-            <a href="{{ route('admin.kunjungan-pengendalian.create', $psnTerpilih ? ['psn_id' => $psnTerpilih->id] : []) }}"
-               class="rounded-md bg-blue-800 text-white px-4 py-2 text-sm hover:bg-blue-700">
-                + Kunjungan Baru
-            </a>
+            <div class="flex items-center gap-4">
+                <a href="{{ route('admin.debottlenecking') }}" class="text-sm text-blue-800 hover:underline">
+                    Ringkasan Debottlenecking &rarr;
+                </a>
+                <a href="{{ route('admin.kunjungan-pengendalian.create', $psnTerpilih ? ['psn_id' => $psnTerpilih->id] : []) }}"
+                   class="rounded-md bg-blue-800 text-white px-4 py-2 text-sm hover:bg-blue-700">
+                    + Kunjungan Baru
+                </a>
+            </div>
         </div>
     </x-slot>
 

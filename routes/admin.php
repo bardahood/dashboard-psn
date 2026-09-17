@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DebottleneckingController;
 use App\Http\Controllers\Admin\DokumenController;
 use App\Http\Controllers\Admin\EvaluasiKeluarController;
 use App\Http\Controllers\Admin\KunjunganPengendalianController;
@@ -34,6 +35,8 @@ Route::middleware(['auth', 'akun.aktif'])->prefix('admin')->name('admin.')->grou
         Route::get('/create', [KunjunganPengendalianController::class, 'create'])->name('create');
         Route::get('/{kunjungan}/edit', [KunjunganPengendalianController::class, 'edit'])->name('edit');
     });
+
+    Route::middleware('permission:pengendalian.manage')->get('/debottlenecking', [DebottleneckingController::class, 'index'])->name('debottlenecking');
 
     Route::middleware('permission:perencanaan.manage')->prefix('kunjungan-perencanaan')->name('kunjungan-perencanaan.')->group(function () {
         Route::get('/', [KunjunganPerencanaanController::class, 'index'])->name('index');

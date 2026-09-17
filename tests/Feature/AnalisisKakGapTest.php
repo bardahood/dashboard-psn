@@ -2,11 +2,16 @@
 
 namespace Tests\Feature;
 
+use App\Models\KebutuhanRegulasi;
+use App\Models\KunjunganPengendalian;
+use App\Models\KunjunganPengendalianRegulasi;
 use App\Models\KunjunganPerencanaan;
 use App\Models\Psn;
 use App\Models\PsnEvaluasiStatus;
 use App\Models\RefDokumenTeknis;
 use App\Models\RefKlaster;
+use App\Models\RisikoPsn;
+use App\Models\RisikoStatusPeriode;
 use App\Models\User;
 use Database\Seeders\RefDokumenTeknisSeeder;
 use Database\Seeders\RoleSeeder;
@@ -162,5 +167,71 @@ class AnalisisKakGapTest extends TestCase
 
         $response->assertOk();
         $response->assertHeader('content-type', 'application/pdf');
+    }
+
+    // GAP #3: Ringkasan Debottlenecking per Klaster
+
+    public function test_halaman_debottlenecking_menyatukan_risiko_regulasi_dan_isu_lintas_psn(): void
+    {
+        $this->actingAsSuperAdmin();
+
+        $konektivitas = RefKlaster::create(['nama_klaster' => 'Konektivitas dan Infrastruktur Logistik Jalan']);
+        $pangan = RefKlaster::create(['nama_klaster' => 'Swasembada Pangan']);
+
+        $psnA = Psn::create(['nama_psn' => 'Jalan Tol A', 'klaster_id' => $konektivitas->id]);
+        $psnB = Psn::create(['nama_psn' => 'Bendungan B', 'klaster_id' => $pangan->id]);
+
+        $risikoA = RisikoPsn::create([
+            'psn_id' => $psnA->id, 'peristiwa_risiko' => 'Keterlambatan pembebasan lahan',
+            'level_risiko_awal' => 'Tinggi', 'perlakuan_rencana' => 'Percepatan appraisal lahan',
+        ]);
+        RisikoStatusPeriode::create([
+            'risiko_id' => $risikoA->id, 'tahun' => 2026, 'triwulan' => 2,
+            'risiko_residual_aktual' => 'Sedang', 'status_perlakuan' => 'On Progress',
+        ]);
+        RisikoPsn::create([
+            'psn_id' => $psnB->id, 'peristiwa_risiko' => 'Risiko gagal panen', 'level_risiko_awal' => 'Rendah',
+        ]);
+
+        $regulasiA = KebutuhanRegulasi::create([
+            'psn_id' => $psnA->id, 'nama_regulasi' => 'Perpres Penetapan Lokasi', 'target_tahun_penyelesaian' => 2024,
+        ]);
+        $kunjunganA = KunjunganPengendalian::create(['psn_id' => $psnA->id, 'tanggal_kunjungan' => '2026-01-10']);
+        KunjunganPengendalianRegulasi::create([
+            'kunjungan_id' => $kunjunganA->id, 'regulasi_id' => $regulasiA->id, 'status_klaim' => 'Proses',
+        ]);
+
+        KunjunganPengendalian::create([
+            'psn_id' => $psnA->id, 'tanggal_kunjungan' => '2026-02-15',
+            'isu_tantangan' => 'Kontraktor utama mengalami kendala arus kas.',
+            'kebutuhan_tindak_lanjut' => 'Fasilitasi pertemuan dengan bank penyalur.',
+            'status_pengendalian' => 'Perlu Perhatian',
+        ]);
+
+        // Tanpa filter: semua klaster tampil.
+        $response = $this->get('/admin/debottlenecking');
+        $response->assertOk();
+        $response->assertSee('Jalan Tol A');
+        $response->assertSee('Keterlambatan pembebasan lahan');
+        $response->assertSee('Perpres Penetapan Lokasi');
+        $response->assertSee('Terlambat');
+        $response->assertSee('Kontraktor utama mengalami kendala arus kas.');
+        $response->assertSee('Bendungan B');
+
+        // Difilter ke klaster Konektivitas saja: Bendungan B (Swasembada Pangan) tidak boleh muncul.
+        $response = $this->get('/admin/debottlenecking?klaster_id[]='.$konektivitas->id);
+        $response->assertOk();
+        $response->assertSee('Jalan Tol A');
+        $response->assertDontSee('Bendungan B');
+    }
+
+    public function test_verifikator_lapangan_tidak_punya_akses_debottlenecking(): void
+    {
+        $this->seed(RoleSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole('K/L Pelaksana');
+        $this->actingAs($user);
+
+        $this->get('/admin/debottlenecking')->assertForbidden();
     }
 }
