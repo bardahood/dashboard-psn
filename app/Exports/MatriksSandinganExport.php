@@ -14,9 +14,19 @@ use Maatwebsite\Excel\Concerns\WithMapping;
  */
 class MatriksSandinganExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping
 {
+    /**
+     * @param  array<int, string>|null  $namaKlaster  GAP #10: filter "klaster fokus periode
+     *                                                 laporan", null = semua klaster.
+     */
+    public function __construct(private ?array $namaKlaster = null)
+    {
+    }
+
     public function query()
     {
-        return DB::table('v_psn_sandingan_sumber')->orderBy('nama_psn');
+        return DB::table('v_psn_sandingan_sumber')
+            ->when($this->namaKlaster, fn ($q) => $q->whereIn('nama_klaster', $this->namaKlaster))
+            ->orderBy('nama_psn');
     }
 
     public function headings(): array

@@ -19,7 +19,12 @@
 </head>
 <body>
     <h1>Laporan Ringkasan Proyek Strategis Nasional</h1>
-    <p class="subtitle">Tim Koordinasi Perencanaan dan Pengendalian PSN, Kementerian PPN/Bappenas &mdash; per {{ $tanggal }}</p>
+    <p class="subtitle">
+        Tim Koordinasi Perencanaan dan Pengendalian PSN, Kementerian PPN/Bappenas &mdash; per {{ $tanggal }}
+        @if ($klaster_fokus)
+            <br><strong>Fokus Klaster:</strong> {{ implode(', ', $klaster_fokus) }}
+        @endif
+    </p>
 
     <table class="kpi-table">
         <tr>

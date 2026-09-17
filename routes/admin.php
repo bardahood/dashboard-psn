@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DokumenController;
+use App\Http\Controllers\Admin\EvaluasiKeluarController;
 use App\Http\Controllers\Admin\KunjunganPengendalianController;
 use App\Http\Controllers\Admin\KunjunganPerencanaanController;
 use App\Http\Controllers\Admin\LaporanController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\Admin\MatriksSandinganController;
 use App\Http\Controllers\Admin\PenggunaController;
 use App\Http\Controllers\Admin\PsnController;
 use App\Http\Controllers\Admin\SinkronisasiPsiController;
+use App\Http\Controllers\Admin\VerifikasiUsulanController;
 use App\Models\Psn;
 use Illuminate\Support\Facades\Route;
 
@@ -38,6 +40,10 @@ Route::middleware(['auth', 'akun.aktif'])->prefix('admin')->name('admin.')->grou
         Route::get('/create', [KunjunganPerencanaanController::class, 'create'])->name('create');
         Route::get('/{kunjungan}/edit', [KunjunganPerencanaanController::class, 'edit'])->name('edit');
     });
+
+    Route::middleware('permission:perencanaan.manage')->get('/verifikasi-usulan', [VerifikasiUsulanController::class, 'index'])->name('verifikasi-usulan');
+
+    Route::middleware('permission:profil.manage')->get('/evaluasi-keluar', [EvaluasiKeluarController::class, 'index'])->name('evaluasi-keluar');
 
     Route::middleware('permission:pengguna.manage')->prefix('pengguna')->name('pengguna.')->group(function () {
         Route::get('/', [PenggunaController::class, 'index'])->name('index');

@@ -44,6 +44,15 @@
     </div>
 
     <div>
+        <x-input-label for="kategori_usulan" value="Kategori Usulan" />
+        <select id="kategori_usulan" name="kategori_usulan" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+            <option value="">-- Belum Ditetapkan --</option>
+            <option value="Carryover" @selected(old('kategori_usulan', $psn?->kategori_usulan) == 'Carryover')>Carryover (PSN Berjalan)</option>
+            <option value="Usulan Baru" @selected(old('kategori_usulan', $psn?->kategori_usulan) == 'Usulan Baru')>Usulan Baru</option>
+        </select>
+    </div>
+
+    <div>
         <x-input-label for="tipe_hierarki" value="Tipe Hierarki" />
         <select id="tipe_hierarki" name="tipe_hierarki" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
             <option value="">-- Tidak Ditetapkan --</option>

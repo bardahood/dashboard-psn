@@ -89,7 +89,24 @@ Seeder (`database/seeders/`) mengisi seluruh data referensi dari Bagian 8 skema 
 - Detail lengkap kredensial & matriks permission ada di **[`AKSES.md`](AKSES.md)**
 - Test otomatis: `ManajemenPenggunaTest` (CRUD, guard self-deactivation, blokir middleware, gating permission) — total 64 test, seluruhnya hijau
 
-**Belum dikerjakan:** tidak ada sisa item Tier 1/Tier 2 dari Bagian 9 prompt. Seluruh Tier 3 (predictive analytics/AI forecasting, simulasi lanjutan) sengaja tidak dikerjakan sesuai batasan scope eksplisit pada prompt.
+**Selesai (hasil analisis kesesuaian dengan output KAK konsultansi):**
+
+Selain Bagian 9 prompt pengembangan, dilakukan juga analisis silang terhadap dokumen KAK (Kerangka Acuan Kerja) konsultansi Tim Koordinasi Perencanaan dan Pengendalian PSN untuk mencari kebutuhan yang implisit di KAK tapi belum tercermin di aplikasi. 4 gap prioritas-rendah/cepat berikut sudah ditutup (existing-first, tanpa tabel baru kecuali kolom kecil):
+
+- **Kategori Usulan (Carryover vs Usulan Baru)** — kolom `psn.kategori_usulan` (nullable, CHECK constraint) memenuhi KAK Bagian 3a ("Daftar PSN berjalan/carryover dan usulan baru"). Filter & kolom tampil di Data PSN admin dan Daftar PSN publik, badge di halaman detail publik.
+- **Rekomendasi Keluar dari Daftar PSN** (`/admin/evaluasi-keluar`, permission `profil.manage`) — memenuhi KAK Bagian 3c. Menyaring `psn_evaluasi_status` yang `masih_butuh_status_psn = false` beserta justifikasinya; mekanismenya sudah ada sejak awal (Evaluasi Status pada profil PSN), halaman ini hanya merekapnya lintas-PSN. Tertaut dari halaman Data PSN.
+- **Rekap Kelengkapan Administrasi & Verifikasi Usulan** (`/admin/verifikasi-usulan`, permission `perencanaan.manage`) — memenuhi KAK Bagian 3d. Merekap lintas seluruh Instrumen Kunjungan Perencanaan: jumlah dokumen Lengkap/Sebagian/Tidak Ada (dari 9 dokumen tetap), status gate Kriteria Utama, skor keseluruhan, dan rekomendasi otomatis. Tertaut dari halaman Kunjungan Perencanaan.
+- **Filter "Fokus Klaster" pada Reporting** — KAK menyoroti klaster berbeda per periode laporan (mis. Laporan Awal: Energi & Pangan; Interim: Konektivitas/Hilirisasi/SDA). Ketiga unduhan di `/admin/laporan` (Ringkasan PDF, Matriks Sandingan Excel, Daftar PSN Excel) kini menerima filter klaster opsional lewat checkbox, tanpa perlu konsep "periode laporan" tersimpan di database.
+- Test otomatis: `AnalisisKakGapTest` (kategori usulan + filter, evaluasi keluar + gating, rekap verifikasi usulan, filter klaster pada reporting) — total 72 test, seluruhnya hijau.
+
+**Belum dikerjakan / perlu klarifikasi lebih lanjut sebelum dikerjakan** (sisa hasil analisis KAK, lihat riwayat percakapan untuk detail lengkap tiap poin):
+- Instrumen penilaian manfaat PSN terhadap Trisula Pembangunan (KAK 1a/2a/5f) — saat ini `trisula_kontribusi_psn` hanya pencatatan data, bukan instrumen skoring seperti Kunjungan Perencanaan/Pengendalian
+- Ringkasan Debottlenecking per klaster (KAK 2b/2c) — data sudah ada (risiko, regulasi, isu, tindak lanjut) tapi tersebar, belum ada menu agregasi
+- Pemisahan format Laporan Presiden vs Laporan Semester (KAK 4b) — butuh contoh/template resmi sebelum dibuat dua versi terpisah
+- Konsep "status keberlanjutan PSN" pasca-konstruksi (KAK 5b) — perlu klarifikasi definisi, apakah beda dari `status_psn_id` (lifecycle) yang sudah ada
+- Penanda "sampel penilaian trisula tahun ini" (KAK 5f) dan versioning instrumen kriteria (KAK 5g) — prioritas rendah, ditunda
+
+**Tidak dikerjakan (di luar scope aplikasi):** rencana kerja/timeline konsultan, evaluasi kinerja dukungan konsultan — ini deliverable administratif proses konsultansi, bukan fitur dashboard.
 
 **Catatan lingkungan pengembangan:** Chart.js dan Leaflet.js dimuat lewat CDN (`cdn.jsdelivr.net`) — pada sandbox pengembangan ini akses keluar ke CDN tsb diblokir sehingga chart/peta tidak bisa diverifikasi tampil secara visual di sini, namun payload data JSON yang dikirim ke browser (`markers`, dataset chart) sudah diverifikasi benar; pada lingkungan produksi dengan akses internet normal, chart & peta akan tampil seperti biasa.
 

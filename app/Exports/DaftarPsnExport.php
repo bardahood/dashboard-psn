@@ -14,9 +14,20 @@ use Maatwebsite\Excel\Concerns\WithMapping;
  */
 class DaftarPsnExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping
 {
+    /**
+     * @param  array<int, string>|null  $namaKlaster  GAP #10: filter "klaster fokus periode
+     *                                                 laporan" (mis. hanya Energi & Pangan sesuai
+     *                                                 fokus Laporan Awal KAK), null = semua klaster.
+     */
+    public function __construct(private ?array $namaKlaster = null)
+    {
+    }
+
     public function query()
     {
-        return DB::table('v_psn_profil_lengkap')->orderBy('nama_psn');
+        return DB::table('v_psn_profil_lengkap')
+            ->when($this->namaKlaster, fn ($q) => $q->whereIn('nama_klaster', $this->namaKlaster))
+            ->orderBy('nama_psn');
     }
 
     public function headings(): array

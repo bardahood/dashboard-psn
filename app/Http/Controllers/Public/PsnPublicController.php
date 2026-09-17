@@ -20,7 +20,7 @@ class PsnPublicController extends Controller
     public function index(Request $request)
     {
         $query = Psn::query()
-            ->select('id', 'nama_psn', 'klaster_id', 'provinsi_id', 'status_psn_id', 'tahun_penyelesaian', 'output_akhir')
+            ->select('id', 'nama_psn', 'klaster_id', 'provinsi_id', 'status_psn_id', 'kategori_usulan', 'tahun_penyelesaian', 'output_akhir')
             ->with(['klaster', 'provinsi', 'statusPsn']);
 
         if ($request->filled('klaster_id')) {
@@ -34,6 +34,9 @@ class PsnPublicController extends Controller
         }
         if ($request->filled('instansi_id')) {
             $query->whereHas('penanggungJawab', fn ($q) => $q->where('instansi_id', $request->integer('instansi_id')));
+        }
+        if ($request->filled('kategori_usulan')) {
+            $query->where('kategori_usulan', $request->string('kategori_usulan'));
         }
         if ($request->filled('q')) {
             $query->whereFullText('nama_psn', $request->string('q'));

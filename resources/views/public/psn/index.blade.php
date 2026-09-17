@@ -25,14 +25,19 @@
                 <option value="{{ $s->id }}" @selected(request('status_psn_id') == $s->id)>{{ $s->nama_status }}</option>
             @endforeach
         </select>
-        <select name="instansi_id" class="col-span-1 sm:col-span-3 rounded-md border-gray-300 text-sm">
+        <select name="instansi_id" class="col-span-1 sm:col-span-2 rounded-md border-gray-300 text-sm">
             <option value="">Semua K/L Penanggung Jawab</option>
             @foreach ($instansi as $i)
                 <option value="{{ $i->id }}" @selected(request('instansi_id') == $i->id)>{{ $i->nama_instansi }}</option>
             @endforeach
         </select>
+        <select name="kategori_usulan" class="rounded-md border-gray-300 text-sm">
+            <option value="">Semua Kategori Usulan</option>
+            <option value="Carryover" @selected(request('kategori_usulan') === 'Carryover')>Carryover (PSN Berjalan)</option>
+            <option value="Usulan Baru" @selected(request('kategori_usulan') === 'Usulan Baru')>Usulan Baru</option>
+        </select>
         <button class="rounded-md bg-blue-800 text-white text-sm font-medium py-2 hover:bg-blue-700">Filter</button>
-        @if (request()->anyFilled(['q', 'klaster_id', 'provinsi_id', 'status_psn_id', 'instansi_id']))
+        @if (request()->anyFilled(['q', 'klaster_id', 'provinsi_id', 'status_psn_id', 'instansi_id', 'kategori_usulan']))
             <a href="{{ route('psn.index') }}" class="text-sm text-gray-500 self-center hover:underline">Reset filter</a>
         @endif
     </form>
@@ -45,6 +50,7 @@
                     <th class="px-4 py-3">Klaster</th>
                     <th class="px-4 py-3">Provinsi</th>
                     <th class="px-4 py-3">Status</th>
+                    <th class="px-4 py-3">Kategori Usulan</th>
                     <th class="px-4 py-3">Target Selesai</th>
                 </tr>
             </thead>
@@ -59,10 +65,11 @@
                         <td class="px-4 py-3">{{ $psn->klaster?->nama_klaster ?? '-' }}</td>
                         <td class="px-4 py-3">{{ $psn->provinsi?->nama_provinsi ?? '-' }}</td>
                         <td class="px-4 py-3">{{ $psn->statusPsn?->nama_status ?? '-' }}</td>
+                        <td class="px-4 py-3">{{ $psn->kategori_usulan ?? '-' }}</td>
                         <td class="px-4 py-3">{{ $psn->tahun_penyelesaian ?? '-' }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="px-4 py-6 text-center text-gray-400">Belum ada data PSN.</td></tr>
+                    <tr><td colspan="6" class="px-4 py-6 text-center text-gray-400">Belum ada data PSN.</td></tr>
                 @endforelse
             </tbody>
         </table>

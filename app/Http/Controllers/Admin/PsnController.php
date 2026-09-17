@@ -25,6 +25,9 @@ class PsnController extends Controller
         if ($request->filled('status_psn_id')) {
             $query->where('status_psn_id', $request->integer('status_psn_id'));
         }
+        if ($request->filled('kategori_usulan')) {
+            $query->where('kategori_usulan', $request->string('kategori_usulan'));
+        }
         if ($request->filled('q')) {
             $query->whereFullText('nama_psn', $request->string('q'));
         }
@@ -114,6 +117,7 @@ class PsnController extends Controller
             'klaster_id' => ['nullable', 'exists:ref_klaster,id'],
             'provinsi_id' => ['nullable', 'exists:ref_provinsi,id'],
             'status_psn_id' => ['nullable', 'exists:ref_status_psn,id'],
+            'kategori_usulan' => ['nullable', 'in:Carryover,Usulan Baru'],
             'tipe_hierarki' => ['nullable', 'in:PKPN,PSN'],
             'kabupaten_kota' => ['nullable', 'string', 'max:150'],
             'kode_rkp' => ['nullable', 'string', 'max:30'],

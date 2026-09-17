@@ -2,9 +2,14 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Kunjungan Lapangan: Perencanaan</h2>
-            <a href="{{ route('admin.kunjungan-perencanaan.create') }}" class="rounded-md bg-blue-800 text-white px-4 py-2 text-sm hover:bg-blue-700">
-                + Kunjungan Baru
-            </a>
+            <div class="flex items-center gap-4">
+                <a href="{{ route('admin.verifikasi-usulan') }}" class="text-sm text-blue-800 hover:underline">
+                    Rekap Kelengkapan &amp; Verifikasi &rarr;
+                </a>
+                <a href="{{ route('admin.kunjungan-perencanaan.create') }}" class="rounded-md bg-blue-800 text-white px-4 py-2 text-sm hover:bg-blue-700">
+                    + Kunjungan Baru
+                </a>
+            </div>
         </div>
     </x-slot>
 

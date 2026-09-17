@@ -16,6 +16,9 @@
             @if ($profil->tipe_hierarki)
                 <span class="rounded-full bg-gray-100 text-gray-700 px-3 py-1">{{ $profil->tipe_hierarki }}</span>
             @endif
+            @if ($profil->kategori_usulan)
+                <span class="rounded-full bg-purple-100 text-purple-700 px-3 py-1">{{ $profil->kategori_usulan }}</span>
+            @endif
         </div>
 
         <dl class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">

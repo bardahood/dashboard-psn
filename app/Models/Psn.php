@@ -29,6 +29,7 @@ class Psn extends Model
         'klaster_id',
         'provinsi_id',
         'status_psn_id',
+        'kategori_usulan',
         'tipe_hierarki',
         'kabupaten_kota',
         'kode_rkp',
