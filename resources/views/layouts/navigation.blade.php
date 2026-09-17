@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false }" class="bg-white border-b border-gray-100 border-t-4 border-t-gold-500">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                        <x-application-logo class="block h-9 w-auto" />
                     </a>
                 </div>
 
@@ -58,9 +58,6 @@
                             {{ __('Reporting') }}
                         </x-nav-link>
                     @endcan
-                    <x-nav-link :href="route('beranda')" :active="false">
-                        {{ __('Lihat Situs Publik') }}
-                    </x-nav-link>
                 </div>
             </div>
 
@@ -82,6 +79,10 @@
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
+                        </x-dropdown-link>
+
+                        <x-dropdown-link :href="route('beranda')">
+                            {{ __('Lihat Situs Publik') }}
                         </x-dropdown-link>
 
                         <!-- Authentication -->
@@ -171,6 +172,10 @@
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('beranda')">
+                    {{ __('Lihat Situs Publik') }}
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->

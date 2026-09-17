@@ -10,7 +10,10 @@
     <header class="bg-blue-900 text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             <a href="{{ route('beranda') }}" class="flex items-center gap-3">
-                <span class="font-bold text-lg leading-tight">Dashboard PSN<br><span class="text-xs font-normal text-blue-200">Kementerian PPN/Bappenas</span></span>
+                <span class="bg-white rounded px-2 py-1.5 shadow-sm shrink-0">
+                    <x-application-logo class="h-7 w-auto" />
+                </span>
+                <span class="font-bold text-lg leading-tight">Dashboard PSN<br><span class="text-xs font-normal text-blue-200">Tim Koordinasi Perencanaan &amp; Pengendalian PSN</span></span>
             </a>
             <nav class="hidden sm:flex items-center gap-6 text-sm font-medium">
                 <a href="{{ route('beranda') }}" class="hover:text-blue-200 {{ request()->routeIs('beranda') ? 'text-blue-200' : '' }}">Beranda</a>

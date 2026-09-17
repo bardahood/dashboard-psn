@@ -6,6 +6,14 @@ Dashboard Proyek Strategis Nasional untuk Tim Koordinasi Perencanaan dan Pengend
 
 Laravel 11 (PHP 8.2+) · Blade + Tailwind + Alpine (via Breeze) · MySQL 8.0+/MariaDB 10.6+ · spatie/laravel-permission · Livewire · maatwebsite/excel · barryvdh/laravel-dompdf · Chart.js.
 
+## Tema & Branding
+
+Logo dan palet warna aplikasi (publik & admin) mengikuti identitas visual **Kementerian PPN/Bappenas**, diambil dari materi resmi yang dilampirkan pada prompt pengembangan (`Update_Project_Profile_Final_Rapat_9_Sept.pptx`):
+
+- Logo (`public/images/logo-bappenas.png`) menggantikan logo Laravel bawaan Breeze di `resources/views/components/application-logo.blade.php` — dipakai di halaman login/register (`layouts/guest.blade.php`), nav admin (`layouts/navigation.blade.php`), dan header situs publik (`layouts/public.blade.php`, ditaruh di atas chip putih agar kontras dengan header navy).
+- Skala warna `blue` bawaan Tailwind di-override di `tailwind.config.js` dengan navy resmi logo (`#346698` sebagai `blue-600`), sehingga seluruh kelas `bg-blue-*`/`text-blue-*` yang sudah dipakai di ~48 file Blade otomatis mengikuti warna korporat tanpa perlu diedit satu per satu. Ditambahkan pula skala `gold` (`#ca9934`, elemen emas pada logo) untuk aksen terbatas: garis atas nav admin dan status tab aktif (menggantikan `indigo` bawaan Breeze).
+- Setelah mengubah `tailwind.config.js`, jalankan `npm run build` (atau `npm run dev` saat development) agar CSS terkompilasi ulang.
+
 ## Instalasi
 
 ```bash
