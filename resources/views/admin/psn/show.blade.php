@@ -34,6 +34,13 @@
                     <div><dt class="text-gray-500">Kontraktor</dt><dd>{{ $psn->kontraktorInstansi?->nama_instansi ?? '-' }}</dd></div>
                     <div><dt class="text-gray-500">Supervisi</dt><dd>{{ $psn->supervisiInstansi?->nama_instansi ?? '-' }}</dd></div>
                 </dl>
+
+                @if ($psn->diagram_kelembagaan_path)
+                    <div class="mt-6 border-t pt-4">
+                        <dt class="text-gray-500 text-sm mb-2">Visualisasi Kerangka Kelembagaan</dt>
+                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($psn->diagram_kelembagaan_path) }}" alt="Diagram Kerangka Kelembagaan {{ $psn->nama_psn }}" class="max-w-full rounded border">
+                    </div>
+                @endif
             </div>
 
             <div class="bg-white shadow rounded-lg p-6">

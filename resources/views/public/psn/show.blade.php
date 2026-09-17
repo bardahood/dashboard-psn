@@ -51,6 +51,13 @@
                 <dd class="mt-0.5">{{ $profil->pengelola ?? '-' }}</dd>
             </div>
         </dl>
+
+        @if ($profil->diagram_kelembagaan_path)
+            <div class="mt-6 border-t pt-4">
+                <dt class="text-gray-500 text-sm mb-2">Visualisasi Kerangka Kelembagaan</dt>
+                <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($profil->diagram_kelembagaan_path) }}" alt="Diagram Kerangka Kelembagaan {{ $profil->nama_psn }}" class="max-w-full rounded border">
+            </div>
+        @endif
     </div>
 
     @if ($indikator->isNotEmpty())

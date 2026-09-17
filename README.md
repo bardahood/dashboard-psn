@@ -108,6 +108,24 @@ Selain Bagian 9 prompt pengembangan, dilakukan juga analisis silang terhadap dok
 
 **Tidak dikerjakan (di luar scope aplikasi):** rencana kerja/timeline konsultan, evaluasi kinerja dukungan konsultan — ini deliverable administratif proses konsultansi, bukan fitur dashboard.
 
+## Kesesuaian dengan Pedoman Project Profile PSN
+
+Dilakukan analisis silang terhadap dokumen resmi **Pedoman Project Profile PSN** (dilampirkan terpisah dari KAK) untuk memastikan struktur pengisian data selaras dengan tata cara pengisian Project Profile yang berlaku. Sebagian besar komponen pedoman (Struktur Kerangka Kerja Logis via `kode_rkp`, Status PSN 6 tahap, Stakeholder Mapping & Kerangka Kelembagaan 4-level via `stakeholder_psn.level_kelembagaan`, Lokasi per-RO via `ro_proyek.lokasi`, Indikasi Sumber Pendanaan per periode via `ro_target_periode.indikasi_sumber_pendanaan` — 5 kategori sesuai Permen PPN 4/2025 Pasal 18, target Trisula tahunan **dan** triwulanan via `trisula_target_periode`) **sudah tercermin persis di skema sejak awal** — cek ini menemukan skema jauh lebih matang dari dugaan awal.
+
+Field yang benar-benar hilang dan sudah ditambahkan (existing-first, memperluas tabel yang ada):
+
+- **PJ Risiko & tenggat perlakuan** — `risiko_psn` sebelumnya tidak punya penanggung jawab maupun target mulai/selesai perlakuan risiko, padahal pedoman mensyaratkan keduanya pada Profil Risiko. Ditambahkan `penanggung_jawab_id` (FK `ref_pic`), `target_mulai`, `target_selesai`.
+- **Critical Path berbasis Risiko** — pedoman meminta risiko dikelompokkan ke Proyek/RO tertentu dan ditandai titik kritis; `risiko_psn` sebelumnya tidak tertaut ke `ro_proyek` sama sekali. Ditambahkan `ro_id` (FK `ro_proyek`), `is_titik_kritis`, `tahun_pelaksanaan_perlakuan` — ditampilkan juga di Ringkasan Debottlenecking (GAP #3 di atas).
+- **Sub-Kategori Indeks Modal Manusia** — pedoman mensyaratkan pemilihan kategori Pendidikan atau Kesehatan sebelum indikator bebas teks diisi untuk Trisula SDM. Ditambahkan `trisula_kontribusi_psn.sub_kategori_sdm` (CHECK IN Pendidikan/Kesehatan).
+- **Label kategori Trisula** diperjelas mengikuti nomenklatur resmi pedoman (Pertumbuhan Ekonomi Berkualitas, Penurunan Kemiskinan dan Ketimpangan, Peningkatan Kualitas SDM) — nilai kolom tetap kode singkat lama agar tidak mengubah data existing, hanya label UI yang diperkaya.
+- **Visualisasi Kerangka Kelembagaan** — diagram skematik hubungan antar pihak yang secara eksplisit disyaratkan pedoman, sebelumnya tidak punya tempat penyimpanan sama sekali. Ditambahkan `psn.diagram_kelembagaan_path` + upload gambar di form Data PSN (admin), ditampilkan di halaman detail admin & publik.
+- Test otomatis: `PedomanProjectProfileTest` (PJ & tenggat risiko, Critical Path, sub-kategori IMM, upload/hapus/tolak-non-gambar diagram kelembagaan) — total 79 test, seluruhnya hijau.
+
+**Perlu klarifikasi lebih lanjut sebelum dikerjakan** (sisa hasil analisis pedoman ini):
+- "Target fisik" vs "target persentase" pada RO/Proyek — pedoman minta dua jenis target eksplisit, `ro_target_periode` saat ini hanya punya satu kolom `target` generik (bisa diisi salah satu, persentase biasanya dihitung manual dari situ)
+- Diagram Kerangka Kerja Logis (cascading PN→PP→KP→Proyek/RO) — belum ada representasi terstruktur, hanya `psn.kode_rkp` sebagai kode acuan
+- Pedoman Work Breakdown Structure (5 pendekatan: Linear/Spasial, Deliverable, Trade/EPC, Phased, Geographical) — ini panduan penamaan RO yang sudah bisa diterapkan lewat field teks bebas yang ada, belum ada tooltip/rujukan pedoman di form RO/Proyek
+
 **Catatan lingkungan pengembangan:** Chart.js dan Leaflet.js dimuat lewat CDN (`cdn.jsdelivr.net`) — pada sandbox pengembangan ini akses keluar ke CDN tsb diblokir sehingga chart/peta tidak bisa diverifikasi tampil secara visual di sini, namun payload data JSON yang dikirim ke browser (`markers`, dataset chart) sudah diverifikasi benar; pada lingkungan produksi dengan akses internet normal, chart & peta akan tampil seperti biasa.
 
 **Catatan integrasi Breeze + Livewire:** `resources/js/app.js` sengaja **tidak** meng-import/menjalankan Alpine.js sendiri karena Livewire 3 (`@livewireScripts`) sudah membundel dan menjalankan Alpine miliknya sendiri secara otomatis. Menjalankan dua instance Alpine sekaligus akan merusak sinkronisasi `wire:model` (gejala: form edit Livewire tidak ter-prefill, tapi tidak ada error yang terlihat) — jangan menambahkan `import Alpine from 'alpinejs'; Alpine.start();` kembali ke `app.js`.

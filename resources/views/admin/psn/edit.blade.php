@@ -12,7 +12,7 @@
                 <div class="mb-4 rounded-md bg-green-50 text-green-700 px-4 py-3 text-sm">{{ session('status') }}</div>
             @endif
 
-            <form method="POST" action="{{ route('admin.psn.update', $psn) }}" class="bg-white shadow rounded-lg p-6">
+            <form method="POST" action="{{ route('admin.psn.update', $psn) }}" enctype="multipart/form-data" class="bg-white shadow rounded-lg p-6">
                 @csrf
                 @method('PUT')
                 @include('admin.psn._form')

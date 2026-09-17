@@ -22,6 +22,7 @@ class Psn extends Model
         'nilai_investasi_apbn_rp',
         'nilai_investasi_non_apbn_rp',
         'asta_cita',
+        'diagram_kelembagaan_path',
         'pengusul_instansi_id',
         'pengelola_instansi_id',
         'kontraktor_instansi_id',

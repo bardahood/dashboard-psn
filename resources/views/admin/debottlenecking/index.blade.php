@@ -52,6 +52,7 @@
                                 <th class="px-4 py-3">Level Awal</th>
                                 <th class="px-4 py-3">Level Residual Terkini</th>
                                 <th class="px-4 py-3">Status Perlakuan Terkini</th>
+                                <th class="px-4 py-3">PJ &amp; Target</th>
                                 <th class="px-4 py-3">Rencana Perlakuan</th>
                             </tr>
                         </thead>
@@ -60,7 +61,15 @@
                                 <tr class="align-top hover:bg-gray-50">
                                     <td class="px-4 py-3">{{ \Illuminate\Support\Str::limit($r->psn?->nama_psn, 40) }}</td>
                                     <td class="px-4 py-3">{{ $r->psn?->klaster?->nama_klaster ?? '-' }}</td>
-                                    <td class="px-4 py-3 max-w-xs">{{ $r->peristiwa_risiko }}</td>
+                                    <td class="px-4 py-3 max-w-xs">
+                                        {{ $r->peristiwa_risiko }}
+                                        @if ($r->is_titik_kritis)
+                                            <span class="rounded-full text-xs px-2 py-1 bg-red-100 text-red-700 ml-1">Titik Kritis</span>
+                                        @endif
+                                        @if ($r->ro)
+                                            <div class="text-xs text-gray-400 mt-0.5">RO: {{ $r->ro->nama_ro }}</div>
+                                        @endif
+                                    </td>
                                     <td class="px-4 py-3">
                                         @if ($r->level_risiko_awal)
                                             <span class="rounded-full text-xs px-2 py-1 {{ $levelBadge($r->level_risiko_awal) }}">{{ $r->level_risiko_awal }}</span>
@@ -72,6 +81,12 @@
                                         @else <span class="text-gray-400">Belum dilaporkan</span> @endif
                                     </td>
                                     <td class="px-4 py-3">{{ $r->status_terkini?->status_perlakuan ?? '-' }}</td>
+                                    <td class="px-4 py-3 text-xs">
+                                        {{ $r->penanggungJawab?->nama_pic ?? '-' }}
+                                        @if ($r->target_mulai || $r->target_selesai)
+                                            <div class="text-gray-400">{{ $r->target_mulai?->format('d/m/y') ?? '-' }} &rarr; {{ $r->target_selesai?->format('d/m/y') ?? '-' }}</div>
+                                        @endif
+                                    </td>
                                     <td class="px-4 py-3 max-w-xs">{{ $r->perlakuan_rencana ?? '-' }}</td>
                                 </tr>
                             @empty

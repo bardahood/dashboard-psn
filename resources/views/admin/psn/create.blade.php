@@ -5,7 +5,7 @@
 
     <div class="py-8">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
-            <form method="POST" action="{{ route('admin.psn.store') }}" class="bg-white shadow rounded-lg p-6">
+            <form method="POST" action="{{ route('admin.psn.store') }}" enctype="multipart/form-data" class="bg-white shadow rounded-lg p-6">
                 @csrf
                 @include('admin.psn._form')
 

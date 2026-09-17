@@ -3,8 +3,10 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Psn;
+use App\Models\RefPic;
 use App\Models\RisikoPsn;
 use App\Models\RisikoStatusPeriode;
+use App\Models\RoProyek;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -48,6 +50,12 @@ class RisikoManager extends Component
             'level_risiko_awal' => null,
             'perlakuan_rencana' => null,
             'risiko_residual_harapan' => null,
+            'penanggung_jawab_id' => null,
+            'target_mulai' => null,
+            'target_selesai' => null,
+            'ro_id' => null,
+            'is_titik_kritis' => false,
+            'tahun_pelaksanaan_perlakuan' => null,
         ];
     }
 
@@ -55,7 +63,12 @@ class RisikoManager extends Component
     {
         $risiko = RisikoPsn::where('psn_id', $this->psn->id)->findOrFail($id);
         $this->editingId = $id;
-        $this->form = $risiko->only(['peristiwa_risiko', 'kategori_risiko', 'level_risiko_awal', 'perlakuan_rencana', 'risiko_residual_harapan']);
+        $this->form = $risiko->only([
+            'peristiwa_risiko', 'kategori_risiko', 'level_risiko_awal', 'perlakuan_rencana', 'risiko_residual_harapan',
+            'penanggung_jawab_id', 'target_mulai', 'target_selesai', 'ro_id', 'is_titik_kritis', 'tahun_pelaksanaan_perlakuan',
+        ]);
+        $this->form['target_mulai'] = $risiko->target_mulai?->format('Y-m-d');
+        $this->form['target_selesai'] = $risiko->target_selesai?->format('Y-m-d');
     }
 
     public function save(): void
@@ -129,7 +142,7 @@ class RisikoManager extends Component
 
     public function render()
     {
-        $risikoList = RisikoPsn::where('psn_id', $this->psn->id)->orderByDesc('id')->get();
+        $risikoList = RisikoPsn::where('psn_id', $this->psn->id)->with(['penanggungJawab', 'ro'])->orderByDesc('id')->get();
 
         $statusList = $this->expandedStatusRisikoId
             ? RisikoStatusPeriode::where('risiko_id', $this->expandedStatusRisikoId)->orderByDesc('tahun')->orderByDesc('triwulan')->get()
@@ -140,6 +153,8 @@ class RisikoManager extends Component
             'statusList' => $statusList,
             'levels' => self::LEVELS,
             'statusPerlakuanOptions' => self::STATUS_PERLAKUAN,
+            'picOptions' => RefPic::orderBy('nama_pic')->pluck('nama_pic', 'id'),
+            'roOptions' => RoProyek::where('psn_id', $this->psn->id)->orderBy('nama_ro')->pluck('nama_ro', 'id'),
         ]);
     }
 }

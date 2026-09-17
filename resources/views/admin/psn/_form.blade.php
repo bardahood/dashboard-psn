@@ -153,4 +153,22 @@
         <x-input-label for="asta_cita" value="Keterkaitan dengan Asta Cita" />
         <textarea id="asta_cita" name="asta_cita" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">{{ old('asta_cita', $psn?->asta_cita) }}</textarea>
     </div>
+
+    <div class="sm:col-span-2">
+        <x-input-label for="diagram_kelembagaan" value="Visualisasi Kerangka Kelembagaan" />
+        <p class="text-xs text-gray-400 mb-1">
+            Diagram skematik hubungan antar pihak (delegasi/pengarahan, akuntabilitas &amp; pelaporan, koordinasi &amp; kolaborasi) sesuai Pedoman Project Profile PSN. Format gambar, maks. 4MB.
+        </p>
+        @if ($psn?->diagram_kelembagaan_path)
+            <div class="mb-2 flex items-center gap-3">
+                <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($psn->diagram_kelembagaan_path) }}" alt="Kerangka Kelembagaan" class="h-24 w-auto rounded border">
+                <label class="inline-flex items-center gap-2 text-xs text-red-700">
+                    <input type="checkbox" name="hapus_diagram_kelembagaan" value="1" class="rounded border-gray-300">
+                    Hapus diagram ini
+                </label>
+            </div>
+        @endif
+        <input type="file" id="diagram_kelembagaan" name="diagram_kelembagaan" accept="image/*" class="block w-full text-sm">
+        <x-input-error :messages="$errors->get('diagram_kelembagaan')" class="mt-2" />
+    </div>
 </div>

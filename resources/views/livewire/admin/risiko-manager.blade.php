@@ -34,6 +34,42 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Perlakuan/Rencana Penyelesaian</label>
                 <textarea wire:model="form.perlakuan_rencana" rows="2" class="block w-full rounded-md border-gray-300 shadow-sm text-sm"></textarea>
             </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">PJ Risiko</label>
+                <select wire:model="form.penanggung_jawab_id" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                    <option value="">-- Pilih PIC --</option>
+                    @foreach ($picOptions as $id => $nama)
+                        <option value="{{ $id }}">{{ $nama }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Proyek/RO Terkait <span class="text-xs font-normal text-gray-400">(untuk Critical Path)</span></label>
+                <select wire:model="form.ro_id" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                    <option value="">-- Tidak terkait RO spesifik --</option>
+                    @foreach ($roOptions as $id => $nama)
+                        <option value="{{ $id }}">{{ $nama }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Target Mulai Perlakuan</label>
+                <input type="date" wire:model="form.target_mulai" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Target Selesai Perlakuan</label>
+                <input type="date" wire:model="form.target_selesai" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tahun Pelaksanaan Perlakuan</label>
+                <input type="number" wire:model="form.tahun_pelaksanaan_perlakuan" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+            </div>
+            <div class="flex items-end pb-1.5">
+                <label class="inline-flex items-center gap-2 text-sm">
+                    <input type="checkbox" wire:model="form.is_titik_kritis" class="rounded border-gray-300">
+                    Titik Kritis (Critical Path)
+                </label>
+            </div>
 
             <div class="sm:col-span-2 flex justify-end gap-3">
                 @if ($editingId)
@@ -51,14 +87,26 @@
             <div wire:key="risiko-{{ $risiko->id }}" class="bg-white shadow rounded-lg p-4">
                 <div class="flex items-start justify-between gap-4">
                     <div class="text-sm">
-                        <div class="font-medium text-gray-800">{{ $risiko->peristiwa_risiko }}</div>
-                        <div class="text-gray-500 text-xs mt-0.5 flex gap-2">
+                        <div class="font-medium text-gray-800">
+                            {{ $risiko->peristiwa_risiko }}
+                            @if ($risiko->is_titik_kritis)
+                                <span class="ml-1 text-xs rounded-full bg-red-100 text-red-700 px-2 py-0.5">Titik Kritis</span>
+                            @endif
+                        </div>
+                        <div class="text-gray-500 text-xs mt-0.5 flex flex-wrap gap-2">
                             @if ($risiko->kategori_risiko) <span>{{ $risiko->kategori_risiko }}</span> @endif
                             @if ($risiko->level_risiko_awal)
                                 <span class="rounded-full bg-amber-100 text-amber-700 px-2 py-0.5">{{ $risiko->level_risiko_awal }}</span>
                             @endif
                             @if ($risiko->risiko_residual_harapan)
                                 <span class="text-gray-400">Harapan residual: {{ $risiko->risiko_residual_harapan }}</span>
+                            @endif
+                            @if ($risiko->ro) <span class="text-gray-400">RO: {{ $risiko->ro->nama_ro }}</span> @endif
+                            @if ($risiko->penanggungJawab) <span class="text-gray-400">PJ: {{ $risiko->penanggungJawab->nama_pic }}</span> @endif
+                            @if ($risiko->target_mulai || $risiko->target_selesai)
+                                <span class="text-gray-400">
+                                    Target: {{ $risiko->target_mulai?->format('d/m/Y') ?? '-' }} &rarr; {{ $risiko->target_selesai?->format('d/m/Y') ?? '-' }}
+                                </span>
                             @endif
                         </div>
                     </div>

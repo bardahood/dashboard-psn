@@ -33,7 +33,7 @@ class DebottleneckingController extends Controller
         $klasterIds = array_filter((array) $request->input('klaster_id', []));
 
         $risiko = RisikoPsn::query()
-            ->with(['psn.klaster', 'statusPeriode'])
+            ->with(['psn.klaster', 'statusPeriode', 'penanggungJawab', 'ro'])
             ->whereHas('psn', fn ($q) => $klasterIds ? $q->whereIn('klaster_id', $klasterIds) : $q)
             ->get()
             ->map(function (RisikoPsn $r) {

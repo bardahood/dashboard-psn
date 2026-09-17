@@ -72,11 +72,17 @@ class AnnualTargetManager extends Component
                 'titleField' => 'nama_indikator',
                 'parentFields' => [
                     ['name' => 'kategori_trisula', 'label' => 'Kategori Trisula', 'type' => 'select', 'required' => true, 'options' => [
-                        'Kemiskinan' => 'Kemiskinan', 'Pertumbuhan Ekonomi' => 'Pertumbuhan Ekonomi', 'Sumber Daya Manusia' => 'Sumber Daya Manusia',
+                        'Pertumbuhan Ekonomi' => 'Pertumbuhan Ekonomi Berkualitas (Investasi)',
+                        'Kemiskinan' => 'Penurunan Kemiskinan dan Ketimpangan (Serapan Tenaga Kerja)',
+                        'Sumber Daya Manusia' => 'Peningkatan Kualitas Sumber Daya Manusia (Indeks Modal Manusia)',
+                    ]],
+                    ['name' => 'sub_kategori_sdm', 'label' => 'Sub-Kategori IMM (khusus kategori SDM)', 'type' => 'select', 'options' => [
+                        'Pendidikan' => 'Pendidikan (Harapan Lama Sekolah usia 4-18)',
+                        'Kesehatan' => 'Kesehatan (Adult Survival Rate/Prevalensi Stunting)',
                     ]],
                     ['name' => 'nama_indikator', 'label' => 'Nama Indikator', 'type' => 'textarea', 'required' => true],
-                    ['name' => 'sumber_dana', 'label' => 'Sumber Dana', 'type' => 'select', 'options' => ['APBN' => 'APBN', 'Non-APBN' => 'Non-APBN']],
-                    ['name' => 'baseline', 'label' => 'Baseline', 'type' => 'text'],
+                    ['name' => 'sumber_dana', 'label' => 'Sumber Dana (khusus indikator Investasi)', 'type' => 'select', 'options' => ['APBN' => 'APBN', 'Non-APBN' => 'Non-APBN']],
+                    ['name' => 'baseline', 'label' => 'Baseline 2025', 'type' => 'text'],
                 ],
             ],
         ];
