@@ -16,6 +16,7 @@
                 <a href="{{ route('beranda') }}" class="hover:text-blue-200 {{ request()->routeIs('beranda') ? 'text-blue-200' : '' }}">Beranda</a>
                 <a href="{{ route('psn.index') }}" class="hover:text-blue-200 {{ request()->routeIs('psn.*') ? 'text-blue-200' : '' }}">Daftar PSN</a>
                 <a href="{{ route('statistik') }}" class="hover:text-blue-200 {{ request()->routeIs('statistik') ? 'text-blue-200' : '' }}">Statistik</a>
+                <a href="{{ route('peta') }}" class="hover:text-blue-200 {{ request()->routeIs('peta') ? 'text-blue-200' : '' }}">Peta Sebaran</a>
                 @auth
                     <a href="{{ route('dashboard') }}" class="rounded bg-blue-700 px-3 py-1.5 hover:bg-blue-600">Admin</a>
                 @else

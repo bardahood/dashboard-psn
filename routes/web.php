@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Public\BerandaController;
+use App\Http\Controllers\Public\PetaController;
 use App\Http\Controllers\Public\PsnPublicController;
 use App\Http\Controllers\Public\StatistikController;
 use Illuminate\Support\Facades\Route;
@@ -11,6 +12,7 @@ Route::get('/', [BerandaController::class, 'index'])->name('beranda');
 Route::get('/psn', [PsnPublicController::class, 'index'])->name('psn.index');
 Route::get('/psn/{psn}', [PsnPublicController::class, 'show'])->name('psn.show');
 Route::get('/statistik', [StatistikController::class, 'index'])->name('statistik');
+Route::get('/peta', [PetaController::class, 'index'])->name('peta');
 
 // ============ AUTH (Breeze) ============
 Route::middleware('auth')->group(function () {

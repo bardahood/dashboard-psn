@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    // API Dit. PSI (Direktorat Pembiayaan Strategis dan Inovatif) -- lihat
+    // App\Services\PsiSyncService. Kosong sampai endpoint resmi tersedia.
+    'psi' => [
+        'endpoint' => env('PSI_API_ENDPOINT'),
+        'token' => env('PSI_API_TOKEN'),
+    ],
+
 ];

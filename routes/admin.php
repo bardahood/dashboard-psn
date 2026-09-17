@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KunjunganPengendalianController;
 use App\Http\Controllers\Admin\KunjunganPerencanaanController;
+use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\MatriksSandinganController;
 use App\Http\Controllers\Admin\PsnController;
+use App\Http\Controllers\Admin\SinkronisasiPsiController;
 use App\Models\Psn;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +35,20 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/', [KunjunganPerencanaanController::class, 'index'])->name('index');
         Route::get('/create', [KunjunganPerencanaanController::class, 'create'])->name('create');
         Route::get('/{kunjungan}/edit', [KunjunganPerencanaanController::class, 'edit'])->name('edit');
+    });
+
+    Route::middleware('permission:audit.view')->get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log');
+
+    Route::middleware('permission:sinkronisasi.manage')->prefix('sinkronisasi-psi')->group(function () {
+        Route::get('/', [SinkronisasiPsiController::class, 'index'])->name('sinkronisasi-psi');
+        Route::post('/trigger', [SinkronisasiPsiController::class, 'trigger'])->name('sinkronisasi-psi.trigger');
+    });
+
+    Route::middleware('permission:laporan.export')->prefix('laporan')->name('laporan.')->group(function () {
+        Route::get('/', [LaporanController::class, 'index'])->name('index');
+        Route::get('/ringkasan-pdf', [LaporanController::class, 'ringkasanPdf'])->name('ringkasan-pdf');
+        Route::get('/matriks-excel', [LaporanController::class, 'matriksExcel'])->name('matriks-excel');
+        Route::get('/daftar-psn-excel', [LaporanController::class, 'daftarPsnExcel'])->name('daftar-psn-excel');
     });
 });
 

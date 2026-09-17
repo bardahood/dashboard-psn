@@ -53,13 +53,20 @@ Seeder (`database/seeders/`) mengisi seluruh data referensi dari Bagian 8 skema 
   - Verifikasi Lokasi, Dokumen Teknis (9 dokumen tetap), Dampak Trisula (3 dampak tetap), dan Indeks Bukti
   - **Skor keseluruhan berbobot otomatis**: Pendukung 35% + Kesiapan 35% + Lokasi 15% + Trisula 15% (`KunjunganPerencanaan::skorKeseluruhan()`), dipetakan ke rekomendasi Layak Dilanjutkan/Layak dengan Catatan/Perlu Perbaikan Dokumen/Belum Layak — bobot komponen yang belum terisi didistribusikan ulang secara proporsional agar instrumen bisa dinilai bertahap
   - Sama seperti instrumen Pengendalian: **ambang batas skor adalah interpretasi kami**, bukan dari dokumen Excel asli yang tidak turut dilampirkan
-- Test otomatis: relasi model & CHECK constraint (`PsnRelationsTest`), middleware role (`AdminAccessTest`), komponen Livewire sub-profil (`LivewireSubResourceTest`), wizard Pengendalian termasuk unggah file (`KunjunganPengendalianWizardTest`), dan wizard Perencanaan termasuk visibilitas kriteria kondisional & gate Kriteria Utama (`KunjunganPerencanaanWizardTest`) — 46 test, seluruhnya hijau
 
-**Belum dikerjakan (sisa Sprint 4–5, sesuai urutan Bagian 9 prompt):**
-- Reporting PDF/Excel (Laporan Presiden/Semester)
-- Command `psn:sync-psi` (skeleton sinkronisasi API PSI, endpoint belum tersedia dari Dit. PSI)
-- Audit log otomatis via Model Observer
-- Tier 2: peta sebaran (Leaflet), manajemen dokumen, filter lanjutan
+**Selesai (Sprint 4 lanjutan, sesuai Bagian 9 prompt):**
+- **Audit log otomatis** via `AuditLogObserver` (generic Eloquent observer terdaftar di `AppServiceProvider` untuk `Psn`, `RoProyek`, `RisikoPsn`, `KebutuhanRegulasi`, `KunjunganPengendalian`, `KunjunganPerencanaan`) — mencatat `created`/`updated`/`deleted` beserta PIC pelaku ke tabel `audit_log`; halaman admin **Audit Log** (`/admin/audit-log`) untuk menelusurinya
+- **Sinkronisasi data PSI**: command `php artisan psn:sync-psi` + `PsiSyncService` (skeleton — memanggil endpoint API Direktorat PSI via `Http::`, endpoint/token dikonfigurasi lewat `.env` `PSI_API_ENDPOINT`/`PSI_API_TOKEN` karena API sesungguhnya belum tersedia dari Dit. PSI saat pengembangan), setiap percobaan sinkronisasi dicatat ke `sync_log_psi`; halaman admin **Sinkronisasi PSI** (`/admin/sinkronisasi-psi`) menampilkan riwayat & tombol jalankan manual
+- **Reporting PDF/Excel** (`LaporanController`, `/admin/laporan`):
+  - Excel: `MatriksSandinganExport` (dari view `v_psn_sandingan_sumber`) dan `DaftarPsnExport` (dari view `v_psn_profil_lengkap`, 14 kolom) via maatwebsite/excel
+  - PDF: Laporan Ringkasan (`ringkasan-pdf.blade.php`, layout tabel murni tanpa flexbox karena keterbatasan DomPDF) berisi KPI ringkas, rekap per klaster, per status, per level risiko, dan ketersediaan sumber data via barryvdh/laravel-dompdf
+- **Tier 2 — Peta Sebaran PSN** (`/peta`, publik): marker per-provinsi (agregat, karena skema tidak menyimpan koordinat presisi lokasi) menggunakan Leaflet.js + `ProvinsiCoordinates` (koordinat 38 provinsi), `PetaController` meng-cache hasil agregasi 15 menit; klik marker menampilkan daftar PSN pada provinsi tsb dengan tautan ke halaman detail publik
+- Test otomatis: relasi model & CHECK constraint (`PsnRelationsTest`), middleware role (`AdminAccessTest`), komponen Livewire sub-profil (`LivewireSubResourceTest`), wizard Pengendalian termasuk unggah file (`KunjunganPengendalianWizardTest`), wizard Perencanaan termasuk visibilitas kriteria kondisional & gate Kriteria Utama (`KunjunganPerencanaanWizardTest`), audit log & sinkronisasi PSI (`AuditLogAndSyncPsiTest`), export laporan PDF/Excel (`LaporanExportTest`), dan peta sebaran (`PetaTest`) — 53 test, seluruhnya hijau
+
+**Belum dikerjakan (sisa Sprint 5, sesuai urutan Bagian 9 prompt):**
+- Tier 2: manajemen dokumen (repositori dokumen terpusat lintas PSN), filter lanjutan pada halaman publik/admin (multi-kriteria, simpan filter)
+
+**Catatan lingkungan pengembangan:** Chart.js dan Leaflet.js dimuat lewat CDN (`cdn.jsdelivr.net`) — pada sandbox pengembangan ini akses keluar ke CDN tsb diblokir sehingga chart/peta tidak bisa diverifikasi tampil secara visual di sini, namun payload data JSON yang dikirim ke browser (`markers`, dataset chart) sudah diverifikasi benar; pada lingkungan produksi dengan akses internet normal, chart & peta akan tampil seperti biasa.
 
 **Catatan integrasi Breeze + Livewire:** `resources/js/app.js` sengaja **tidak** meng-import/menjalankan Alpine.js sendiri karena Livewire 3 (`@livewireScripts`) sudah membundel dan menjalankan Alpine miliknya sendiri secara otomatis. Menjalankan dua instance Alpine sekaligus akan merusak sinkronisasi `wire:model` (gejala: form edit Livewire tidak ter-prefill, tapi tidak ada error yang terlihat) — jangan menambahkan `import Alpine from 'alpinejs'; Alpine.start();` kembali ke `app.js`.
 

@@ -33,6 +33,21 @@
                             {{ __('Kunjungan Perencanaan') }}
                         </x-nav-link>
                     @endcan
+                    @can('audit.view')
+                        <x-nav-link :href="route('admin.audit-log')" :active="request()->routeIs('admin.audit-log')">
+                            {{ __('Audit Log') }}
+                        </x-nav-link>
+                    @endcan
+                    @can('sinkronisasi.manage')
+                        <x-nav-link :href="route('admin.sinkronisasi-psi')" :active="request()->routeIs('admin.sinkronisasi-psi')">
+                            {{ __('Sinkronisasi PSI') }}
+                        </x-nav-link>
+                    @endcan
+                    @can('laporan.export')
+                        <x-nav-link :href="route('admin.laporan.index')" :active="request()->routeIs('admin.laporan.*')">
+                            {{ __('Reporting') }}
+                        </x-nav-link>
+                    @endcan
                     <x-nav-link :href="route('beranda')" :active="false">
                         {{ __('Lihat Situs Publik') }}
                     </x-nav-link>
@@ -107,6 +122,21 @@
             @can('perencanaan.manage')
                 <x-responsive-nav-link :href="route('admin.kunjungan-perencanaan.index')" :active="request()->routeIs('admin.kunjungan-perencanaan.*')">
                     {{ __('Kunjungan Perencanaan') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('audit.view')
+                <x-responsive-nav-link :href="route('admin.audit-log')" :active="request()->routeIs('admin.audit-log')">
+                    {{ __('Audit Log') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('sinkronisasi.manage')
+                <x-responsive-nav-link :href="route('admin.sinkronisasi-psi')" :active="request()->routeIs('admin.sinkronisasi-psi')">
+                    {{ __('Sinkronisasi PSI') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('laporan.export')
+                <x-responsive-nav-link :href="route('admin.laporan.index')" :active="request()->routeIs('admin.laporan.*')">
+                    {{ __('Reporting') }}
                 </x-responsive-nav-link>
             @endcan
         </div>
