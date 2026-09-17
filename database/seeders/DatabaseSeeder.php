@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             RefDokumenTeknisSeeder::class,
             RefDampakTrisulaSeeder::class,
             RoleSeeder::class,
+            MatriksSandinganPsnSeeder::class,
         ]);
 
         $pic = RefPic::create([

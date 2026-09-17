@@ -21,7 +21,7 @@
         <dl class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
             <div>
                 <dt class="text-gray-500">Lokasi</dt>
-                <dd class="mt-0.5">{{ $profil->nama_provinsi ?? '-' }}@if($profil->kabupaten_kota), {{ $profil->kabupaten_kota }}@endif</dd>
+                <dd class="mt-0.5">{{ $profil->nama_provinsi ?? '-' }}@if($profil->kabupaten_kota && $profil->kabupaten_kota !== $profil->nama_provinsi), {{ $profil->kabupaten_kota }}@endif</dd>
             </div>
             <div>
                 <dt class="text-gray-500">Target Penyelesaian</dt>
