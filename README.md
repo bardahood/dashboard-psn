@@ -16,7 +16,7 @@ php artisan key:generate
 php artisan migrate --seed
 ```
 
-Login awal setelah seeding: `admin@bappenas.go.id` / `password` (role **Super Admin** — segera ganti password di lingkungan produksi).
+Login awal setelah seeding: `admin@bappenas.go.id` / `password` (role **Super Admin** — segera ganti password di lingkungan produksi). Seeder juga membuat 5 akun demo lain (satu per role) untuk mencoba tiap tingkat akses — daftar lengkap kredensial & matriks permission per role ada di **[`AKSES.md`](AKSES.md)**.
 
 ## Struktur Basis Data
 
