@@ -19,6 +19,7 @@ class RoTargetPeriode extends Model
         'triwulan',
         'bulan',
         'target',
+        'target_persen',
         'pembiayaan_rencana_juta_rp',
         'realisasi_fisik',
         'realisasi_anggaran_juta_rp',
@@ -31,6 +32,7 @@ class RoTargetPeriode extends Model
 
     protected $casts = [
         'target' => 'decimal:2',
+        'target_persen' => 'decimal:2',
         'pembiayaan_rencana_juta_rp' => 'decimal:2',
         'realisasi_fisik' => 'decimal:2',
         'realisasi_anggaran_juta_rp' => 'decimal:2',

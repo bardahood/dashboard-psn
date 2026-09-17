@@ -98,6 +98,7 @@ class RoProyekManager extends Component
             'triwulan' => null,
             'bulan' => null,
             'target' => null,
+            'target_persen' => null,
             'pembiayaan_rencana_juta_rp' => null,
             'realisasi_fisik' => null,
             'realisasi_anggaran_juta_rp' => null,

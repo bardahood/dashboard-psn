@@ -4,10 +4,12 @@ namespace Tests\Feature;
 
 use App\Livewire\Admin\AnnualTargetManager;
 use App\Livewire\Admin\RisikoManager;
+use App\Livewire\Admin\RoProyekManager;
 use App\Models\Psn;
 use App\Models\RefPic;
 use App\Models\RisikoPsn;
 use App\Models\RoProyek;
+use App\Models\RoTargetPeriode;
 use App\Models\TrisulaKontribusiPsn;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
@@ -137,6 +139,27 @@ class PedomanProjectProfileTest extends TestCase
         $psn->refresh();
         $this->assertNull($psn->diagram_kelembagaan_path);
         Storage::disk('public')->assertMissing($pathLama);
+    }
+
+    public function test_target_ro_periode_bisa_diisi_target_fisik_dan_target_persentase_terpisah(): void
+    {
+        $this->actingAsSuperAdmin();
+        $psn = Psn::create(['nama_psn' => 'Bendungan Contoh']);
+        $ro = RoProyek::create(['psn_id' => $psn->id, 'nama_ro' => 'Pembangunan Bendungan Utama', 'satuan' => 'M3 Timbunan']);
+
+        Livewire::test(RoProyekManager::class, ['psn' => $psn])
+            ->call('togglePeriode', $ro->id)
+            ->set('periodeForm.tahun', 2026)
+            ->set('periodeForm.tipe_periode', 'TRIWULANAN')
+            ->set('periodeForm.triwulan', 2)
+            ->set('periodeForm.target', 15000)
+            ->set('periodeForm.target_persen', 25.5)
+            ->call('addPeriode')
+            ->assertHasNoErrors();
+
+        $periode = RoTargetPeriode::where('ro_id', $ro->id)->firstOrFail();
+        $this->assertSame('15000.00', (string) $periode->target);
+        $this->assertSame('25.50', (string) $periode->target_persen);
     }
 
     public function test_upload_diagram_kelembagaan_ditolak_bila_bukan_gambar(): void

@@ -31,8 +31,12 @@
                 </div>
             @endif
             <div>
-                <label class="block text-gray-500 mb-1">Target</label>
+                <label class="block text-gray-500 mb-1">Target Fisik <span class="text-gray-400">({{ $ro->satuan ?? 'satuan RO' }})</span></label>
                 <input type="number" step="0.01" wire:model="periodeForm.target" class="w-full rounded border-gray-300 text-xs">
+            </div>
+            <div>
+                <label class="block text-gray-500 mb-1">Target Persentase (%)</label>
+                <input type="number" step="0.01" min="0" max="100" wire:model="periodeForm.target_persen" class="w-full rounded border-gray-300 text-xs">
             </div>
             <div>
                 <label class="block text-gray-500 mb-1">Realisasi Fisik</label>
@@ -67,7 +71,8 @@
             <thead class="text-left text-gray-500">
                 <tr>
                     <th class="py-1 pr-3">Periode</th>
-                    <th class="py-1 pr-3">Target</th>
+                    <th class="py-1 pr-3">Target Fisik</th>
+                    <th class="py-1 pr-3">Target %</th>
                     <th class="py-1 pr-3">Realisasi Fisik</th>
                     <th class="py-1 pr-3">Realisasi Anggaran</th>
                     <th class="py-1 pr-3">Status</th>
@@ -79,6 +84,7 @@
                     <tr wire:key="periode-{{ $p->id }}">
                         <td class="py-1 pr-3">{{ $p->tahun }} {{ $p->tipe_periode }}@if($p->triwulan) TW{{ $p->triwulan }}@endif@if($p->bulan) Bln{{ $p->bulan }}@endif</td>
                         <td class="py-1 pr-3">{{ $p->target ?? '-' }}</td>
+                        <td class="py-1 pr-3">{{ $p->target_persen !== null ? $p->target_persen.'%' : '-' }}</td>
                         <td class="py-1 pr-3">{{ $p->realisasi_fisik ?? '-' }}</td>
                         <td class="py-1 pr-3">{{ $p->realisasi_anggaran_juta_rp ?? '-' }}</td>
                         <td class="py-1 pr-3">{{ $p->status ?? '-' }}</td>
@@ -87,7 +93,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="py-2 text-center text-gray-400">Belum ada data periode.</td></tr>
+                    <tr><td colspan="7" class="py-2 text-center text-gray-400">Belum ada data periode.</td></tr>
                 @endforelse
             </tbody>
         </table>
