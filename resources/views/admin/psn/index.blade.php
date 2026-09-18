@@ -7,6 +7,9 @@
                     <a href="{{ route('admin.evaluasi-keluar') }}" class="text-sm text-blue-800 hover:underline">
                         Rekomendasi Keluar dari Daftar &rarr;
                     </a>
+                    <a href="{{ route('admin.analisis-rkp2027') }}" class="text-sm text-blue-800 hover:underline">
+                        Analisis Carryover RKP 2027 &rarr;
+                    </a>
                 @endcan
                 @can('create', App\Models\Psn::class)
                     <a href="{{ route('admin.psn.create') }}" class="rounded-md bg-blue-800 text-white px-4 py-2 text-sm hover:bg-blue-700">+ Tambah PSN</a>

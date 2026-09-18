@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AnalisisRkp2027Controller;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DebottleneckingController;
@@ -47,6 +48,11 @@ Route::middleware(['auth', 'akun.aktif'])->prefix('admin')->name('admin.')->grou
     Route::middleware('permission:perencanaan.manage')->get('/verifikasi-usulan', [VerifikasiUsulanController::class, 'index'])->name('verifikasi-usulan');
 
     Route::middleware('permission:profil.manage')->get('/evaluasi-keluar', [EvaluasiKeluarController::class, 'index'])->name('evaluasi-keluar');
+
+    Route::middleware('permission:profil.manage')->prefix('analisis-rkp2027')->name('analisis-rkp2027')->group(function () {
+        Route::get('/', [AnalisisRkp2027Controller::class, 'index'])->name('');
+        Route::post('/terapkan', [AnalisisRkp2027Controller::class, 'terapkan'])->name('.terapkan');
+    });
 
     Route::middleware('permission:pengguna.manage')->prefix('pengguna')->name('pengguna.')->group(function () {
         Route::get('/', [PenggunaController::class, 'index'])->name('index');

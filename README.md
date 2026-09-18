@@ -126,6 +126,20 @@ Field yang benar-benar hilang dan sudah ditambahkan (existing-first, memperluas 
 - Diagram Kerangka Kerja Logis (cascading PN→PP→KP→Proyek/RO) — belum ada representasi terstruktur, hanya `psn.kode_rkp` sebagai kode acuan
 - Pedoman Work Breakdown Structure (5 pendekatan: Linear/Spasial, Deliverable, Trade/EPC, Phased, Geographical) — ini panduan penamaan RO yang sudah bisa diterapkan lewat field teks bebas yang ada, belum ada tooltip/rujukan pedoman di form RO/Proyek
 
+## Analisis Carryover RKP 2027
+
+Lampiran resmi **"Daftar PSN dalam RKP 2027"** (.docx, dibundel di `database/seeders/data/Daftar_PSN_RKP_2027.docx`) disandingkan dengan data PSN dashboard (hasil impor Matrik Sandingan, bersumber dari RKP Pemutakhiran 2026/Perpres 68 -- dashboard belum memiliki flag sumber data terpisah untuk "RKP 2025") untuk mengidentifikasi proyek yang berlanjut (carryover) ke RKP 2027.
+
+- **`App\Support\DocxTableParser`** — parser generik `.docx` tanpa dependensi pustaka pihak ketiga (unzip + baca `word/document.xml` via DOMDocument/XPath). Sel tabel yang di-merge horizontal (`w:gridSpan`) diduplikasi teksnya sebanyak span agar jumlah kolom konsisten per baris, meniru perilaku `python-docx` yang dipakai saat membuat prototipe fitur ini.
+- **`App\Support\Rkp2027CarryoverAnalyzer`** — mem-parsing 24 tabel/346 baris lampiran (baris "judul grup" yang di-merge penuh 1 kolom dikenali sebagai nama Program payung, bukan baris proyek), lalu mencocokkan tiap nama proyek terhadap `psn.nama_psn` memakai fuzzy matching (kombinasi `similar_text()` dan Jaccard token, ambang skor 0.55 — dikalibrasi manual terhadap sampel data). Hasil dikelompokkan 3 kategori:
+  - **Carryover** (skor &ge; 0.55): PSN existing yang muncul lagi di RKP 2027.
+  - **Perlu ditinjau manual**: proyek RKP 2027 tanpa kecocokan meyakinkan — kemungkinan redaksional berbeda dari proyek existing (mis. "RDMP RU V Balikpapan" belum tentu proyek baru, bisa jadi penamaan ulang) atau benar-benar usulan baru. Sengaja **tidak** auto-diputuskan/auto-insert karena berisiko salah pada data pemerintah.
+  - **Tidak ditemukan lagi di RKP 2027**: PSN existing yang tidak terdeteksi di lampiran — kandidat untuk ditindaklanjuti lewat mekanisme Evaluasi Status/Rekomendasi Keluar dari Daftar PSN yang sudah ada.
+- **`php artisan psn:analisis-rkp2027 [--terapkan]`** — jalankan analisis dari CLI; `--terapkan` mengisi `psn.kategori_usulan = 'Carryover'` untuk PSN yang cocok dan **belum** berkategori (tidak menimpa isian manual).
+- **`/admin/analisis-rkp2027`** (permission `profil.manage`) — halaman ringkasan (3 kartu jumlah), tabel "Perlu Ditinjau Manual", dan tabel "Tidak Ditemukan Lagi di RKP 2027", plus tombol untuk menerapkan kategori Carryover. Tertaut dari halaman Data PSN.
+- Hasil pada data sample: dari 303 proyek/program pada lampiran RKP 2027, 288 cocok (283 PSN unik) diklasifikasikan Carryover, 15 perlu ditinjau manual, dan 105 dari 388 PSN existing tidak terdeteksi lagi di RKP 2027.
+- Test otomatis: `Rkp2027CarryoverAnalyzerTest` (parser docx, klasifikasi 3 kategori, penerapan kategori tanpa menimpa isian manual, halaman admin + gating permission) — total 85 test, seluruhnya hijau.
+
 **Catatan lingkungan pengembangan:** Chart.js dan Leaflet.js dimuat lewat CDN (`cdn.jsdelivr.net`) — pada sandbox pengembangan ini akses keluar ke CDN tsb diblokir sehingga chart/peta tidak bisa diverifikasi tampil secara visual di sini, namun payload data JSON yang dikirim ke browser (`markers`, dataset chart) sudah diverifikasi benar; pada lingkungan produksi dengan akses internet normal, chart & peta akan tampil seperti biasa.
 
 **Catatan integrasi Breeze + Livewire:** `resources/js/app.js` sengaja **tidak** meng-import/menjalankan Alpine.js sendiri karena Livewire 3 (`@livewireScripts`) sudah membundel dan menjalankan Alpine miliknya sendiri secara otomatis. Menjalankan dua instance Alpine sekaligus akan merusak sinkronisasi `wire:model` (gejala: form edit Livewire tidak ter-prefill, tapi tidak ada error yang terlihat) — jangan menambahkan `import Alpine from 'alpinejs'; Alpine.start();` kembali ke `app.js`.
