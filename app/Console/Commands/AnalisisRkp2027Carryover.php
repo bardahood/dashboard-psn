@@ -9,7 +9,7 @@ class AnalisisRkp2027Carryover extends Command
 {
     protected $signature = 'psn:analisis-rkp2027
         {file? : Path file .docx Daftar PSN dalam RKP 2027 (default: berkas bawaan database/seeders/data)}
-        {--terapkan : Terapkan hasil (isi kategori_usulan=Carryover untuk PSN yang cocok dan belum berkategori)}';
+        {--terapkan : Terapkan hasil (isi kategori_usulan=Carryover untuk PSN yang cocok dan belum berkategori, serta perbarui kolom RKP 2027 pada Matriks Sandingan)}';
 
     protected $description = 'Sandingkan Daftar PSN RKP 2027 dengan data PSN dashboard untuk identifikasi proyek carryover';
 
@@ -40,8 +40,11 @@ class AnalisisRkp2027Carryover extends Command
         if ($this->option('terapkan')) {
             $jumlahDiperbarui = $analyzer->terapkanKategoriCarryover($hasil['carryover']);
             $this->info("kategori_usulan='Carryover' diterapkan pada {$jumlahDiperbarui} PSN (yang sebelumnya masih kosong).");
+
+            $jumlahMatriks = $analyzer->terapkanKeMatriksSandingan($hasil);
+            $this->info("Kolom RKP 2027 pada Matriks Sandingan diperbarui untuk {$jumlahMatriks} PSN.");
         } else {
-            $this->comment('Jalankan dengan --terapkan untuk mengisi kolom kategori_usulan berdasarkan hasil ini.');
+            $this->comment('Jalankan dengan --terapkan untuk mengisi kolom kategori_usulan dan kolom RKP 2027 pada Matriks Sandingan berdasarkan hasil ini.');
         }
 
         return self::SUCCESS;

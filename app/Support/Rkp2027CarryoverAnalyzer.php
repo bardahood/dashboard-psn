@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\Psn;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Menyandingkan daftar PSN pada lampiran "Daftar PSN dalam RKP 2027" dengan
@@ -148,6 +149,40 @@ class Rkp2027CarryoverAnalyzer
         return Psn::whereIn('id', $idUnik)
             ->whereNull('kategori_usulan')
             ->update(['kategori_usulan' => 'Carryover']);
+    }
+
+    /**
+     * Tuliskan hasil pencocokan ke tabel psn_sumber_data sebagai sumber
+     * "RKP 2027" (mengikuti pola 4 sumber lain pada Matrik Sandingan) --
+     * setiap PSN existing diberi satu baris tersedia=true (cocok/carryover)
+     * atau tersedia=false (tidak ditemukan lagi), sehingga langsung tampil
+     * sebagai kolom baru di halaman Matriks Sandingan (v_psn_sandingan_sumber).
+     *
+     * @param  array{carryover: Collection, tidak_ditemukan_lagi: Collection<int, Psn>}  $hasil
+     */
+    public function terapkanKeMatriksSandingan(array $hasil): int
+    {
+        $sumberDataId = DB::table('ref_sumber_data')->where('nama_sumber', 'RKP 2027')->value('id');
+
+        if ($sumberDataId === null) {
+            throw new \RuntimeException("Ref sumber data 'RKP 2027' belum ada -- jalankan RefSumberDataSeeder.");
+        }
+
+        $idCocok = $hasil['carryover']->pluck('psn_id')->filter()->unique();
+        $idTidakCocok = $hasil['tidak_ditemukan_lagi']->pluck('id');
+
+        $now = now();
+        $baris = $idCocok->map(fn ($id) => ['psn_id' => $id, 'tersedia' => true])
+            ->concat($idTidakCocok->map(fn ($id) => ['psn_id' => $id, 'tersedia' => false]));
+
+        foreach ($baris as $b) {
+            DB::table('psn_sumber_data')->updateOrInsert(
+                ['psn_id' => $b['psn_id'], 'sumber_data_id' => $sumberDataId],
+                ['tersedia' => $b['tersedia'], 'updated_at' => $now, 'created_at' => $now]
+            );
+        }
+
+        return $baris->count();
     }
 
     /**

@@ -6,7 +6,9 @@
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-4">
             <p class="text-sm text-gray-500">
-                Sandingan ketersediaan data PSN di 4 sumber: RKP Pemutakhiran 2026, Data PEKS3, Data PSI, dan Permenko.
+                Sandingan ketersediaan data PSN di 5 sumber: RKP Pemutakhiran 2026, Data PEKS3, Data PSI, Permenko,
+                dan RKP 2027 (hasil pencocokan otomatis terhadap
+                <a href="{{ route('admin.analisis-rkp2027') }}" class="text-blue-800 hover:underline">lampiran Daftar PSN RKP 2027</a>).
             </p>
 
             <form method="GET" class="bg-white rounded-lg shadow p-4 flex flex-wrap items-center gap-3">
@@ -45,6 +47,7 @@
                             <th class="px-4 py-3 text-center">PEKS3</th>
                             <th class="px-4 py-3 text-center">PSI</th>
                             <th class="px-4 py-3 text-center">Permenko</th>
+                            <th class="px-4 py-3 text-center">RKP 2027</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y">
@@ -58,9 +61,10 @@
                                 <td class="px-4 py-3 text-center">{!! $mark($row->data_peks3) !!}</td>
                                 <td class="px-4 py-3 text-center">{!! $mark($row->data_psi) !!}</td>
                                 <td class="px-4 py-3 text-center">{!! $mark($row->permenko) !!}</td>
+                                <td class="px-4 py-3 text-center">{!! $mark($row->rkp_2027) !!}</td>
                             </tr>
                         @empty
-                            <tr><td colspan="7" class="px-4 py-6 text-center text-gray-400">Belum ada data.</td></tr>
+                            <tr><td colspan="8" class="px-4 py-6 text-center text-gray-400">Belum ada data.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

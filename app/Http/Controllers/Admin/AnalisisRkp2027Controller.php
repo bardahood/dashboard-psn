@@ -41,9 +41,10 @@ class AnalisisRkp2027Controller extends Controller
         }
 
         $hasil = $analyzer->analisis($this->dokumenPath());
-        $jumlah = $analyzer->terapkanKategoriCarryover($hasil['carryover']);
+        $jumlahKategori = $analyzer->terapkanKategoriCarryover($hasil['carryover']);
+        $jumlahMatriks = $analyzer->terapkanKeMatriksSandingan($hasil);
 
         return redirect()->route('admin.analisis-rkp2027')
-            ->with('status', "kategori_usulan='Carryover' diterapkan pada {$jumlah} PSN.");
+            ->with('status', "kategori_usulan='Carryover' diterapkan pada {$jumlahKategori} PSN, dan kolom RKP 2027 pada Matriks Sandingan diperbarui untuk {$jumlahMatriks} PSN.");
     }
 }

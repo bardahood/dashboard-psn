@@ -49,6 +49,7 @@ class DatabaseSeeder extends Seeder
             RefDampakTrisulaSeeder::class,
             RoleSeeder::class,
             MatriksSandinganPsnSeeder::class,
+            Rkp2027CarryoverSeeder::class,
         ]);
 
         foreach (self::AKUN_DEMO as $akun) {

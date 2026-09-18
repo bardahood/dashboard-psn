@@ -40,7 +40,8 @@ class MatriksSandinganController extends Controller
                 $q->where('rkp_pemutakhiran_2026', false)
                     ->orWhere('data_peks3', false)
                     ->orWhere('data_psi', false)
-                    ->orWhere('permenko', false);
+                    ->orWhere('permenko', false)
+                    ->orWhere('rkp_2027', false);
             });
         }
 

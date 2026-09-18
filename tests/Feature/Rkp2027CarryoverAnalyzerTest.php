@@ -13,6 +13,7 @@ use Database\Seeders\RefStatusKetersediaanSeeder;
 use Database\Seeders\RefSumberDataSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /**
@@ -90,6 +91,23 @@ class Rkp2027CarryoverAnalyzerTest extends TestCase
         $this->assertSame('Usulan Baru', $sudahDiisi->fresh()->kategori_usulan);
     }
 
+    public function test_terapkan_ke_matriks_sandingan_mengisi_kolom_rkp_2027_untuk_seluruh_psn(): void
+    {
+        $this->seedRefDataDanMatriks();
+
+        $path = database_path('seeders/data/Daftar_PSN_RKP_2027.docx');
+        $analyzer = app(Rkp2027CarryoverAnalyzer::class);
+        $hasil = $analyzer->analisis($path);
+        $jumlah = $analyzer->terapkanKeMatriksSandingan($hasil);
+
+        $this->assertSame(388, $jumlah);
+        $this->assertSame(283, DB::table('v_psn_sandingan_sumber')->where('rkp_2027', true)->count());
+        $this->assertSame(105, DB::table('v_psn_sandingan_sumber')->where('rkp_2027', false)->count());
+
+        $mbg = Psn::where('nama_psn', 'Makan Bergizi Gratis')->firstOrFail();
+        $this->assertSame(1, DB::table('v_psn_sandingan_sumber')->where('psn_id', $mbg->id)->where('rkp_2027', true)->count());
+    }
+
     public function test_halaman_admin_analisis_rkp2027_menampilkan_ringkasan_dan_bisa_menerapkan_kategori(): void
     {
         $this->actingAsSuperAdmin();
@@ -104,6 +122,21 @@ class Rkp2027CarryoverAnalyzerTest extends TestCase
 
         $mbg = Psn::where('nama_psn', 'Makan Bergizi Gratis')->firstOrFail();
         $this->assertSame('Carryover', $mbg->fresh()->kategori_usulan);
+        $this->assertSame(283, DB::table('v_psn_sandingan_sumber')->where('rkp_2027', true)->count());
+    }
+
+    public function test_halaman_matriks_sandingan_menampilkan_kolom_rkp_2027(): void
+    {
+        $this->actingAsSuperAdmin();
+        $this->seedRefDataDanMatriks();
+
+        $path = database_path('seeders/data/Daftar_PSN_RKP_2027.docx');
+        $analyzer = app(Rkp2027CarryoverAnalyzer::class);
+        $analyzer->terapkanKeMatriksSandingan($analyzer->analisis($path));
+
+        $response = $this->get('/admin/matriks-sandingan?q=Makan+Bergizi+Gratis');
+        $response->assertOk();
+        $response->assertSee('RKP 2027');
     }
 
     public function test_halaman_analisis_rkp2027_ditolak_tanpa_izin_profil_manage(): void
