@@ -16,6 +16,12 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
  * (beberapa baris hanya "Permenko" tanpa K/L, klaster, atau lokasi) --
  * ini dibiarkan apa adanya (null) sesuai prinsip validasi longgar pada
  * prompt pengembangan, bukan bug pada importer.
+ *
+ * Sejak pembaruan 17 Sept 2026, kolom K/L Matrik tidak lagi berisi 1
+ * "Ketersediaan Data" (Ada/Tidak Ada + Keterangan) melainkan 2 dimensi
+ * terpisah: "Data Gambaran Umum Proyek" dan "Data Project Profile Lengkap
+ * untuk Kebutuhan Evaluasi" (masing-masing Ada/Tidak Ada) -- disimpan
+ * sebagai 2 baris psn_ketersediaan per PSN dibedakan `jenis_ketersediaan`.
  */
 class MatriksSandinganImporter
 {
@@ -52,11 +58,12 @@ class MatriksSandinganImporter
         $jumlahPsn = 0;
         $jumlahPenanggungJawab = 0;
         $jumlahSumberData = 0;
+        $jumlahKetersediaan = 0;
         $jumlahDilewati = 0;
 
         DB::transaction(function () use (
             $sheet, $highestRow, $periode,
-            &$jumlahPsn, &$jumlahPenanggungJawab, &$jumlahSumberData, &$jumlahDilewati
+            &$jumlahPsn, &$jumlahPenanggungJawab, &$jumlahSumberData, &$jumlahKetersediaan, &$jumlahDilewati
         ) {
             // Hapus data hasil import sebelumnya agar perintah ini idempotent.
             // ON DELETE CASCADE pada psn_penanggung_jawab/psn_sumber_data/psn_ketersediaan
@@ -81,9 +88,8 @@ class MatriksSandinganImporter
                 $klaster = trim((string) $sheet->getCell("D{$row}")->getFormattedValue());
                 $lokasiProv = trim((string) $sheet->getCell("E{$row}")->getFormattedValue());
                 $lokasiKab = trim((string) $sheet->getCell("F{$row}")->getFormattedValue());
-                $ada = trim((string) $sheet->getCell('K'.$row)->getFormattedValue());
-                $tidakAda = trim((string) $sheet->getCell('L'.$row)->getFormattedValue());
-                $keterangan = trim((string) $sheet->getCell("M{$row}")->getFormattedValue());
+                $ketersediaanGambaranUmum = trim((string) $sheet->getCell('K'.$row)->getFormattedValue());
+                $ketersediaanProfileLengkap = trim((string) $sheet->getCell('L'.$row)->getFormattedValue());
 
                 $provinsiId = $this->resolveProvinsi($lokasiProv);
 
@@ -128,17 +134,26 @@ class MatriksSandinganImporter
                     $jumlahSumberData++;
                 }
 
-                if ($ada !== '' || $tidakAda !== '') {
+                foreach ([
+                    'Gambaran Umum' => $ketersediaanGambaranUmum,
+                    'Project Profile Lengkap' => $ketersediaanProfileLengkap,
+                ] as $jenis => $nilai) {
+                    $statusId = $this->statusKetersediaanMap[mb_strtolower($nilai)] ?? null;
+
+                    if ($statusId === null) {
+                        continue;
+                    }
+
                     DB::table('psn_ketersediaan')->insert([
                         'psn_id' => $psnId,
-                        'status_ketersediaan_id' => $ada !== ''
-                            ? $this->statusKetersediaanMap['ada']
-                            : $this->statusKetersediaanMap['tidak ada'],
-                        'keterangan' => $keterangan !== '' ? $keterangan : null,
+                        'status_ketersediaan_id' => $statusId,
+                        'jenis_ketersediaan' => $jenis,
+                        'keterangan' => null,
                         'periode_pemutakhiran' => $periode,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
+                    $jumlahKetersediaan++;
                 }
             }
         });
@@ -147,8 +162,45 @@ class MatriksSandinganImporter
             'psn' => $jumlahPsn,
             'penanggung_jawab' => $jumlahPenanggungJawab,
             'sumber_data' => $jumlahSumberData,
+            'ketersediaan' => $jumlahKetersediaan,
             'dilewati' => $jumlahDilewati,
         ];
+    }
+
+    /**
+     * Isi psn.kode_rkp dari "Master Data PSN Kode" (Kode_PSI + Nama PSN),
+     * dicocokkan lewat nama_psn persis sama (kedua file terbukti selaras
+     * baris-demi-baris pada sumber 17 Sept 2026 -- dicocokkan lewat nama,
+     * bukan urutan baris, agar tahan bila urutan berubah pada pembaruan
+     * berikutnya).
+     */
+    public function importKodeRkp(string $path): array
+    {
+        $spreadsheet = IOFactory::load($path);
+        $sheet = $spreadsheet->getSheet(0);
+        $highestRow = $sheet->getHighestRow();
+
+        $jumlahCocok = 0;
+        $jumlahTidakCocok = 0;
+
+        for ($row = 2; $row <= $highestRow; $row++) {
+            $kode = trim((string) $sheet->getCell('A'.$row)->getFormattedValue());
+            $namaPsn = trim((string) $sheet->getCell('B'.$row)->getFormattedValue());
+
+            if ($kode === '' || $namaPsn === '') {
+                continue;
+            }
+
+            $terupdate = DB::table('psn')->where('nama_psn', $namaPsn)->update(['kode_rkp' => $kode]);
+
+            if ($terupdate > 0) {
+                $jumlahCocok++;
+            } else {
+                $jumlahTidakCocok++;
+            }
+        }
+
+        return ['cocok' => $jumlahCocok, 'tidak_cocok' => $jumlahTidakCocok];
     }
 
     private function muatPeta(): void

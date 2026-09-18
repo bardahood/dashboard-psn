@@ -35,6 +35,8 @@ class AnnualTargetManager extends Component
 
     public array $yearForm = [];
 
+    public array $twForm = [];
+
     protected array $years = [2025, 2026, 2027, 2028, 2029, 2030];
 
     protected function config(): array
@@ -173,7 +175,11 @@ class AnnualTargetManager extends Component
 
         $config = $this->typeConfig();
         $childModel = $config['childModel'];
-        $existing = $childModel::where($config['childFk'], $parentId)->get()->keyBy('tahun');
+        $query = $childModel::where($config['childFk'], $parentId);
+        if ($this->type === 'trisula') {
+            $query->where('tipe_periode', 'TAHUNAN');
+        }
+        $existing = $query->get()->keyBy('tahun');
 
         $this->yearForm = [];
         foreach ($this->years as $year) {
@@ -185,6 +191,67 @@ class AnnualTargetManager extends Component
                 'status_capaian' => $row->status_capaian ?? null,
             ];
         }
+
+        if ($this->type === 'trisula') {
+            $this->resetTwForm();
+        }
+    }
+
+    public function resetTwForm(): void
+    {
+        $this->twForm = [
+            'tahun' => now()->year,
+            'triwulan' => null,
+            'target' => null,
+            'realisasi' => null,
+            'status_capaian' => null,
+        ];
+    }
+
+    /**
+     * Target/realisasi Trisula per triwulan -- dipisah dari target tahunan
+     * (Perencanaan) karena angka triwulanan bersifat agregat capaian
+     * berjalan yang dipantau lewat siklus Pengendalian, bukan bagian dari
+     * grid tahun 2025-2030 yang sama.
+     */
+    public function saveTw(): void
+    {
+        Gate::authorize('update', $this->psn);
+
+        $this->validate([
+            'twForm.tahun' => 'required|integer',
+            'twForm.triwulan' => 'required|integer|between:1,4',
+        ]);
+
+        $persenRealisasi = ($this->twForm['target'] && $this->twForm['realisasi'] !== null)
+            ? round(($this->twForm['realisasi'] / $this->twForm['target']) * 100, 2)
+            : null;
+
+        TrisulaTargetPeriode::updateOrCreate(
+            [
+                'kontribusi_id' => $this->expandedParentId,
+                'tipe_periode' => 'TRIWULANAN',
+                'tahun' => $this->twForm['tahun'],
+                'triwulan' => $this->twForm['triwulan'],
+            ],
+            [
+                'target' => $this->twForm['target'],
+                'realisasi' => $this->twForm['realisasi'],
+                'persen_realisasi' => $persenRealisasi,
+                'status_capaian' => $this->twForm['status_capaian'],
+            ]
+        );
+
+        $this->resetTwForm();
+    }
+
+    public function deleteTw(int $id): void
+    {
+        Gate::authorize('update', $this->psn);
+
+        TrisulaTargetPeriode::where('kontribusi_id', $this->expandedParentId)
+            ->where('tipe_periode', 'TRIWULANAN')
+            ->findOrFail($id)->delete();
     }
 
     public function saveYears(): void
@@ -195,9 +262,18 @@ class AnnualTargetManager extends Component
         $childModel = $config['childModel'];
         $fk = $config['childFk'];
 
+        $isTrisula = $config['childModel'] === TrisulaTargetPeriode::class;
+
         foreach ($this->yearForm as $year => $data) {
+            $matchKeys = [$fk => $this->expandedParentId, 'tahun' => $year];
+            if ($isTrisula) {
+                // Kunci ini juga membedakan baris TAHUNAN dari baris TRIWULANAN
+                // pada tahun yang sama, supaya updateOrCreate tidak salah timpa.
+                $matchKeys['tipe_periode'] = 'TAHUNAN';
+            }
+
             if ($data['target'] === null && $data['realisasi'] === null && $data['target_akhir'] === null) {
-                $childModel::where($fk, $this->expandedParentId)->where('tahun', $year)->delete();
+                $childModel::where($matchKeys)->delete();
 
                 continue;
             }
@@ -210,11 +286,7 @@ class AnnualTargetManager extends Component
                 'persen_realisasi' => $persenRealisasi,
             ]);
 
-            if ($config['childModel'] === TrisulaTargetPeriode::class) {
-                $payload['tipe_periode'] = 'TAHUNAN';
-            }
-
-            $childModel::updateOrCreate([$fk => $this->expandedParentId, 'tahun' => $year], $payload);
+            $childModel::updateOrCreate($matchKeys, $payload);
         }
     }
 
@@ -225,10 +297,17 @@ class AnnualTargetManager extends Component
 
         $parents = $parentModel::where('psn_id', $this->psn->id)->orderBy('id')->get();
 
+        $twList = ($this->type === 'trisula' && $this->expandedParentId)
+            ? TrisulaTargetPeriode::where('kontribusi_id', $this->expandedParentId)
+                ->where('tipe_periode', 'TRIWULANAN')
+                ->orderByDesc('tahun')->orderByDesc('triwulan')->get()
+            : collect();
+
         return view('livewire.admin.annual-target-manager', [
             'config' => $config,
             'parents' => $parents,
             'years' => $this->years,
+            'twList' => $twList,
         ]);
     }
 }

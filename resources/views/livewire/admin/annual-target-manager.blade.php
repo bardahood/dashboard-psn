@@ -52,7 +52,7 @@
                     </div>
                     <div class="flex gap-3 text-sm whitespace-nowrap">
                         <button wire:click="toggleYears({{ $parent->id }})" class="text-blue-800 hover:underline">
-                            {{ $expandedParentId === $parent->id ? 'Tutup' : 'Target/Realisasi Tahunan' }}
+                            {{ $expandedParentId === $parent->id ? 'Tutup' : ($type === 'trisula' ? 'Target/Realisasi Tahunan & Triwulanan' : 'Target/Realisasi Tahunan') }}
                         </button>
                         <button wire:click="editParent({{ $parent->id }})" class="text-blue-800 hover:underline">Ubah</button>
                         <button wire:click="deleteParent({{ $parent->id }})" wire:confirm="Hapus data ini beserta seluruh target tahunannya?" class="text-red-700 hover:underline">Hapus</button>
@@ -88,6 +88,71 @@
                         </div>
                         <p class="mt-2 text-xs text-gray-400">% Realisasi dihitung otomatis dari Target &amp; Realisasi. Kosongkan seluruh kolom pada satu tahun untuk menghapus baris tahun tersebut.</p>
                     </form>
+
+                    @if ($type === 'trisula')
+                        <div class="mt-4 border-t pt-4">
+                            <h4 class="text-sm font-medium text-gray-700 mb-2">Target/Realisasi Triwulanan</h4>
+                            <form wire:submit="saveTw" class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
+                                <div>
+                                    <label class="block text-gray-500 mb-1">Tahun</label>
+                                    <input type="number" wire:model="twForm.tahun" class="w-full rounded border-gray-300 text-xs">
+                                    @error('twForm.tahun') <p class="text-red-600 mt-0.5">{{ $message }}</p> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-gray-500 mb-1">Triwulan</label>
+                                    <select wire:model="twForm.triwulan" class="w-full rounded border-gray-300 text-xs">
+                                        <option value="">-</option>
+                                        @for ($i = 1; $i <= 4; $i++) <option value="{{ $i }}">TW {{ $i }}</option> @endfor
+                                    </select>
+                                    @error('twForm.triwulan') <p class="text-red-600 mt-0.5">{{ $message }}</p> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-gray-500 mb-1">Target</label>
+                                    <input type="number" step="0.01" wire:model="twForm.target" class="w-full rounded border-gray-300 text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-500 mb-1">Realisasi</label>
+                                    <input type="number" step="0.01" wire:model="twForm.realisasi" class="w-full rounded border-gray-300 text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-500 mb-1">Status Capaian</label>
+                                    <input type="text" wire:model="twForm.status_capaian" class="w-full rounded border-gray-300 text-xs">
+                                </div>
+                                <div class="col-span-2 sm:col-span-5 flex justify-end">
+                                    <button type="submit" class="rounded-md bg-blue-800 text-white px-3 py-1.5 text-xs hover:bg-blue-700">Tambah Target Triwulanan</button>
+                                </div>
+                            </form>
+
+                            <table class="min-w-full text-xs mt-3">
+                                <thead class="text-left text-gray-500">
+                                    <tr>
+                                        <th class="py-1 pr-3">Periode</th>
+                                        <th class="py-1 pr-3">Target</th>
+                                        <th class="py-1 pr-3">Realisasi</th>
+                                        <th class="py-1 pr-3">% Realisasi</th>
+                                        <th class="py-1 pr-3">Status Capaian</th>
+                                        <th class="py-1"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y">
+                                    @forelse ($twList as $tw)
+                                        <tr wire:key="tw-{{ $tw->id }}">
+                                            <td class="py-1 pr-3">{{ $tw->tahun }} TW{{ $tw->triwulan }}</td>
+                                            <td class="py-1 pr-3">{{ $tw->target ?? '-' }}</td>
+                                            <td class="py-1 pr-3">{{ $tw->realisasi ?? '-' }}</td>
+                                            <td class="py-1 pr-3">{{ $tw->persen_realisasi !== null ? $tw->persen_realisasi.'%' : '-' }}</td>
+                                            <td class="py-1 pr-3">{{ $tw->status_capaian ?? '-' }}</td>
+                                            <td class="py-1 text-right">
+                                                <button wire:click="deleteTw({{ $tw->id }})" wire:confirm="Hapus data triwulan ini?" class="text-red-700 hover:underline">Hapus</button>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="6" class="py-2 text-center text-gray-400">Belum ada target triwulanan.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
                 @endif
             </div>
         @empty

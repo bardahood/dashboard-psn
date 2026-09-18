@@ -9,7 +9,8 @@ class ImportMatriksSandingan extends Command
 {
     protected $signature = 'psn:import-matriks
         {file? : Path file .xlsx Matrik Sandingan (default: berkas bawaan database/seeders/data)}
-        {--periode= : Tanggal periode pemutakhiran, format YYYY-MM-DD (default: hari ini)}';
+        {--periode= : Tanggal periode pemutakhiran, format YYYY-MM-DD (default: hari ini)}
+        {--kode= : Path file .xlsx Master Data PSN Kode untuk mengisi kode_rkp (default: berkas bawaan database/seeders/data, lewati dengan --kode=0)}';
 
     protected $description = 'Impor data PSN dari file Matrik Sandingan (.xlsx) ke tabel psn beserta normalisasinya';
 
@@ -31,9 +32,17 @@ class ImportMatriksSandingan extends Command
         $hasil = $importer->import($path, $periode);
 
         $this->table(
-            ['PSN dibuat', 'Baris K/L Penanggung Jawab', 'Baris Sumber Data', 'Baris dilewati (nama kosong)'],
-            [[$hasil['psn'], $hasil['penanggung_jawab'], $hasil['sumber_data'], $hasil['dilewati']]]
+            ['PSN dibuat', 'Baris K/L Penanggung Jawab', 'Baris Sumber Data', 'Baris Ketersediaan', 'Baris dilewati (nama kosong)'],
+            [[$hasil['psn'], $hasil['penanggung_jawab'], $hasil['sumber_data'], $hasil['ketersediaan'], $hasil['dilewati']]]
         );
+
+        $kodePath = $this->option('kode') ?? database_path('seeders/data/Master_Data_PSN_Kode.xlsx');
+
+        if ($kodePath !== '0' && is_file($kodePath)) {
+            $this->info("Mengisi kode_rkp dari {$kodePath}...");
+            $hasilKode = $importer->importKodeRkp($kodePath);
+            $this->table(['Kode Cocok', 'Kode Tidak Cocok'], [[$hasilKode['cocok'], $hasilKode['tidak_cocok']]]);
+        }
 
         $this->info('Impor selesai.');
 

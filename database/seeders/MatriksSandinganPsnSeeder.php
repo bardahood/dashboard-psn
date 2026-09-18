@@ -24,5 +24,12 @@ class MatriksSandinganPsnSeeder extends Seeder
         $hasil = $importer->import($path, now()->toDateString());
 
         $this->command?->info("Matrik Sandingan: {$hasil['psn']} PSN diimpor.");
+
+        $kodePath = database_path('seeders/data/Master_Data_PSN_Kode.xlsx');
+
+        if (is_file($kodePath)) {
+            $hasilKode = $importer->importKodeRkp($kodePath);
+            $this->command?->info("Master Data PSN Kode: {$hasilKode['cocok']} kode_rkp cocok, {$hasilKode['tidak_cocok']} tidak cocok.");
+        }
     }
 }

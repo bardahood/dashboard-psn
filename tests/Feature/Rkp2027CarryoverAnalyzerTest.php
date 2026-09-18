@@ -59,14 +59,14 @@ class Rkp2027CarryoverAnalyzerTest extends TestCase
     public function test_analisis_carryover_mengelompokkan_psn_sesuai_kecocokan_dengan_daftar_rkp_2027(): void
     {
         $this->seedRefDataDanMatriks();
-        $this->assertSame(388, Psn::count());
+        $this->assertSame(380, Psn::count());
 
         $path = database_path('seeders/data/Daftar_PSN_RKP_2027.docx');
         $hasil = app(Rkp2027CarryoverAnalyzer::class)->analisis($path);
 
         $this->assertSame(288, $hasil['carryover']->count());
         $this->assertSame(15, $hasil['perlu_ditinjau']->count());
-        $this->assertSame(105, $hasil['tidak_ditemukan_lagi']->count());
+        $this->assertSame(98, $hasil['tidak_ditemukan_lagi']->count());
 
         // "Makan Bergizi Gratis" ada di kedua sumber -> harus terklasifikasi carryover.
         $mbg = Psn::where('nama_psn', 'Makan Bergizi Gratis')->firstOrFail();
@@ -100,9 +100,9 @@ class Rkp2027CarryoverAnalyzerTest extends TestCase
         $hasil = $analyzer->analisis($path);
         $jumlah = $analyzer->terapkanKeMatriksSandingan($hasil);
 
-        $this->assertSame(388, $jumlah);
-        $this->assertSame(283, DB::table('v_psn_sandingan_sumber')->where('rkp_2027', true)->count());
-        $this->assertSame(105, DB::table('v_psn_sandingan_sumber')->where('rkp_2027', false)->count());
+        $this->assertSame(380, $jumlah);
+        $this->assertSame(282, DB::table('v_psn_sandingan_sumber')->where('rkp_2027', true)->count());
+        $this->assertSame(98, DB::table('v_psn_sandingan_sumber')->where('rkp_2027', false)->count());
 
         $mbg = Psn::where('nama_psn', 'Makan Bergizi Gratis')->firstOrFail();
         $this->assertSame(1, DB::table('v_psn_sandingan_sumber')->where('psn_id', $mbg->id)->where('rkp_2027', true)->count());
@@ -122,7 +122,7 @@ class Rkp2027CarryoverAnalyzerTest extends TestCase
 
         $mbg = Psn::where('nama_psn', 'Makan Bergizi Gratis')->firstOrFail();
         $this->assertSame('Carryover', $mbg->fresh()->kategori_usulan);
-        $this->assertSame(283, DB::table('v_psn_sandingan_sumber')->where('rkp_2027', true)->count());
+        $this->assertSame(282, DB::table('v_psn_sandingan_sumber')->where('rkp_2027', true)->count());
     }
 
     public function test_halaman_matriks_sandingan_menampilkan_kolom_rkp_2027(): void

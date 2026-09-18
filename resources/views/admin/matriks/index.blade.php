@@ -6,9 +6,11 @@
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-4">
             <p class="text-sm text-gray-500">
-                Sandingan ketersediaan data PSN di 5 sumber: RKP Pemutakhiran 2026, Data PEKS3, Data PSI, Permenko,
+                Sandingan ketersediaan PSN di 5 sumber: RKP Pemutakhiran 2026, Data PEKS3, Data PSI, Permenko,
                 dan RKP 2027 (hasil pencocokan otomatis terhadap
-                <a href="{{ route('admin.analisis-rkp2027') }}" class="text-blue-800 hover:underline">lampiran Daftar PSN RKP 2027</a>).
+                <a href="{{ route('admin.analisis-rkp2027') }}" class="text-blue-800 hover:underline">lampiran Daftar PSN RKP 2027</a>),
+                serta kelengkapan 2 jenis data pendukung (Matrik Sandingan 17 Sept 2026): Data Gambaran Umum Proyek
+                dan Data Project Profile Lengkap untuk kebutuhan evaluasi.
             </p>
 
             <form method="GET" class="bg-white rounded-lg shadow p-4 flex flex-wrap items-center gap-3">
@@ -48,10 +50,15 @@
                             <th class="px-4 py-3 text-center">PSI</th>
                             <th class="px-4 py-3 text-center">Permenko</th>
                             <th class="px-4 py-3 text-center">RKP 2027</th>
+                            <th class="px-4 py-3 text-center">Gambaran Umum</th>
+                            <th class="px-4 py-3 text-center">Project Profile Lengkap</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y">
-                        @php $mark = fn ($v) => $v === null ? '<span class="text-gray-300">—</span>' : ($v ? '<span class="text-green-600 font-bold">&#10003;</span>' : '<span class="text-red-600 font-bold">&times;</span>'); @endphp
+                        @php
+                            $mark = fn ($v) => $v === null ? '<span class="text-gray-300">—</span>' : ($v ? '<span class="text-green-600 font-bold">&#10003;</span>' : '<span class="text-red-600 font-bold">&times;</span>');
+                            $markStatus = fn (?string $v) => $v === null ? '<span class="text-gray-300">—</span>' : ($v === 'Ada' ? '<span class="text-green-600 font-bold">&#10003;</span>' : '<span class="text-red-600 font-bold">&times;</span>');
+                        @endphp
                         @forelse ($matriks as $row)
                             <tr class="hover:bg-gray-50">
                                 <td class="px-4 py-3">{{ \Illuminate\Support\Str::limit($row->nama_psn, 60) }}</td>
@@ -62,9 +69,11 @@
                                 <td class="px-4 py-3 text-center">{!! $mark($row->data_psi) !!}</td>
                                 <td class="px-4 py-3 text-center">{!! $mark($row->permenko) !!}</td>
                                 <td class="px-4 py-3 text-center">{!! $mark($row->rkp_2027) !!}</td>
+                                <td class="px-4 py-3 text-center">{!! $markStatus($row->ketersediaan_gambaran_umum) !!}</td>
+                                <td class="px-4 py-3 text-center">{!! $markStatus($row->ketersediaan_project_profile) !!}</td>
                             </tr>
                         @empty
-                            <tr><td colspan="8" class="px-4 py-6 text-center text-gray-400">Belum ada data.</td></tr>
+                            <tr><td colspan="10" class="px-4 py-6 text-center text-gray-400">Belum ada data.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

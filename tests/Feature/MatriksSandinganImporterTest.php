@@ -28,11 +28,13 @@ class MatriksSandinganImporterTest extends TestCase
 
         $hasil = app(MatriksSandinganImporter::class)->import($path, '2026-09-11');
 
-        $this->assertSame(388, $hasil['psn']);
-        $this->assertSame(388, Psn::count());
-        $this->assertSame(388 * 4, DB::table('psn_sumber_data')->count());
-        $this->assertSame(296, DB::table('psn_ketersediaan')->where('status_ketersediaan_id', 1)->count());
-        $this->assertSame(92, DB::table('psn_ketersediaan')->where('status_ketersediaan_id', 2)->count());
+        $this->assertSame(380, $hasil['psn']);
+        $this->assertSame(380, Psn::count());
+        $this->assertSame(380 * 4, DB::table('psn_sumber_data')->count());
+        // 2 baris ketersediaan per PSN (Gambaran Umum + Project Profile Lengkap).
+        $this->assertSame(380 * 2, DB::table('psn_ketersediaan')->count());
+        $this->assertSame(305, DB::table('psn_ketersediaan')->where('status_ketersediaan_id', 1)->count());
+        $this->assertSame(455, DB::table('psn_ketersediaan')->where('status_ketersediaan_id', 2)->count());
 
         $mbg = Psn::where('nama_psn', 'Makan Bergizi Gratis')->with('klaster', 'provinsi')->first();
         $this->assertNotNull($mbg);
@@ -49,12 +51,43 @@ class MatriksSandinganImporterTest extends TestCase
         $this->assertTrue((bool) $sumberMbg['Data PSI']);
         $this->assertTrue((bool) $sumberMbg['Permenko']);
 
+        $ketersediaanMbg = DB::table('psn_ketersediaan')
+            ->join('ref_status_ketersediaan', 'ref_status_ketersediaan.id', '=', 'psn_ketersediaan.status_ketersediaan_id')
+            ->where('psn_ketersediaan.psn_id', $mbg->id)
+            ->pluck('ref_status_ketersediaan.nama_status', 'psn_ketersediaan.jenis_ketersediaan');
+        $this->assertSame('Ada', $ketersediaanMbg['Gambaran Umum']);
+        $this->assertSame('Ada', $ketersediaanMbg['Project Profile Lengkap']);
+
         // Baris multi-K/L: "Menteri Sosial dan Menteri Pekerjaan Umum" harus terpecah 2 instansi.
         $sekolahRakyat = Psn::where('nama_psn', 'Pembangunan Sekolah Rakyat')->first();
         $this->assertSame(2, DB::table('psn_penanggung_jawab')->where('psn_id', $sekolahRakyat->id)->count());
 
         // Import ulang harus idempoten (tidak dobel).
         app(MatriksSandinganImporter::class)->import($path, '2026-09-11');
-        $this->assertSame(388, Psn::count());
+        $this->assertSame(380, Psn::count());
+    }
+
+    public function test_import_kode_rkp_mengisi_kolom_kode_rkp_dari_master_data_psn_kode(): void
+    {
+        $this->seed(RefKlasterSeeder::class);
+        $this->seed(RefProvinsiSeeder::class);
+        $this->seed(RefSumberDataSeeder::class);
+        $this->seed(RefStatusKetersediaanSeeder::class);
+
+        $path = database_path('seeders/data/Matrik_Sandingan_Data_PSN_2026.xlsx');
+        $importer = app(MatriksSandinganImporter::class);
+        $importer->import($path, '2026-09-17');
+
+        $kodePath = database_path('seeders/data/Master_Data_PSN_Kode.xlsx');
+        $this->assertFileExists($kodePath);
+
+        $hasil = $importer->importKodeRkp($kodePath);
+
+        $this->assertSame(378, $hasil['cocok']);
+        $this->assertSame(0, $hasil['tidak_cocok']);
+        $this->assertSame(378, Psn::whereNotNull('kode_rkp')->count());
+
+        $mbg = Psn::where('nama_psn', 'Makan Bergizi Gratis')->firstOrFail();
+        $this->assertSame('DP.1-2026.1-01', $mbg->kode_rkp);
     }
 }

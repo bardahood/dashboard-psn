@@ -11,6 +11,7 @@ use App\Models\RisikoPsn;
 use App\Models\RoProyek;
 use App\Models\RoTargetPeriode;
 use App\Models\TrisulaKontribusiPsn;
+use App\Models\TrisulaTargetPeriode;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -105,6 +106,43 @@ class PedomanProjectProfileTest extends TestCase
         $kontribusi = TrisulaKontribusiPsn::firstOrFail();
         $this->assertSame('Sumber Daya Manusia', $kontribusi->kategori_trisula);
         $this->assertSame('Kesehatan', $kontribusi->sub_kategori_sdm);
+    }
+
+    public function test_kontribusi_trisula_bisa_diisi_target_triwulanan_terpisah_dari_target_tahunan(): void
+    {
+        $this->actingAsSuperAdmin();
+        $psn = Psn::create(['nama_psn' => 'Bendungan Contoh']);
+
+        $kontribusi = TrisulaKontribusiPsn::create([
+            'psn_id' => $psn->id,
+            'kategori_trisula' => 'Pertumbuhan Ekonomi',
+            'nama_indikator' => 'Nilai Investasi',
+        ]);
+
+        Livewire::test(AnnualTargetManager::class, ['psn' => $psn, 'type' => 'trisula'])
+            ->call('toggleYears', $kontribusi->id)
+            ->set('yearForm.2026.target', 100)
+            ->set('yearForm.2026.realisasi', 40)
+            ->call('saveYears')
+            ->set('twForm.tahun', 2026)
+            ->set('twForm.triwulan', 2)
+            ->set('twForm.target', 25)
+            ->set('twForm.realisasi', 20)
+            ->call('saveTw')
+            ->assertHasNoErrors();
+
+        $tahunan = TrisulaTargetPeriode::where('kontribusi_id', $kontribusi->id)->where('tipe_periode', 'TAHUNAN')->firstOrFail();
+        $this->assertSame('100.00', (string) $tahunan->target);
+        $this->assertNull($tahunan->triwulan);
+
+        $triwulanan = TrisulaTargetPeriode::where('kontribusi_id', $kontribusi->id)->where('tipe_periode', 'TRIWULANAN')->firstOrFail();
+        $this->assertSame(2, $triwulanan->triwulan);
+        $this->assertSame('25.00', (string) $triwulanan->target);
+        $this->assertSame('20.00', (string) $triwulanan->realisasi);
+        $this->assertSame('80.00', (string) $triwulanan->persen_realisasi);
+
+        // Kedua tipe periode tetap terpisah walau tahun sama (tidak saling menimpa).
+        $this->assertSame(2, TrisulaTargetPeriode::where('kontribusi_id', $kontribusi->id)->where('tahun', 2026)->count());
     }
 
     public function test_diagram_kerangka_kelembagaan_bisa_diunggah_ditampilkan_dan_dihapus(): void
