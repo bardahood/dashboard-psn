@@ -4,13 +4,13 @@
     <div class="sm:col-span-2">
         <x-input-label for="nama_psn" value="Nama PSN" />
         <textarea id="nama_psn" name="nama_psn" rows="2" required
-                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">{{ old('nama_psn', $psn?->nama_psn) }}</textarea>
+                  class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">{{ old('nama_psn', $psn?->nama_psn) }}</textarea>
         <x-input-error :messages="$errors->get('nama_psn')" class="mt-2" />
     </div>
 
     <div>
         <x-input-label for="klaster_id" value="Klaster" />
-        <select id="klaster_id" name="klaster_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+        <select id="klaster_id" name="klaster_id" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">
             <option value="">-- Pilih Klaster --</option>
             @foreach ($klasterOptions as $k)
                 <option value="{{ $k->id }}" @selected(old('klaster_id', $psn?->klaster_id) == $k->id)>{{ $k->nama_klaster }}</option>
@@ -20,7 +20,7 @@
 
     <div>
         <x-input-label for="status_psn_id" value="Status PSN" />
-        <select id="status_psn_id" name="status_psn_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+        <select id="status_psn_id" name="status_psn_id" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">
             <option value="">-- Pilih Status --</option>
             @foreach ($statusOptions as $s)
                 <option value="{{ $s->id }}" @selected(old('status_psn_id', $psn?->status_psn_id) == $s->id)>{{ $s->nama_status }}</option>
@@ -30,7 +30,7 @@
 
     <div>
         <x-input-label for="provinsi_id" value="Provinsi" />
-        <select id="provinsi_id" name="provinsi_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+        <select id="provinsi_id" name="provinsi_id" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">
             <option value="">-- Pilih Provinsi --</option>
             @foreach ($provinsiOptions as $p)
                 <option value="{{ $p->id }}" @selected(old('provinsi_id', $psn?->provinsi_id) == $p->id)>{{ $p->nama_provinsi }}</option>
@@ -45,7 +45,7 @@
 
     <div>
         <x-input-label for="kategori_usulan" value="Kategori Usulan" />
-        <select id="kategori_usulan" name="kategori_usulan" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+        <select id="kategori_usulan" name="kategori_usulan" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">
             <option value="">-- Belum Ditetapkan --</option>
             <option value="Carryover" @selected(old('kategori_usulan', $psn?->kategori_usulan) == 'Carryover')>Carryover (PSN Berjalan)</option>
             <option value="Usulan Baru" @selected(old('kategori_usulan', $psn?->kategori_usulan) == 'Usulan Baru')>Usulan Baru</option>
@@ -54,7 +54,7 @@
 
     <div>
         <x-input-label for="tipe_hierarki" value="Tipe Hierarki" />
-        <select id="tipe_hierarki" name="tipe_hierarki" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+        <select id="tipe_hierarki" name="tipe_hierarki" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">
             <option value="">-- Tidak Ditetapkan --</option>
             <option value="PKPN" @selected(old('tipe_hierarki', $psn?->tipe_hierarki) == 'PKPN')>PKPN (wajib lapor bulanan)</option>
             <option value="PSN" @selected(old('tipe_hierarki', $psn?->tipe_hierarki) == 'PSN')>PSN (bulanan/triwulanan)</option>
@@ -68,17 +68,17 @@
 
     <div class="sm:col-span-2">
         <x-input-label for="output_akhir" value="Output Akhir" />
-        <textarea id="output_akhir" name="output_akhir" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">{{ old('output_akhir', $psn?->output_akhir) }}</textarea>
+        <textarea id="output_akhir" name="output_akhir" rows="2" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">{{ old('output_akhir', $psn?->output_akhir) }}</textarea>
     </div>
 
     <div class="sm:col-span-2">
         <x-input-label for="tujuan_utama" value="Tujuan Utama" />
-        <textarea id="tujuan_utama" name="tujuan_utama" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">{{ old('tujuan_utama', $psn?->tujuan_utama) }}</textarea>
+        <textarea id="tujuan_utama" name="tujuan_utama" rows="3" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">{{ old('tujuan_utama', $psn?->tujuan_utama) }}</textarea>
     </div>
 
     <div class="sm:col-span-2">
         <x-input-label for="urgensi" value="Urgensi & Dasar Hukum" />
-        <textarea id="urgensi" name="urgensi" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">{{ old('urgensi', $psn?->urgensi) }}</textarea>
+        <textarea id="urgensi" name="urgensi" rows="3" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">{{ old('urgensi', $psn?->urgensi) }}</textarea>
     </div>
 
     <div>
@@ -93,7 +93,7 @@
 
     <div>
         <x-input-label for="pengusul_instansi_id" value="Pengusul" />
-        <select id="pengusul_instansi_id" name="pengusul_instansi_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+        <select id="pengusul_instansi_id" name="pengusul_instansi_id" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">
             <option value="">-- Pilih Instansi --</option>
             @foreach ($instansiOptions as $i)
                 <option value="{{ $i->id }}" @selected(old('pengusul_instansi_id', $psn?->pengusul_instansi_id) == $i->id)>{{ $i->nama_instansi }}</option>
@@ -103,7 +103,7 @@
 
     <div>
         <x-input-label for="pengelola_instansi_id" value="Pengelola" />
-        <select id="pengelola_instansi_id" name="pengelola_instansi_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+        <select id="pengelola_instansi_id" name="pengelola_instansi_id" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">
             <option value="">-- Pilih Instansi --</option>
             @foreach ($instansiOptions as $i)
                 <option value="{{ $i->id }}" @selected(old('pengelola_instansi_id', $psn?->pengelola_instansi_id) == $i->id)>{{ $i->nama_instansi }}</option>
@@ -113,7 +113,7 @@
 
     <div>
         <x-input-label for="kontraktor_instansi_id" value="Kontraktor" />
-        <select id="kontraktor_instansi_id" name="kontraktor_instansi_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+        <select id="kontraktor_instansi_id" name="kontraktor_instansi_id" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">
             <option value="">-- Pilih Instansi --</option>
             @foreach ($instansiOptions as $i)
                 <option value="{{ $i->id }}" @selected(old('kontraktor_instansi_id', $psn?->kontraktor_instansi_id) == $i->id)>{{ $i->nama_instansi }}</option>
@@ -123,7 +123,7 @@
 
     <div>
         <x-input-label for="supervisi_instansi_id" value="Supervisi" />
-        <select id="supervisi_instansi_id" name="supervisi_instansi_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+        <select id="supervisi_instansi_id" name="supervisi_instansi_id" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">
             <option value="">-- Pilih Instansi --</option>
             @foreach ($instansiOptions as $i)
                 <option value="{{ $i->id }}" @selected(old('supervisi_instansi_id', $psn?->supervisi_instansi_id) == $i->id)>{{ $i->nama_instansi }}</option>
@@ -138,7 +138,7 @@
 
     <div>
         <x-input-label for="sumber_input" value="Sumber Input" />
-        <select id="sumber_input" name="sumber_input" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+        <select id="sumber_input" name="sumber_input" required class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">
             <option value="Manual" @selected(old('sumber_input', $psn?->sumber_input ?? 'Manual') == 'Manual')>Manual</option>
             <option value="API PSI" @selected(old('sumber_input', $psn?->sumber_input) == 'API PSI')>API PSI</option>
         </select>
@@ -151,7 +151,7 @@
 
     <div class="sm:col-span-2">
         <x-input-label for="asta_cita" value="Keterkaitan dengan Asta Cita" />
-        <textarea id="asta_cita" name="asta_cita" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">{{ old('asta_cita', $psn?->asta_cita) }}</textarea>
+        <textarea id="asta_cita" name="asta_cita" rows="2" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">{{ old('asta_cita', $psn?->asta_cita) }}</textarea>
     </div>
 
     <div class="sm:col-span-2">

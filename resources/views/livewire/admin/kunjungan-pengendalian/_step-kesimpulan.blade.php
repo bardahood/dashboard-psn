@@ -1,5 +1,5 @@
 <div class="space-y-6">
-    <div class="bg-white shadow rounded-lg p-6">
+    <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
         <h3 class="font-semibold text-gray-700 mb-4">Skor & Rekomendasi Otomatis</h3>
         <div class="flex items-center gap-6">
             <div>
@@ -15,13 +15,13 @@
         </div>
     </div>
 
-    <div class="bg-white shadow rounded-lg p-6">
+    <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
         <h3 class="font-semibold text-gray-700 mb-4">Bagian I: Kesimpulan & Pengesahan</h3>
 
         <form wire:submit="saveKesimpulan" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Status Pengendalian</label>
-                <select wire:model="kesimpulan.status_pengendalian" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <select wire:model="kesimpulan.status_pengendalian" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                     <option value="">-- Pilih --</option>
                     <option value="Aktif Dikendalikan Sesuai Rencana">Aktif Dikendalikan Sesuai Rencana</option>
                     <option value="Perlu Perhatian">Perlu Perhatian</option>
@@ -31,7 +31,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Mengetahui</label>
-                <select wire:model="kesimpulan.mengetahui_id" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <select wire:model="kesimpulan.mengetahui_id" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                     <option value="">-- Pilih PIC --</option>
                     @foreach ($picOptions as $id => $nama)
                         <option value="{{ $id }}">{{ $nama }}</option>
@@ -40,15 +40,15 @@
             </div>
             <div class="sm:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Rekomendasi Kelanjutan Status</label>
-                <textarea wire:model="kesimpulan.rekomendasi_kelanjutan_status" rows="2" class="block w-full rounded-md border-gray-300 shadow-sm text-sm"></textarea>
+                <textarea wire:model="kesimpulan.rekomendasi_kelanjutan_status" rows="2" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm"></textarea>
             </div>
             <div class="sm:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Kesimpulan Umum</label>
-                <textarea wire:model="kesimpulan.kesimpulan_umum" rows="3" class="block w-full rounded-md border-gray-300 shadow-sm text-sm"></textarea>
+                <textarea wire:model="kesimpulan.kesimpulan_umum" rows="3" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm"></textarea>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Pengesahan</label>
-                <input type="date" wire:model="kesimpulan.tanggal_pengesahan" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <input type="date" wire:model="kesimpulan.tanggal_pengesahan" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
             </div>
 
             <div class="sm:col-span-2 flex justify-between">

@@ -10,22 +10,22 @@
                 agar dapat ditelusuri per-PSN/kategori tanpa membuka wizard satu per satu.
             </p>
 
-            <form method="GET" class="bg-white rounded-lg shadow p-4 flex flex-wrap gap-3">
+            <form method="GET" class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-4 flex flex-wrap gap-3">
                 <input type="text" name="psn" value="{{ request('psn') }}" placeholder="Cari nama PSN..."
-                       class="rounded-md border-gray-300 text-sm flex-1 min-w-[200px]">
-                <select name="kategori" class="rounded-md border-gray-300 text-sm">
+                       class="rounded-lg border-gray-300 transition-colors text-sm flex-1 min-w-[200px]">
+                <select name="kategori" class="rounded-lg border-gray-300 transition-colors text-sm">
                     <option value="">Semua Kategori</option>
                     @foreach ($kategoriList as $kategori)
                         <option value="{{ $kategori }}" @selected(request('kategori') === $kategori)>{{ $kategori }}</option>
                     @endforeach
                 </select>
-                <button class="rounded-md bg-gray-700 text-white text-sm font-medium px-4 hover:bg-gray-600">Filter</button>
+                <button class="rounded-lg bg-gray-700 text-white shadow-sm transition-all text-sm font-medium px-4 hover:bg-gray-600">Filter</button>
                 @if (request('psn') || request('kategori'))
                     <a href="{{ route('admin.dokumen') }}" class="text-sm text-gray-500 self-center hover:underline">Reset</a>
                 @endif
             </form>
 
-            <div class="bg-white shadow rounded-lg overflow-x-auto">
+            <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead class="bg-gray-50 text-left text-gray-500">
                         <tr>
@@ -41,7 +41,7 @@
                             <tr class="hover:bg-gray-50">
                                 <td class="px-4 py-3">
                                     @if ($doc->kunjungan?->psn)
-                                        <a href="{{ route('admin.psn.show', $doc->kunjungan->psn) }}" class="text-blue-800 hover:underline">
+                                        <a href="{{ route('admin.psn.show', $doc->kunjungan->psn) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">
                                             {{ $doc->kunjungan->psn->nama_psn }}
                                         </a>
                                     @else
@@ -50,13 +50,13 @@
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">{{ $doc->kunjungan?->tanggal_kunjungan?->format('d M Y') ?? '-' }}</td>
                                 <td class="px-4 py-3">
-                                    <span class="rounded-full text-xs px-2 py-1 bg-blue-50 text-blue-700">{{ $doc->kategori ?? '-' }}</span>
+                                    <span class="rounded-full text-xs px-2.5 py-1 font-medium bg-blue-50 text-blue-700">{{ $doc->kategori ?? '-' }}</span>
                                 </td>
                                 <td class="px-4 py-3">{{ $doc->deskripsi ?? '-' }}</td>
                                 <td class="px-4 py-3">
                                     @if ($doc->nama_file_tautan)
                                         <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($doc->nama_file_tautan) }}"
-                                           target="_blank" class="text-blue-800 hover:underline">Lihat/Unduh</a>
+                                           target="_blank" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Lihat/Unduh</a>
                                     @else
                                         <span class="text-gray-400">-</span>
                                     @endif

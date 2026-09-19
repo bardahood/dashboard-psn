@@ -11,20 +11,20 @@
                 pada profil masing-masing PSN, bukan tabel terpisah.
             </p>
 
-            <form method="GET" class="bg-white rounded-lg shadow p-4 flex flex-wrap items-center gap-3">
-                <select name="tahun_evaluasi" class="rounded-md border-gray-300 text-sm">
+            <form method="GET" class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-4 flex flex-wrap items-center gap-3">
+                <select name="tahun_evaluasi" class="rounded-lg border-gray-300 transition-colors text-sm">
                     <option value="">Semua Tahun</option>
                     @foreach ($tahunOptions as $tahun)
                         <option value="{{ $tahun }}" @selected(request('tahun_evaluasi') == $tahun)>{{ $tahun }}</option>
                     @endforeach
                 </select>
-                <button class="rounded-md bg-gray-700 text-white text-sm font-medium px-4 py-2 hover:bg-gray-600">Filter</button>
+                <button class="rounded-lg bg-gray-700 text-white shadow-sm transition-all text-sm font-medium px-4 py-2 hover:bg-gray-600">Filter</button>
                 @if (request()->filled('tahun_evaluasi'))
                     <a href="{{ route('admin.evaluasi-keluar') }}" class="text-sm text-gray-500 hover:underline">Reset</a>
                 @endif
             </form>
 
-            <div class="bg-white shadow rounded-lg overflow-x-auto">
+            <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead class="bg-gray-50 text-left text-gray-500">
                         <tr>
@@ -44,7 +44,7 @@
                                 <td class="px-4 py-3 max-w-lg">{{ $evaluasi->justifikasi ?? '-' }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     @if ($evaluasi->psn)
-                                        <a href="{{ route('admin.psn.profil', [$evaluasi->psn, 'evaluasi_status']) }}" class="text-blue-800 hover:underline">Lihat Detail</a>
+                                        <a href="{{ route('admin.psn.profil', [$evaluasi->psn, 'evaluasi_status']) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Lihat Detail</a>
                                     @endif
                                 </td>
                             </tr>

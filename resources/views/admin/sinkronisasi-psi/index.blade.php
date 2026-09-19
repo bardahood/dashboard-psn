@@ -4,7 +4,7 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Sinkronisasi API PSI</h2>
             <form method="POST" action="{{ route('admin.sinkronisasi-psi.trigger') }}">
                 @csrf
-                <button class="rounded-md bg-blue-800 text-white px-4 py-2 text-sm hover:bg-blue-700">
+                <button class="rounded-lg bg-blue-800 text-white shadow-sm hover:shadow transition-all px-4 py-2 text-sm hover:bg-blue-700">
                     Jalankan Sinkronisasi Sekarang
                 </button>
             </form>
@@ -25,7 +25,7 @@
                 Endpoint API resmi belum tersedia -- lihat catatan pada <code>App\Services\PsiSyncService</code>.
             </p>
 
-            <div class="bg-white shadow rounded-lg overflow-x-auto">
+            <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead class="bg-gray-50 text-left text-gray-500">
                         <tr>
@@ -41,7 +41,7 @@
                                 <td class="px-4 py-3 whitespace-nowrap">{{ $log->tanggal_sync->format('d M Y H:i') }}</td>
                                 <td class="px-4 py-3">{{ $log->jumlah_psn_diterima ?? '-' }}</td>
                                 <td class="px-4 py-3">
-                                    <span class="rounded-full text-xs px-2 py-1
+                                    <span class="rounded-full text-xs px-2.5 py-1 font-medium
                                         {{ $log->status === 'Sukses' ? 'bg-green-100 text-green-700' : ($log->status === 'Sebagian' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700') }}">
                                         {{ $log->status }}
                                     </span>

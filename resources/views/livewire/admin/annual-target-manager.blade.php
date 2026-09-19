@@ -1,5 +1,5 @@
 <div class="space-y-6">
-    <div class="bg-white shadow rounded-lg p-6">
+    <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
         <h3 class="font-semibold text-gray-700 mb-4">{{ $editingParentId ? 'Ubah' : 'Tambah' }} {{ $config['label'] }}</h3>
 
         <form wire:submit="saveParent" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -10,16 +10,16 @@
                     </label>
 
                     @if ($field['type'] === 'textarea')
-                        <textarea wire:model="parentForm.{{ $field['name'] }}" rows="2" class="block w-full rounded-md border-gray-300 shadow-sm text-sm"></textarea>
+                        <textarea wire:model="parentForm.{{ $field['name'] }}" rows="2" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm"></textarea>
                     @elseif ($field['type'] === 'select')
-                        <select wire:model="parentForm.{{ $field['name'] }}" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                        <select wire:model="parentForm.{{ $field['name'] }}" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                             <option value="">-- Pilih --</option>
                             @foreach ($field['options'] as $value => $labelText)
                                 <option value="{{ $value }}">{{ $labelText }}</option>
                             @endforeach
                         </select>
                     @else
-                        <input type="text" wire:model="parentForm.{{ $field['name'] }}" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                        <input type="text" wire:model="parentForm.{{ $field['name'] }}" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                     @endif
 
                     @error('parentForm.'.$field['name'])
@@ -32,7 +32,7 @@
                 @if ($editingParentId)
                     <button type="button" wire:click="resetParentForm" class="rounded-md border px-4 py-2 text-sm">Batal</button>
                 @endif
-                <button type="submit" class="rounded-md bg-blue-800 text-white px-4 py-2 text-sm hover:bg-blue-700">
+                <button type="submit" class="rounded-lg bg-blue-800 text-white shadow-sm hover:shadow transition-all px-4 py-2 text-sm hover:bg-blue-700">
                     {{ $editingParentId ? 'Simpan Perubahan' : 'Tambah' }}
                 </button>
             </div>
@@ -41,7 +41,7 @@
 
     <div class="space-y-3">
         @forelse ($parents as $parent)
-            <div wire:key="parent-{{ $parent->id }}" class="bg-white shadow rounded-lg p-4">
+            <div wire:key="parent-{{ $parent->id }}" class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-4">
                 <div class="flex items-start justify-between gap-4">
                     <div class="text-sm">
                         <div class="font-medium text-gray-800">{{ $parent->{$config['titleField']} }}</div>
@@ -51,10 +51,10 @@
                         </div>
                     </div>
                     <div class="flex gap-3 text-sm whitespace-nowrap">
-                        <button wire:click="toggleYears({{ $parent->id }})" class="text-blue-800 hover:underline">
+                        <button wire:click="toggleYears({{ $parent->id }})" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">
                             {{ $expandedParentId === $parent->id ? 'Tutup' : ($type === 'trisula' ? 'Target/Realisasi Tahunan & Triwulanan' : 'Target/Realisasi Tahunan') }}
                         </button>
-                        <button wire:click="editParent({{ $parent->id }})" class="text-blue-800 hover:underline">Ubah</button>
+                        <button wire:click="editParent({{ $parent->id }})" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Ubah</button>
                         <button wire:click="deleteParent({{ $parent->id }})" wire:confirm="Hapus data ini beserta seluruh target tahunannya?" class="text-red-700 hover:underline">Hapus</button>
                     </div>
                 </div>
@@ -75,16 +75,16 @@
                                 @foreach ($years as $year)
                                     <tr>
                                         <td class="py-1 pr-3 font-medium">{{ $year }}</td>
-                                        <td class="py-1 pr-3"><input type="text" wire:model="yearForm.{{ $year }}.target_akhir" class="w-28 rounded border-gray-300 text-xs"></td>
-                                        <td class="py-1 pr-3"><input type="number" step="0.01" wire:model="yearForm.{{ $year }}.target" class="w-24 rounded border-gray-300 text-xs"></td>
-                                        <td class="py-1 pr-3"><input type="number" step="0.01" wire:model="yearForm.{{ $year }}.realisasi" class="w-24 rounded border-gray-300 text-xs"></td>
-                                        <td class="py-1 pr-3"><input type="text" wire:model="yearForm.{{ $year }}.status_capaian" class="w-32 rounded border-gray-300 text-xs"></td>
+                                        <td class="py-1 pr-3"><input type="text" wire:model="yearForm.{{ $year }}.target_akhir" class="w-28 rounded-lg border-gray-300 transition-colors text-xs"></td>
+                                        <td class="py-1 pr-3"><input type="number" step="0.01" wire:model="yearForm.{{ $year }}.target" class="w-24 rounded-lg border-gray-300 transition-colors text-xs"></td>
+                                        <td class="py-1 pr-3"><input type="number" step="0.01" wire:model="yearForm.{{ $year }}.realisasi" class="w-24 rounded-lg border-gray-300 transition-colors text-xs"></td>
+                                        <td class="py-1 pr-3"><input type="text" wire:model="yearForm.{{ $year }}.status_capaian" class="w-32 rounded-lg border-gray-300 transition-colors text-xs"></td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
                         <div class="mt-3 flex justify-end">
-                            <button type="submit" class="rounded-md bg-blue-800 text-white px-4 py-1.5 text-xs hover:bg-blue-700">Simpan Target Tahunan</button>
+                            <button type="submit" class="rounded-lg bg-blue-800 text-white shadow-sm hover:shadow transition-all px-4 py-1.5 text-xs hover:bg-blue-700">Simpan Target Tahunan</button>
                         </div>
                         <p class="mt-2 text-xs text-gray-400">% Realisasi dihitung otomatis dari Target &amp; Realisasi. Kosongkan seluruh kolom pada satu tahun untuk menghapus baris tahun tersebut.</p>
                     </form>
@@ -95,12 +95,12 @@
                             <form wire:submit="saveTw" class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
                                 <div>
                                     <label class="block text-gray-500 mb-1">Tahun</label>
-                                    <input type="number" wire:model="twForm.tahun" class="w-full rounded border-gray-300 text-xs">
+                                    <input type="number" wire:model="twForm.tahun" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
                                     @error('twForm.tahun') <p class="text-red-600 mt-0.5">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
                                     <label class="block text-gray-500 mb-1">Triwulan</label>
-                                    <select wire:model="twForm.triwulan" class="w-full rounded border-gray-300 text-xs">
+                                    <select wire:model="twForm.triwulan" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
                                         <option value="">-</option>
                                         @for ($i = 1; $i <= 4; $i++) <option value="{{ $i }}">TW {{ $i }}</option> @endfor
                                     </select>
@@ -108,18 +108,18 @@
                                 </div>
                                 <div>
                                     <label class="block text-gray-500 mb-1">Target</label>
-                                    <input type="number" step="0.01" wire:model="twForm.target" class="w-full rounded border-gray-300 text-xs">
+                                    <input type="number" step="0.01" wire:model="twForm.target" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
                                 </div>
                                 <div>
                                     <label class="block text-gray-500 mb-1">Realisasi</label>
-                                    <input type="number" step="0.01" wire:model="twForm.realisasi" class="w-full rounded border-gray-300 text-xs">
+                                    <input type="number" step="0.01" wire:model="twForm.realisasi" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
                                 </div>
                                 <div>
                                     <label class="block text-gray-500 mb-1">Status Capaian</label>
-                                    <input type="text" wire:model="twForm.status_capaian" class="w-full rounded border-gray-300 text-xs">
+                                    <input type="text" wire:model="twForm.status_capaian" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
                                 </div>
                                 <div class="col-span-2 sm:col-span-5 flex justify-end">
-                                    <button type="submit" class="rounded-md bg-blue-800 text-white px-3 py-1.5 text-xs hover:bg-blue-700">Tambah Target Triwulanan</button>
+                                    <button type="submit" class="rounded-lg bg-blue-800 text-white shadow-sm hover:shadow transition-all px-3 py-1.5 text-xs hover:bg-blue-700">Tambah Target Triwulanan</button>
                                 </div>
                             </form>
 
@@ -156,7 +156,7 @@
                 @endif
             </div>
         @empty
-            <div class="bg-white shadow rounded-lg p-6 text-center text-gray-400 text-sm">Belum ada data {{ $config['label'] }}.</div>
+            <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6 text-center text-gray-400 text-sm">Belum ada data {{ $config['label'] }}.</div>
         @endforelse
     </div>
 </div>

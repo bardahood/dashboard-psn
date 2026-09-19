@@ -8,11 +8,11 @@
                 @endif
             </h2>
             <div class="flex items-center gap-4">
-                <a href="{{ route('admin.debottlenecking') }}" class="text-sm text-blue-800 hover:underline">
+                <a href="{{ route('admin.debottlenecking') }}" class="text-sm text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">
                     Ringkasan Debottlenecking &rarr;
                 </a>
                 <a href="{{ route('admin.kunjungan-pengendalian.create', $psnTerpilih ? ['psn_id' => $psnTerpilih->id] : []) }}"
-                   class="rounded-md bg-blue-800 text-white px-4 py-2 text-sm hover:bg-blue-700">
+                   class="rounded-lg bg-blue-800 text-white shadow-sm hover:shadow transition-all px-4 py-2 text-sm hover:bg-blue-700">
                     + Kunjungan Baru
                 </a>
             </div>
@@ -21,7 +21,7 @@
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-4">
-            <div class="bg-white shadow rounded-lg overflow-x-auto">
+            <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead class="bg-gray-50 text-left text-gray-500">
                         <tr>
@@ -42,11 +42,11 @@
                                 <td class="px-4 py-3">{{ $k->skorKeseluruhan() ?? '-' }}</td>
                                 <td class="px-4 py-3">
                                     @if ($k->status_pengendalian)
-                                        <span class="rounded-full text-xs px-2 py-1 bg-gray-100 text-gray-700">{{ $k->status_pengendalian }}</span>
+                                        <span class="rounded-full text-xs px-2.5 py-1 font-medium bg-gray-100 text-gray-700">{{ $k->status_pengendalian }}</span>
                                     @else - @endif
                                 </td>
                                 <td class="px-4 py-3 text-right">
-                                    <a href="{{ route('admin.kunjungan-pengendalian.edit', $k) }}" class="text-blue-800 hover:underline">Lanjutkan/Ubah</a>
+                                    <a href="{{ route('admin.kunjungan-pengendalian.edit', $k) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Lanjutkan/Ubah</a>
                                 </td>
                             </tr>
                         @empty

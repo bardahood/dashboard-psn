@@ -1,5 +1,5 @@
 <div class="space-y-6">
-    <div class="bg-white shadow rounded-lg p-6">
+    <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
         <h3 class="font-semibold text-gray-700 mb-4">Skor & Rekomendasi Otomatis</h3>
 
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
@@ -39,37 +39,37 @@
         </div>
     </div>
 
-    <div class="bg-white shadow rounded-lg p-6">
+    <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
         <h3 class="font-semibold text-gray-700 mb-4">Kesimpulan & Rekomendasi</h3>
 
         <form wire:submit="saveKesimpulan" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="sm:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Fokus Verifikasi Lapangan</label>
-                <textarea wire:model="kesimpulan.fokus_verifikasi_lapangan" rows="2" class="block w-full rounded-md border-gray-300 shadow-sm text-sm"></textarea>
+                <textarea wire:model="kesimpulan.fokus_verifikasi_lapangan" rows="2" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm"></textarea>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Pihak Pengusul Ditemui</label>
-                <input type="text" wire:model="kesimpulan.pihak_pengusul_ditemui" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <input type="text" wire:model="kesimpulan.pihak_pengusul_ditemui" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Narasumber Teknis Lain</label>
-                <input type="text" wire:model="kesimpulan.narasumber_teknis_lain" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <input type="text" wire:model="kesimpulan.narasumber_teknis_lain" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
             </div>
             <div class="sm:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Dasar Justifikasi</label>
-                <textarea wire:model="kesimpulan.dasar_justifikasi" rows="2" class="block w-full rounded-md border-gray-300 shadow-sm text-sm"></textarea>
+                <textarea wire:model="kesimpulan.dasar_justifikasi" rows="2" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm"></textarea>
             </div>
             <div class="sm:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Dokumen yang Masih Diperlukan</label>
-                <textarea wire:model="kesimpulan.dokumen_masih_diperlukan" rows="2" class="block w-full rounded-md border-gray-300 shadow-sm text-sm"></textarea>
+                <textarea wire:model="kesimpulan.dokumen_masih_diperlukan" rows="2" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm"></textarea>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Batas Waktu Pemenuhan</label>
-                <input type="date" wire:model="kesimpulan.batas_waktu_pemenuhan" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <input type="date" wire:model="kesimpulan.batas_waktu_pemenuhan" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Diverifikasi Oleh</label>
-                <select wire:model="kesimpulan.diverifikasi_oleh_id" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <select wire:model="kesimpulan.diverifikasi_oleh_id" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                     <option value="">-- Pilih PIC --</option>
                     @foreach ($picOptions as $id => $nama)
                         <option value="{{ $id }}">{{ $nama }}</option>
@@ -78,7 +78,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Mengetahui</label>
-                <select wire:model="kesimpulan.mengetahui_id" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <select wire:model="kesimpulan.mengetahui_id" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                     <option value="">-- Pilih PIC --</option>
                     @foreach ($picOptions as $id => $nama)
                         <option value="{{ $id }}">{{ $nama }}</option>
@@ -87,7 +87,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Rekomendasi Keseluruhan</label>
-                <select wire:model="kesimpulan.rekomendasi_keseluruhan" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <select wire:model="kesimpulan.rekomendasi_keseluruhan" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                     <option value="">-- Pilih --</option>
                     <option value="Layak Dilanjutkan">Layak Dilanjutkan</option>
                     <option value="Layak dengan Catatan">Layak dengan Catatan</option>

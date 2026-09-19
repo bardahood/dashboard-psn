@@ -8,21 +8,21 @@
             <p class="text-sm text-gray-500">
                 Sandingan ketersediaan PSN di 5 sumber: RKP Pemutakhiran 2026, Data PEKS3, Data PSI, Permenko,
                 dan RKP 2027 (hasil pencocokan otomatis terhadap
-                <a href="{{ route('admin.analisis-rkp2027') }}" class="text-blue-800 hover:underline">lampiran Daftar PSN RKP 2027</a>),
+                <a href="{{ route('admin.analisis-rkp2027') }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">lampiran Daftar PSN RKP 2027</a>),
                 serta kelengkapan 2 jenis data pendukung (Matrik Sandingan 17 Sept 2026): Data Gambaran Umum Proyek
                 dan Data Project Profile Lengkap untuk kebutuhan evaluasi.
             </p>
 
-            <form method="GET" class="bg-white rounded-lg shadow p-4 flex flex-wrap items-center gap-3">
+            <form method="GET" class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-4 flex flex-wrap items-center gap-3">
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama PSN..."
-                       class="flex-1 min-w-[200px] rounded-md border-gray-300 text-sm">
-                <select name="klaster" class="rounded-md border-gray-300 text-sm">
+                       class="flex-1 min-w-[200px] rounded-lg border-gray-300 transition-colors text-sm">
+                <select name="klaster" class="rounded-lg border-gray-300 transition-colors text-sm">
                     <option value="">Semua Klaster</option>
                     @foreach ($klaster as $k)
                         <option value="{{ $k }}" @selected(request('klaster') === $k)>{{ $k }}</option>
                     @endforeach
                 </select>
-                <select name="provinsi" class="rounded-md border-gray-300 text-sm">
+                <select name="provinsi" class="rounded-lg border-gray-300 transition-colors text-sm">
                     <option value="">Semua Provinsi</option>
                     @foreach ($provinsi as $p)
                         <option value="{{ $p }}" @selected(request('provinsi') === $p)>{{ $p }}</option>
@@ -32,13 +32,13 @@
                     <input type="checkbox" name="hanya_gap" value="1" @checked(request()->boolean('hanya_gap')) class="rounded border-gray-300">
                     Hanya tampilkan yang ada gap
                 </label>
-                <button class="rounded-md bg-gray-700 text-white text-sm font-medium px-4 py-2 hover:bg-gray-600">Filter</button>
+                <button class="rounded-lg bg-gray-700 text-white shadow-sm transition-all text-sm font-medium px-4 py-2 hover:bg-gray-600">Filter</button>
                 @if (request()->anyFilled(['q', 'klaster', 'provinsi', 'hanya_gap']))
                     <a href="{{ route('admin.matriks-sandingan') }}" class="text-sm text-gray-500 hover:underline">Reset</a>
                 @endif
             </form>
 
-            <div class="bg-white rounded-lg shadow overflow-x-auto">
+            <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead class="bg-gray-50 text-left text-gray-500">
                         <tr>

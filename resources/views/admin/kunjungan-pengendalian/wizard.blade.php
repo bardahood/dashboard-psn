@@ -4,7 +4,7 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Instrumen Kunjungan Lapangan: Pengendalian
             </h2>
-            <a href="{{ route('admin.kunjungan-pengendalian.index') }}" class="text-sm text-blue-800 hover:underline">&larr; Kembali ke Daftar Kunjungan</a>
+            <a href="{{ route('admin.kunjungan-pengendalian.index') }}" class="text-sm text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">&larr; Kembali ke Daftar Kunjungan</a>
         </div>
     </x-slot>
 

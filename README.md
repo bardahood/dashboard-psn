@@ -167,6 +167,18 @@ Item #2-4 di atas sudah tersedia sejak awal namun tersebar di tab-tab terpisah p
 
 - Test otomatis: `PedomanProjectProfileTest` (ditambah test Target Triwulanan Trisula, memverifikasi baris TAHUNAN & TRIWULANAN tersimpan terpisah tanpa saling menimpa) -- total 89 test, seluruhnya hijau.
 
+## Pembaruan UI/UX (Tampilan Modern)
+
+Refresh visual menyeluruh terhadap seluruh halaman admin & publik, tanpa mengubah struktur data/rute/logika (murni kelas Tailwind & markup) -- 70 file Blade tersentuh.
+
+- **Kartu (card)** — pola lama `bg-white shadow rounded-lg` diganti konsisten di seluruh aplikasi jadi `bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl` (bayangan lebih halus + garis tepi tipis + sudut lebih membulat, gaya dashboard modern).
+- **Navigasi admin** (`layouts/navigation.blade.php`) — sticky header dengan backdrop-blur, tab aktif bergaya pill (`bg-blue-50 text-blue-800`) menggantikan garis bawah lama, avatar inisial pengguna menggantikan teks polos. Menu sekunder (Dokumen, Pengguna, Audit Log, Sinkronisasi PSI, Reporting) dikelompokkan ke dropdown **"Lainnya"** supaya nav bar tidak overflow di lebar 1440px (align dengan kebijakan "jangan menambah item baru ke nav utama" dari sesi sebelumnya) -- tetap tampil satu per satu di menu mobile.
+- **Situs publik** (`layouts/public.blade.php`) — header sticky, footer 3 kolom (Tautan/Sumber Data), hero Beranda bergaya gradient gelap dengan CTA emas.
+- **Login/Register** (`layouts/guest.blade.php`) — latar gradient biru tua dengan pola titik halus, kartu form terangkat dengan shadow lebih tegas.
+- **Komponen bersama** — `primary-button`/`secondary-button`/`danger-button` (drop gaya "UPPERCASE tracking-widest" lama, jadi rounded-lg + shadow-sm + transisi halus), `text-input` (rounded-lg), `dropdown`/`modal` (rounded-xl/2xl, ring tipis, backdrop-blur pada overlay modal).
+- **Dashboard Executive** — kartu KPI diberi ikon badge berwarna sesuai konteks (biru/emas/merah) dan efek hover shadow.
+- Test otomatis: seluruh 89 test tetap hijau (perubahan murni presentasional, tidak menyentuh route/controller/logika).
+
 ## Menjalankan Test
 
 ```bash

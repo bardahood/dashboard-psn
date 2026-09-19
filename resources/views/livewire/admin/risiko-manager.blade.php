@@ -1,20 +1,20 @@
 <div class="space-y-6">
-    <div class="bg-white shadow rounded-lg p-6">
+    <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
         <h3 class="font-semibold text-gray-700 mb-4">{{ $editingId ? 'Ubah' : 'Tambah' }} Risiko</h3>
 
         <form wire:submit="save" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="sm:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Peristiwa Risiko <span class="text-red-500">*</span></label>
-                <textarea wire:model="form.peristiwa_risiko" rows="2" class="block w-full rounded-md border-gray-300 shadow-sm text-sm"></textarea>
+                <textarea wire:model="form.peristiwa_risiko" rows="2" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm"></textarea>
                 @error('form.peristiwa_risiko') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Kategori Risiko</label>
-                <input type="text" wire:model="form.kategori_risiko" placeholder="Regulasi/Teknis/Finansial/Lingkungan" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <input type="text" wire:model="form.kategori_risiko" placeholder="Regulasi/Teknis/Finansial/Lingkungan" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Level Risiko Awal</label>
-                <select wire:model="form.level_risiko_awal" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <select wire:model="form.level_risiko_awal" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                     <option value="">-- Pilih --</option>
                     @foreach ($levels as $value => $labelText)
                         <option value="{{ $value }}">{{ $labelText }}</option>
@@ -23,7 +23,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Risiko Residual Harapan</label>
-                <select wire:model="form.risiko_residual_harapan" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <select wire:model="form.risiko_residual_harapan" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                     <option value="">-- Pilih --</option>
                     @foreach ($levels as $value => $labelText)
                         <option value="{{ $value }}">{{ $labelText }}</option>
@@ -32,11 +32,11 @@
             </div>
             <div class="sm:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Perlakuan/Rencana Penyelesaian</label>
-                <textarea wire:model="form.perlakuan_rencana" rows="2" class="block w-full rounded-md border-gray-300 shadow-sm text-sm"></textarea>
+                <textarea wire:model="form.perlakuan_rencana" rows="2" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm"></textarea>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">PJ Risiko</label>
-                <select wire:model="form.penanggung_jawab_id" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <select wire:model="form.penanggung_jawab_id" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                     <option value="">-- Pilih PIC --</option>
                     @foreach ($picOptions as $id => $nama)
                         <option value="{{ $id }}">{{ $nama }}</option>
@@ -45,7 +45,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Proyek/RO Terkait <span class="text-xs font-normal text-gray-400">(untuk Critical Path)</span></label>
-                <select wire:model="form.ro_id" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <select wire:model="form.ro_id" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                     <option value="">-- Tidak terkait RO spesifik --</option>
                     @foreach ($roOptions as $id => $nama)
                         <option value="{{ $id }}">{{ $nama }}</option>
@@ -54,15 +54,15 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Target Mulai Perlakuan</label>
-                <input type="date" wire:model="form.target_mulai" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <input type="date" wire:model="form.target_mulai" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Target Selesai Perlakuan</label>
-                <input type="date" wire:model="form.target_selesai" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <input type="date" wire:model="form.target_selesai" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tahun Pelaksanaan Perlakuan</label>
-                <input type="number" wire:model="form.tahun_pelaksanaan_perlakuan" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <input type="number" wire:model="form.tahun_pelaksanaan_perlakuan" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
             </div>
             <div class="flex items-end pb-1.5">
                 <label class="inline-flex items-center gap-2 text-sm">
@@ -75,7 +75,7 @@
                 @if ($editingId)
                     <button type="button" wire:click="resetForm" class="rounded-md border px-4 py-2 text-sm">Batal</button>
                 @endif
-                <button type="submit" class="rounded-md bg-blue-800 text-white px-4 py-2 text-sm hover:bg-blue-700">
+                <button type="submit" class="rounded-lg bg-blue-800 text-white shadow-sm hover:shadow transition-all px-4 py-2 text-sm hover:bg-blue-700">
                     {{ $editingId ? 'Simpan Perubahan' : 'Tambah' }}
                 </button>
             </div>
@@ -84,7 +84,7 @@
 
     <div class="space-y-3">
         @forelse ($risikoList as $risiko)
-            <div wire:key="risiko-{{ $risiko->id }}" class="bg-white shadow rounded-lg p-4">
+            <div wire:key="risiko-{{ $risiko->id }}" class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-4">
                 <div class="flex items-start justify-between gap-4">
                     <div class="text-sm">
                         <div class="font-medium text-gray-800">
@@ -111,10 +111,10 @@
                         </div>
                     </div>
                     <div class="flex gap-3 text-sm whitespace-nowrap">
-                        <button wire:click="toggleStatus({{ $risiko->id }})" class="text-blue-800 hover:underline">
+                        <button wire:click="toggleStatus({{ $risiko->id }})" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">
                             {{ $expandedStatusRisikoId === $risiko->id ? 'Tutup' : 'Laporan Triwulanan' }}
                         </button>
-                        <button wire:click="edit({{ $risiko->id }})" class="text-blue-800 hover:underline">Ubah</button>
+                        <button wire:click="edit({{ $risiko->id }})" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Ubah</button>
                         <button wire:click="delete({{ $risiko->id }})" wire:confirm="Hapus risiko ini beserta seluruh laporan triwulanannya?" class="text-red-700 hover:underline">Hapus</button>
                     </div>
                 </div>
@@ -124,21 +124,21 @@
                         <form wire:submit="addStatus" class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                             <div>
                                 <label class="block text-gray-500 mb-1">Tahun</label>
-                                <input type="number" wire:model="statusForm.tahun" class="w-full rounded border-gray-300 text-xs">
+                                <input type="number" wire:model="statusForm.tahun" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
                             </div>
                             <div>
                                 <label class="block text-gray-500 mb-1">Triwulan</label>
-                                <select wire:model="statusForm.triwulan" class="w-full rounded border-gray-300 text-xs">
+                                <select wire:model="statusForm.triwulan" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
                                     @for ($i = 1; $i <= 4; $i++) <option value="{{ $i }}">TW {{ $i }}</option> @endfor
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-gray-500 mb-1">Progres Perlakuan (%)</label>
-                                <input type="number" step="0.01" wire:model="statusForm.progres_pelaksanaan_persen" class="w-full rounded border-gray-300 text-xs">
+                                <input type="number" step="0.01" wire:model="statusForm.progres_pelaksanaan_persen" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
                             </div>
                             <div>
                                 <label class="block text-gray-500 mb-1">Risiko Residual Aktual</label>
-                                <select wire:model="statusForm.risiko_residual_aktual" class="w-full rounded border-gray-300 text-xs">
+                                <select wire:model="statusForm.risiko_residual_aktual" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
                                     <option value="">-</option>
                                     @foreach ($levels as $value => $labelText)
                                         <option value="{{ $value }}">{{ $labelText }}</option>
@@ -147,7 +147,7 @@
                             </div>
                             <div>
                                 <label class="block text-gray-500 mb-1">Status Perlakuan</label>
-                                <select wire:model="statusForm.status_perlakuan" class="w-full rounded border-gray-300 text-xs">
+                                <select wire:model="statusForm.status_perlakuan" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
                                     <option value="">-</option>
                                     @foreach ($statusPerlakuanOptions as $value => $labelText)
                                         <option value="{{ $value }}">{{ $labelText }}</option>
@@ -156,10 +156,10 @@
                             </div>
                             <div class="col-span-2 sm:col-span-3">
                                 <label class="block text-gray-500 mb-1">Catatan</label>
-                                <input type="text" wire:model="statusForm.catatan" class="w-full rounded border-gray-300 text-xs">
+                                <input type="text" wire:model="statusForm.catatan" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
                             </div>
                             <div class="col-span-2 sm:col-span-4 flex justify-end">
-                                <button type="submit" class="rounded-md bg-blue-800 text-white px-3 py-1.5 text-xs hover:bg-blue-700">Simpan Laporan</button>
+                                <button type="submit" class="rounded-lg bg-blue-800 text-white shadow-sm hover:shadow transition-all px-3 py-1.5 text-xs hover:bg-blue-700">Simpan Laporan</button>
                             </div>
                         </form>
 
@@ -193,7 +193,7 @@
                 @endif
             </div>
         @empty
-            <div class="bg-white shadow rounded-lg p-6 text-center text-gray-400 text-sm">Belum ada data risiko.</div>
+            <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6 text-center text-gray-400 text-sm">Belum ada data risiko.</div>
         @endforelse
     </div>
 </div>

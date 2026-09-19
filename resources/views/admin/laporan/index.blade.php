@@ -10,7 +10,7 @@
             </p>
 
             <form method="GET" id="form-laporan">
-                <div class="bg-white shadow rounded-lg p-4 mb-4">
+                <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-4 mb-4">
                     <p class="text-sm font-medium text-gray-700 mb-2">
                         Fokus Klaster <span class="text-xs font-normal text-gray-400">(opsional -- kosongkan untuk semua klaster; berguna saat laporan periode ini hanya perlu menyoroti klaster tertentu, mis. Energi &amp; Pangan)</span>
                     </p>
@@ -25,21 +25,21 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="bg-white shadow rounded-lg p-6">
+                    <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
                         <h3 class="font-medium text-gray-800 mb-1">Laporan Ringkasan (PDF)</h3>
                         <p class="text-xs text-gray-500 mb-4">Ringkasan portfolio, sebaran klaster/status, risiko, dan ketersediaan sumber data.</p>
-                        <button type="submit" formaction="{{ route('admin.laporan.ringkasan-pdf') }}" class="inline-block rounded-md bg-red-700 text-white px-4 py-2 text-sm hover:bg-red-600">
+                        <button type="submit" formaction="{{ route('admin.laporan.ringkasan-pdf') }}" class="inline-block rounded-lg bg-red-700 text-white shadow-sm transition-all px-4 py-2 text-sm hover:bg-red-600">
                             Unduh PDF
                         </button>
                     </div>
-                    <div class="bg-white shadow rounded-lg p-6">
+                    <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
                         <h3 class="font-medium text-gray-800 mb-1">Matriks Sandingan Sumber (Excel)</h3>
                         <p class="text-xs text-gray-500 mb-4">Sandingan ketersediaan data PSN di 4 sumber (RKP/PEKS3/PSI/Permenko).</p>
                         <button type="submit" formaction="{{ route('admin.laporan.matriks-excel') }}" class="inline-block rounded-md bg-green-700 text-white px-4 py-2 text-sm hover:bg-green-600">
                             Unduh Excel
                         </button>
                     </div>
-                    <div class="bg-white shadow rounded-lg p-6">
+                    <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
                         <h3 class="font-medium text-gray-800 mb-1">Daftar PSN Lengkap (Excel)</h3>
                         <p class="text-xs text-gray-500 mb-4">Profil lengkap seluruh PSN: klaster, status, lokasi, nilai investasi, kelembagaan.</p>
                         <button type="submit" formaction="{{ route('admin.laporan.daftar-psn-excel') }}" class="inline-block rounded-md bg-green-700 text-white px-4 py-2 text-sm hover:bg-green-600">

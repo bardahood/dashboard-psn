@@ -5,17 +5,17 @@
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-4">
-            <form method="GET" class="bg-white rounded-lg shadow p-4 flex gap-3">
-                <select name="nama_tabel" class="rounded-md border-gray-300 text-sm">
+            <form method="GET" class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-4 flex gap-3">
+                <select name="nama_tabel" class="rounded-lg border-gray-300 transition-colors text-sm">
                     <option value="">Semua Tabel</option>
                     @foreach ($daftarTabel as $tabel)
                         <option value="{{ $tabel }}" @selected(request('nama_tabel') === $tabel)>{{ $tabel }}</option>
                     @endforeach
                 </select>
-                <button class="rounded-md bg-gray-700 text-white text-sm font-medium px-4 hover:bg-gray-600">Filter</button>
+                <button class="rounded-lg bg-gray-700 text-white shadow-sm transition-all text-sm font-medium px-4 hover:bg-gray-600">Filter</button>
             </form>
 
-            <div class="bg-white shadow rounded-lg overflow-x-auto">
+            <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead class="bg-gray-50 text-left text-gray-500">
                         <tr>
@@ -34,7 +34,7 @@
                                 <td class="px-4 py-3 font-mono text-xs">{{ $log->nama_tabel }}</td>
                                 <td class="px-4 py-3">{{ $log->record_id }}</td>
                                 <td class="px-4 py-3">
-                                    <span class="rounded-full text-xs px-2 py-1
+                                    <span class="rounded-full text-xs px-2.5 py-1 font-medium
                                         {{ $log->aksi === 'insert' ? 'bg-green-100 text-green-700' : ($log->aksi === 'update' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700') }}">
                                         {{ $log->aksi }}
                                     </span>

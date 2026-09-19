@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Detail PSN</h2>
             @can('update', $psn)
-                <a href="{{ route('admin.psn.edit', $psn) }}" class="rounded-md bg-blue-800 text-white px-4 py-2 text-sm hover:bg-blue-700">Ubah</a>
+                <a href="{{ route('admin.psn.edit', $psn) }}" class="rounded-lg bg-blue-800 text-white shadow-sm hover:shadow transition-all px-4 py-2 text-sm hover:bg-blue-700">Ubah</a>
             @endcan
         </div>
     </x-slot>
@@ -12,7 +12,7 @@
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-6">
             @include('admin.psn._profil-tabs')
 
-            <div class="bg-white shadow rounded-lg p-6">
+            <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
                 <h1 class="text-xl font-bold text-gray-900">{{ $psn->nama_psn }}</h1>
                 <div class="mt-3 flex flex-wrap gap-2 text-xs">
                     @if ($psn->klaster) <span class="rounded-full bg-blue-100 text-blue-800 px-3 py-1">{{ $psn->klaster->nama_klaster }}</span> @endif
@@ -43,7 +43,7 @@
                 @endif
             </div>
 
-            <div class="bg-white shadow rounded-lg p-6">
+            <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
                 <h2 class="font-semibold text-gray-700 mb-3">RO/Proyek ({{ $psn->roProyek->count() }})</h2>
                 @forelse ($psn->roProyek->whereNull('ro_induk_id') as $ro)
                     <div class="border-b py-2 text-sm flex justify-between">
@@ -55,7 +55,7 @@
                 @endforelse
             </div>
 
-            <div class="bg-white shadow rounded-lg p-6">
+            <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
                 <h2 class="font-semibold text-gray-700 mb-3">Register Risiko ({{ $psn->risiko->count() }})</h2>
                 @forelse ($psn->risiko as $r)
                     <div class="border-b py-2 text-sm flex justify-between">

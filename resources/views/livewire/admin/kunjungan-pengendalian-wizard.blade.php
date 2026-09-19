@@ -3,7 +3,7 @@
         <div class="rounded-md bg-green-50 text-green-700 px-4 py-3 text-sm">{{ session('status') }}</div>
     @endif
 
-    <div class="bg-white shadow rounded-lg px-2 py-2 overflow-x-auto">
+    <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl px-2 py-2 overflow-x-auto">
         <div class="flex gap-1 min-w-max">
             @foreach ($steps as $num => $label)
                 <button wire:click="goToStep({{ $num }})"

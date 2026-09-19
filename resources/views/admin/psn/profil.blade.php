@@ -4,7 +4,7 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Profil PSN: {{ \Illuminate\Support\Str::limit($psn->nama_psn, 60) }}
             </h2>
-            <a href="{{ route('admin.psn.show', $psn) }}" class="text-sm text-blue-800 hover:underline">&larr; Kembali ke Detail PSN</a>
+            <a href="{{ route('admin.psn.show', $psn) }}" class="text-sm text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">&larr; Kembali ke Detail PSN</a>
         </div>
     </x-slot>
 

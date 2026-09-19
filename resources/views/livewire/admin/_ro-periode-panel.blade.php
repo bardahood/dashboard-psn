@@ -3,11 +3,11 @@
         <form wire:submit="addPeriode" class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
             <div>
                 <label class="block text-gray-500 mb-1">Tahun</label>
-                <input type="number" wire:model="periodeForm.tahun" class="w-full rounded border-gray-300 text-xs">
+                <input type="number" wire:model="periodeForm.tahun" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
             </div>
             <div>
                 <label class="block text-gray-500 mb-1">Tipe Periode</label>
-                <select wire:model.live="periodeForm.tipe_periode" class="w-full rounded border-gray-300 text-xs">
+                <select wire:model.live="periodeForm.tipe_periode" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
                     <option value="TAHUNAN">Tahunan</option>
                     <option value="TRIWULANAN">Triwulanan</option>
                     <option value="BULANAN">Bulanan</option>
@@ -16,7 +16,7 @@
             @if ($periodeForm['tipe_periode'] === 'TRIWULANAN')
                 <div>
                     <label class="block text-gray-500 mb-1">Triwulan</label>
-                    <select wire:model="periodeForm.triwulan" class="w-full rounded border-gray-300 text-xs">
+                    <select wire:model="periodeForm.triwulan" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
                         <option value="">-</option>
                         @for ($i = 1; $i <= 4; $i++) <option value="{{ $i }}">TW {{ $i }}</option> @endfor
                     </select>
@@ -24,7 +24,7 @@
             @elseif ($periodeForm['tipe_periode'] === 'BULANAN')
                 <div>
                     <label class="block text-gray-500 mb-1">Bulan</label>
-                    <select wire:model="periodeForm.bulan" class="w-full rounded border-gray-300 text-xs">
+                    <select wire:model="periodeForm.bulan" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
                         <option value="">-</option>
                         @for ($i = 1; $i <= 12; $i++) <option value="{{ $i }}">Bulan {{ $i }}</option> @endfor
                     </select>
@@ -32,38 +32,38 @@
             @endif
             <div>
                 <label class="block text-gray-500 mb-1">Target Fisik <span class="text-gray-400">({{ $ro->satuan ?? 'satuan RO' }})</span></label>
-                <input type="number" step="0.01" wire:model="periodeForm.target" class="w-full rounded border-gray-300 text-xs">
+                <input type="number" step="0.01" wire:model="periodeForm.target" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
             </div>
             <div>
                 <label class="block text-gray-500 mb-1">Target Persentase (%)</label>
-                <input type="number" step="0.01" min="0" max="100" wire:model="periodeForm.target_persen" class="w-full rounded border-gray-300 text-xs">
+                <input type="number" step="0.01" min="0" max="100" wire:model="periodeForm.target_persen" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
             </div>
             <div>
                 <label class="block text-gray-500 mb-1">Realisasi Fisik</label>
-                <input type="number" step="0.01" wire:model="periodeForm.realisasi_fisik" class="w-full rounded border-gray-300 text-xs">
+                <input type="number" step="0.01" wire:model="periodeForm.realisasi_fisik" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
             </div>
             <div>
                 <label class="block text-gray-500 mb-1">Pembiayaan Rencana (Juta Rp)</label>
-                <input type="number" step="0.01" wire:model="periodeForm.pembiayaan_rencana_juta_rp" class="w-full rounded border-gray-300 text-xs">
+                <input type="number" step="0.01" wire:model="periodeForm.pembiayaan_rencana_juta_rp" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
             </div>
             <div>
                 <label class="block text-gray-500 mb-1">Realisasi Anggaran (Juta Rp)</label>
-                <input type="number" step="0.01" wire:model="periodeForm.realisasi_anggaran_juta_rp" class="w-full rounded border-gray-300 text-xs">
+                <input type="number" step="0.01" wire:model="periodeForm.realisasi_anggaran_juta_rp" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
             </div>
             <div>
                 <label class="block text-gray-500 mb-1">Indikasi Sumber Pendanaan</label>
-                <input type="text" wire:model="periodeForm.indikasi_sumber_pendanaan" placeholder="APBN/APBD/BUMN/BU-Swasta" class="w-full rounded border-gray-300 text-xs">
+                <input type="text" wire:model="periodeForm.indikasi_sumber_pendanaan" placeholder="APBN/APBD/BUMN/BU-Swasta" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
             </div>
             <div>
                 <label class="block text-gray-500 mb-1">Status</label>
-                <input type="text" wire:model="periodeForm.status" class="w-full rounded border-gray-300 text-xs">
+                <input type="text" wire:model="periodeForm.status" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
             </div>
             <div class="col-span-2 sm:col-span-4">
                 <label class="block text-gray-500 mb-1">Permasalahan</label>
-                <input type="text" wire:model="periodeForm.permasalahan" class="w-full rounded border-gray-300 text-xs">
+                <input type="text" wire:model="periodeForm.permasalahan" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
             </div>
             <div class="col-span-2 sm:col-span-4 flex justify-end">
-                <button type="submit" class="rounded-md bg-blue-800 text-white px-3 py-1.5 text-xs hover:bg-blue-700">Tambah Periode</button>
+                <button type="submit" class="rounded-lg bg-blue-800 text-white shadow-sm hover:shadow transition-all px-3 py-1.5 text-xs hover:bg-blue-700">Tambah Periode</button>
             </div>
         </form>
 

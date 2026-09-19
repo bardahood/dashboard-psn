@@ -10,12 +10,12 @@
             @endif
 
             <div class="flex justify-end">
-                <a href="{{ route('admin.pengguna.create') }}" class="rounded-md bg-blue-800 text-white text-sm font-medium px-4 py-2 hover:bg-blue-700">
+                <a href="{{ route('admin.pengguna.create') }}" class="rounded-lg bg-blue-800 text-white shadow-sm hover:shadow transition-all text-sm font-medium px-4 py-2 hover:bg-blue-700">
                     + Tambah Pengguna
                 </a>
             </div>
 
-            <div class="bg-white shadow rounded-lg overflow-x-auto">
+            <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead class="bg-gray-50 text-left text-gray-500">
                         <tr>
@@ -39,13 +39,13 @@
                                 <td class="px-4 py-3">{{ $akses?->level_akses ?? '-' }}</td>
                                 <td class="px-4 py-3">
                                     @if (! $akses || $akses->is_active)
-                                        <span class="rounded-full text-xs px-2 py-1 bg-green-100 text-green-700">Aktif</span>
+                                        <span class="rounded-full text-xs px-2.5 py-1 font-medium bg-green-100 text-green-700">Aktif</span>
                                     @else
-                                        <span class="rounded-full text-xs px-2 py-1 bg-red-100 text-red-700">Nonaktif</span>
+                                        <span class="rounded-full text-xs px-2.5 py-1 font-medium bg-red-100 text-red-700">Nonaktif</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 text-right">
-                                    <a href="{{ route('admin.pengguna.edit', $user) }}" class="text-blue-800 hover:underline">Edit</a>
+                                    <a href="{{ route('admin.pengguna.edit', $user) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Edit</a>
                                 </td>
                             </tr>
                         @empty

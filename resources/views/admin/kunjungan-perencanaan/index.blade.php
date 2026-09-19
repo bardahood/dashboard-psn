@@ -3,10 +3,10 @@
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Kunjungan Lapangan: Perencanaan</h2>
             <div class="flex items-center gap-4">
-                <a href="{{ route('admin.verifikasi-usulan') }}" class="text-sm text-blue-800 hover:underline">
+                <a href="{{ route('admin.verifikasi-usulan') }}" class="text-sm text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">
                     Rekap Kelengkapan &amp; Verifikasi &rarr;
                 </a>
-                <a href="{{ route('admin.kunjungan-perencanaan.create') }}" class="rounded-md bg-blue-800 text-white px-4 py-2 text-sm hover:bg-blue-700">
+                <a href="{{ route('admin.kunjungan-perencanaan.create') }}" class="rounded-lg bg-blue-800 text-white shadow-sm hover:shadow transition-all px-4 py-2 text-sm hover:bg-blue-700">
                     + Kunjungan Baru
                 </a>
             </div>
@@ -15,13 +15,13 @@
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-4">
-            <form method="GET" class="bg-white rounded-lg shadow p-4 flex gap-3">
+            <form method="GET" class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-4 flex gap-3">
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama usulan..."
-                       class="flex-1 rounded-md border-gray-300 text-sm">
-                <button class="rounded-md bg-gray-700 text-white text-sm font-medium px-4 hover:bg-gray-600">Cari</button>
+                       class="flex-1 rounded-lg border-gray-300 transition-colors text-sm">
+                <button class="rounded-lg bg-gray-700 text-white shadow-sm transition-all text-sm font-medium px-4 hover:bg-gray-600">Cari</button>
             </form>
 
-            <div class="bg-white shadow rounded-lg overflow-x-auto">
+            <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead class="bg-gray-50 text-left text-gray-500">
                         <tr>
@@ -42,11 +42,11 @@
                                 <td class="px-4 py-3">{{ optional($k->tanggal_kunjungan)->format('d M Y') }}</td>
                                 <td class="px-4 py-3">
                                     @if ($k->rekomendasi_keseluruhan)
-                                        <span class="rounded-full text-xs px-2 py-1 bg-gray-100 text-gray-700">{{ $k->rekomendasi_keseluruhan }}</span>
+                                        <span class="rounded-full text-xs px-2.5 py-1 font-medium bg-gray-100 text-gray-700">{{ $k->rekomendasi_keseluruhan }}</span>
                                     @else - @endif
                                 </td>
                                 <td class="px-4 py-3 text-right">
-                                    <a href="{{ route('admin.kunjungan-perencanaan.edit', $k) }}" class="text-blue-800 hover:underline">Lanjutkan/Ubah</a>
+                                    <a href="{{ route('admin.kunjungan-perencanaan.edit', $k) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Lanjutkan/Ubah</a>
                                 </td>
                             </tr>
                         @empty

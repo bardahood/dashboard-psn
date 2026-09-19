@@ -11,13 +11,13 @@
                 Penyusunan Daftar PSN).
             </p>
 
-            <form method="GET" class="bg-white rounded-lg shadow p-4 flex gap-3">
+            <form method="GET" class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-4 flex gap-3">
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama usulan/PSN..."
-                       class="flex-1 rounded-md border-gray-300 text-sm">
-                <button class="rounded-md bg-gray-700 text-white text-sm font-medium px-4 hover:bg-gray-600">Cari</button>
+                       class="flex-1 rounded-lg border-gray-300 transition-colors text-sm">
+                <button class="rounded-lg bg-gray-700 text-white shadow-sm transition-all text-sm font-medium px-4 hover:bg-gray-600">Cari</button>
             </form>
 
-            <div class="bg-white shadow rounded-lg overflow-x-auto">
+            <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead class="bg-gray-50 text-left text-gray-500">
                         <tr>
@@ -44,15 +44,15 @@
                                 </td>
                                 <td class="px-4 py-3">
                                     @if ($kunjungan->gateUtamaGagal())
-                                        <span class="rounded-full text-xs px-2 py-1 bg-red-100 text-red-700">Gagal</span>
+                                        <span class="rounded-full text-xs px-2.5 py-1 font-medium bg-red-100 text-red-700">Gagal</span>
                                     @else
-                                        <span class="rounded-full text-xs px-2 py-1 bg-green-100 text-green-700">Lolos</span>
+                                        <span class="rounded-full text-xs px-2.5 py-1 font-medium bg-green-100 text-green-700">Lolos</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3">{{ $kunjungan->skorKeseluruhan() !== null ? number_format($kunjungan->skorKeseluruhan(), 1) : '-' }}</td>
                                 <td class="px-4 py-3">{{ $kunjungan->rekomendasiOtomatis() ?? '-' }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap">
-                                    <a href="{{ route('admin.kunjungan-perencanaan.edit', $kunjungan) }}" class="text-blue-800 hover:underline">Lihat</a>
+                                    <a href="{{ route('admin.kunjungan-perencanaan.edit', $kunjungan) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Lihat</a>
                                 </td>
                             </tr>
                         @empty

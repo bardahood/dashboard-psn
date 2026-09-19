@@ -1,16 +1,16 @@
 <div class="space-y-6">
-    <div class="bg-white shadow rounded-lg p-6">
+    <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
         <h3 class="font-semibold text-gray-700 mb-4">{{ $editingId ? 'Ubah' : 'Tambah' }} RO/Proyek/Aktivitas</h3>
 
         <form wire:submit="save" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="sm:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama RO/Proyek/Aktivitas <span class="text-red-500">*</span></label>
-                <input type="text" wire:model="form.nama_ro" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <input type="text" wire:model="form.nama_ro" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                 @error('form.nama_ro') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tipe</label>
-                <select wire:model.live="form.tipe" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <select wire:model.live="form.tipe" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                     <option value="RO">RO/Proyek (induk)</option>
                     <option value="Aktivitas">Aktivitas (turunan)</option>
                 </select>
@@ -19,7 +19,7 @@
             @if ($form['tipe'] === 'Aktivitas')
                 <div class="sm:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-1">RO/Proyek Induk</label>
-                    <select wire:model="form.ro_induk_id" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                    <select wire:model="form.ro_induk_id" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                         <option value="">-- Pilih RO Induk --</option>
                         @foreach ($roIndukOptions as $id => $nama)
                             <option value="{{ $id }}">{{ $nama }}</option>
@@ -43,23 +43,23 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Satuan</label>
-                <input type="text" wire:model="form.satuan" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <input type="text" wire:model="form.satuan" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Baseline</label>
-                <input type="text" wire:model="form.baseline" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <input type="text" wire:model="form.baseline" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Target Akhir</label>
-                <input type="text" wire:model="form.target_akhir" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <input type="text" wire:model="form.target_akhir" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Lokasi</label>
-                <input type="text" wire:model="form.lokasi" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <input type="text" wire:model="form.lokasi" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
             </div>
             <div class="sm:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Instansi Pelaksana</label>
-                <select wire:model="form.instansi_pelaksana_id" class="block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                <select wire:model="form.instansi_pelaksana_id" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                     <option value="">-- Pilih Instansi --</option>
                     @foreach ($instansiOptions as $id => $nama)
                         <option value="{{ $id }}">{{ $nama }}</option>
@@ -71,7 +71,7 @@
                 @if ($editingId)
                     <button type="button" wire:click="resetForm" class="rounded-md border px-4 py-2 text-sm">Batal</button>
                 @endif
-                <button type="submit" class="rounded-md bg-blue-800 text-white px-4 py-2 text-sm hover:bg-blue-700">
+                <button type="submit" class="rounded-lg bg-blue-800 text-white shadow-sm hover:shadow transition-all px-4 py-2 text-sm hover:bg-blue-700">
                     {{ $editingId ? 'Simpan Perubahan' : 'Tambah' }}
                 </button>
             </div>
@@ -80,7 +80,7 @@
 
     <div class="space-y-4">
         @forelse ($roIndukList as $ro)
-            <div wire:key="ro-{{ $ro->id }}" class="bg-white shadow rounded-lg p-4">
+            <div wire:key="ro-{{ $ro->id }}" class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-4">
                 <div class="flex items-start justify-between gap-4">
                     <div class="text-sm">
                         <div class="font-medium text-gray-800">
@@ -92,10 +92,10 @@
                         </div>
                     </div>
                     <div class="flex gap-3 text-sm whitespace-nowrap">
-                        <button wire:click="togglePeriode({{ $ro->id }})" class="text-blue-800 hover:underline">
+                        <button wire:click="togglePeriode({{ $ro->id }})" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">
                             {{ $expandedPeriodeRoId === $ro->id ? 'Tutup Periode' : 'Kelola Periode' }}
                         </button>
-                        <button wire:click="edit({{ $ro->id }})" class="text-blue-800 hover:underline">Ubah</button>
+                        <button wire:click="edit({{ $ro->id }})" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Ubah</button>
                         <button wire:click="delete({{ $ro->id }})" wire:confirm="Hapus RO ini beserta seluruh aktivitas & periode turunannya?" class="text-red-700 hover:underline">Hapus</button>
                     </div>
                 </div>
@@ -112,10 +112,10 @@
                                     <span class="text-gray-400 text-xs ml-1">{{ $aktivitas->satuan }}</span>
                                 </div>
                                 <div class="flex gap-3 whitespace-nowrap">
-                                    <button wire:click="togglePeriode({{ $aktivitas->id }})" class="text-blue-800 hover:underline text-xs">
+                                    <button wire:click="togglePeriode({{ $aktivitas->id }})" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors text-xs">
                                         {{ $expandedPeriodeRoId === $aktivitas->id ? 'Tutup' : 'Periode' }}
                                     </button>
-                                    <button wire:click="edit({{ $aktivitas->id }})" class="text-blue-800 hover:underline text-xs">Ubah</button>
+                                    <button wire:click="edit({{ $aktivitas->id }})" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors text-xs">Ubah</button>
                                     <button wire:click="delete({{ $aktivitas->id }})" wire:confirm="Hapus aktivitas ini?" class="text-red-700 hover:underline text-xs">Hapus</button>
                                 </div>
                             </div>
@@ -125,7 +125,7 @@
                 @endif
             </div>
         @empty
-            <div class="bg-white shadow rounded-lg p-6 text-center text-gray-400 text-sm">Belum ada data RO/Proyek.</div>
+            <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6 text-center text-gray-400 text-sm">Belum ada data RO/Proyek.</div>
         @endforelse
     </div>
 </div>

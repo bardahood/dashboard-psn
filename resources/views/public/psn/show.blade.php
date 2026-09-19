@@ -2,9 +2,9 @@
 
 @section('content')
 <div class="space-y-6">
-    <a href="{{ route('psn.index') }}" class="text-sm text-blue-800 hover:underline">&larr; Kembali ke Daftar PSN</a>
+    <a href="{{ route('psn.index') }}" class="text-sm text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">&larr; Kembali ke Daftar PSN</a>
 
-    <div class="bg-white rounded-lg shadow p-6">
+    <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
         <h1 class="text-2xl font-bold text-blue-900">{{ $profil->nama_psn }}</h1>
         <div class="mt-3 flex flex-wrap gap-2 text-xs">
             @if ($profil->nama_klaster)
@@ -61,7 +61,7 @@
     </div>
 
     @if ($indikator->isNotEmpty())
-        <div class="bg-white rounded-lg shadow p-6">
+        <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
             <h2 class="font-semibold text-gray-700 mb-4">Indikator Output/Outcome (Capaian Terkini)</h2>
             <table class="min-w-full text-sm">
                 <thead class="text-left text-gray-500">

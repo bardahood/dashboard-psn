@@ -11,7 +11,7 @@
 
     <div id="peta-psn" class="rounded-lg shadow" style="height: 560px;"></div>
 
-    <div class="bg-white rounded-lg shadow p-4 text-xs text-gray-400">
+    <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-4 text-xs text-gray-400">
         Sumber peta: &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" class="underline">OpenStreetMap</a> contributors.
     </div>
 </div>
@@ -38,7 +38,7 @@
         }).addTo(map);
 
         const daftarHtml = m.daftar.slice(0, 8).map((p) =>
-            `<li><a href="/psn/${p.id}" class="text-blue-800 hover:underline">${p.nama}</a></li>`
+            `<li><a href="/psn/${p.id}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">${p.nama}</a></li>`
         ).join('');
 
         marker.bindPopup(`

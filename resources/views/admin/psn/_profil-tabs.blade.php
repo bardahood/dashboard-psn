@@ -21,14 +21,14 @@
     $currentType = $type ?? null;
 @endphp
 
-<div class="bg-white shadow rounded-lg px-2 py-2 overflow-x-auto">
+<div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl px-2 py-2 overflow-x-auto">
     <div class="flex gap-1 min-w-max">
         @foreach ($tabs as $tab)
             @php
                 $isActive = request()->routeIs($tab['route']) && (count($tab['params']) < 2 || $currentType === $tab['params'][1]);
             @endphp
             <a href="{{ route($tab['route'], $tab['params']) }}"
-               class="px-3 py-1.5 rounded-md text-sm whitespace-nowrap {{ $isActive ? 'bg-blue-800 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+               class="px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors duration-150 {{ $isActive ? 'bg-blue-800 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100 hover:text-blue-800' }}">
                 {{ $tab['label'] }}
             </a>
         @endforeach
