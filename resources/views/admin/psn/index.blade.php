@@ -52,6 +52,7 @@
                     <thead class="bg-gray-50 text-left text-gray-500">
                         <tr>
                             <th class="px-4 py-3">Nama PSN</th>
+                            <th class="px-4 py-3">Sub Proyek</th>
                             <th class="px-4 py-3">Klaster</th>
                             <th class="px-4 py-3">Provinsi</th>
                             <th class="px-4 py-3">Status</th>
@@ -64,6 +65,7 @@
                         @forelse ($daftarPsn as $psn)
                             <tr class="hover:bg-gray-50">
                                 <td class="px-4 py-3">{{ \Illuminate\Support\Str::limit($psn->nama_psn, 70) }}</td>
+                                <td class="px-4 py-3 text-gray-500">{{ $psn->nama_sub_proyek ?? '-' }}</td>
                                 <td class="px-4 py-3">{{ $psn->klaster?->nama_klaster ?? '-' }}</td>
                                 <td class="px-4 py-3">{{ $psn->provinsi?->nama_provinsi ?? '-' }}</td>
                                 <td class="px-4 py-3">{{ $psn->statusPsn?->nama_status ?? '-' }}</td>
@@ -95,7 +97,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="7" class="px-4 py-6 text-center text-gray-400">Belum ada data PSN.</td></tr>
+                            <tr><td colspan="8" class="px-4 py-6 text-center text-gray-400">Belum ada data PSN.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

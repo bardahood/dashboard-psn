@@ -11,15 +11,22 @@
 
                     @if ($field['type'] === 'textarea')
                         <textarea wire:model="parentForm.{{ $field['name'] }}" rows="2" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm"></textarea>
+                    @elseif ($field['type'] === 'trisula_indikator')
+                        @if (isset($parentForm['kategori_trisula']) && array_key_exists($parentForm['kategori_trisula'], \App\Livewire\Admin\AnnualTargetManager::PRESET_INDIKATOR_TRISULA))
+                            <input type="text" readonly wire:model="parentForm.{{ $field['name'] }}" class="block w-full rounded-lg border-gray-200 bg-gray-50 text-gray-500 shadow-sm text-sm">
+                            <p class="mt-1 text-xs text-gray-400">Indikator sudah baku untuk kategori Trisula ini.</p>
+                        @else
+                            <textarea wire:model="parentForm.{{ $field['name'] }}" rows="2" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm"></textarea>
+                        @endif
                     @elseif ($field['type'] === 'select')
-                        <select wire:model="parentForm.{{ $field['name'] }}" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
+                        <select wire:model.live="parentForm.{{ $field['name'] }}" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                             <option value="">-- Pilih --</option>
                             @foreach ($field['options'] as $value => $labelText)
                                 <option value="{{ $value }}">{{ $labelText }}</option>
                             @endforeach
                         </select>
                     @else
-                        <input type="text" wire:model="parentForm.{{ $field['name'] }}" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
+                        <input type="{{ $field['type'] === 'number' ? 'number' : 'text' }}" wire:model="parentForm.{{ $field['name'] }}" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                     @endif
 
                     @error('parentForm.'.$field['name'])
@@ -68,7 +75,9 @@
                                     <th class="py-1 pr-3">Target Akhir</th>
                                     <th class="py-1 pr-3">Target</th>
                                     <th class="py-1 pr-3">Realisasi</th>
-                                    <th class="py-1 pr-3">Status Capaian</th>
+                                    @unless ($config['hideStatusCapaian'] ?? false)
+                                        <th class="py-1 pr-3">Status Capaian</th>
+                                    @endunless
                                 </tr>
                             </thead>
                             <tbody>
@@ -77,8 +86,14 @@
                                         <td class="py-1 pr-3 font-medium">{{ $year }}</td>
                                         <td class="py-1 pr-3"><input type="text" wire:model="yearForm.{{ $year }}.target_akhir" class="w-28 rounded-lg border-gray-300 transition-colors text-xs"></td>
                                         <td class="py-1 pr-3"><input type="number" step="0.01" wire:model="yearForm.{{ $year }}.target" class="w-24 rounded-lg border-gray-300 transition-colors text-xs"></td>
-                                        <td class="py-1 pr-3"><input type="number" step="0.01" wire:model="yearForm.{{ $year }}.realisasi" class="w-24 rounded-lg border-gray-300 transition-colors text-xs"></td>
-                                        <td class="py-1 pr-3"><input type="text" wire:model="yearForm.{{ $year }}.status_capaian" class="w-32 rounded-lg border-gray-300 transition-colors text-xs"></td>
+                                        <td class="py-1 pr-3">
+                                            <input type="number" step="0.01" wire:model="yearForm.{{ $year }}.realisasi" @disabled($year > now()->year)
+                                                   class="w-24 rounded-lg border-gray-300 transition-colors text-xs disabled:bg-gray-100 disabled:text-gray-400"
+                                                   title="{{ $year > now()->year ? 'Realisasi tahun mendatang belum bisa diisi' : '' }}">
+                                        </td>
+                                        @unless ($config['hideStatusCapaian'] ?? false)
+                                            <td class="py-1 pr-3"><input type="text" wire:model="yearForm.{{ $year }}.status_capaian" class="w-32 rounded-lg border-gray-300 transition-colors text-xs"></td>
+                                        @endunless
                                     </tr>
                                 @endforeach
                             </tbody>

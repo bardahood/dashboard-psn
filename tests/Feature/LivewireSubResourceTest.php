@@ -60,6 +60,8 @@ class LivewireSubResourceTest extends TestCase
             ->set('form.nama_ro', 'RO Induk')
             ->set('form.tipe', 'RO')
             ->set('form.is_ro_kunci', true)
+            ->set('form.target_akhir', '100 KM')
+            ->set('form.lokasi', 'Provinsi Jawa Barat')
             ->call('save')
             ->assertHasNoErrors();
 
@@ -70,6 +72,8 @@ class LivewireSubResourceTest extends TestCase
             ->set('form.nama_ro', 'Aktivitas Turunan')
             ->set('form.tipe', 'Aktivitas')
             ->set('form.ro_induk_id', $roInduk->id)
+            ->set('form.target_akhir', '50 KM')
+            ->set('form.lokasi', 'Provinsi Jawa Barat')
             ->call('save')
             ->assertHasNoErrors();
 

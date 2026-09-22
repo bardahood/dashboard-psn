@@ -26,7 +26,9 @@
                     <label class="block text-gray-500 mb-1">Bulan</label>
                     <select wire:model="periodeForm.bulan" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
                         <option value="">-</option>
-                        @for ($i = 1; $i <= 12; $i++) <option value="{{ $i }}">Bulan {{ $i }}</option> @endfor
+                        @foreach (['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'] as $i => $namaBulan)
+                            <option value="{{ $i + 1 }}">{{ $namaBulan }}</option>
+                        @endforeach
                     </select>
                 </div>
             @endif
@@ -40,7 +42,9 @@
             </div>
             <div>
                 <label class="block text-gray-500 mb-1">Realisasi Fisik</label>
-                <input type="number" step="0.01" wire:model="periodeForm.realisasi_fisik" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
+                <input type="number" step="0.01" wire:model="periodeForm.realisasi_fisik" @disabled($periodeForm['tahun'] > now()->year)
+                       class="w-full rounded-lg border-gray-300 transition-colors text-xs disabled:bg-gray-100 disabled:text-gray-400"
+                       title="{{ $periodeForm['tahun'] > now()->year ? 'Realisasi tahun mendatang belum bisa diisi' : '' }}">
             </div>
             <div>
                 <label class="block text-gray-500 mb-1">Pembiayaan Rencana (Juta Rp)</label>
@@ -48,15 +52,23 @@
             </div>
             <div>
                 <label class="block text-gray-500 mb-1">Realisasi Anggaran (Juta Rp)</label>
-                <input type="number" step="0.01" wire:model="periodeForm.realisasi_anggaran_juta_rp" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
+                <input type="number" step="0.01" wire:model="periodeForm.realisasi_anggaran_juta_rp" @disabled($periodeForm['tahun'] > now()->year)
+                       class="w-full rounded-lg border-gray-300 transition-colors text-xs disabled:bg-gray-100 disabled:text-gray-400"
+                       title="{{ $periodeForm['tahun'] > now()->year ? 'Realisasi tahun mendatang belum bisa diisi' : '' }}">
             </div>
             <div>
                 <label class="block text-gray-500 mb-1">Indikasi Sumber Pendanaan</label>
-                <input type="text" wire:model="periodeForm.indikasi_sumber_pendanaan" placeholder="APBN/APBD/BUMN/BU-Swasta" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
+                <select wire:model="periodeForm.indikasi_sumber_pendanaan" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
+                    <option value="">-- Pilih --</option>
+                    @foreach (['APBN','APBD','BUMN','BU/Swasta','Lainnya'] as $sumber)
+                        <option value="{{ $sumber }}">{{ $sumber }}</option>
+                    @endforeach
+                </select>
             </div>
             <div>
-                <label class="block text-gray-500 mb-1">Status</label>
-                <input type="text" wire:model="periodeForm.status" class="w-full rounded-lg border-gray-300 transition-colors text-xs">
+                <label class="block text-gray-500 mb-1">Bukti Pelaporan</label>
+                <input type="file" wire:model="periodeForm.bukti_pelaporan" class="w-full text-xs">
+                @error('periodeForm.bukti_pelaporan') <p class="text-red-600 mt-0.5">{{ $message }}</p> @enderror
             </div>
             <div class="col-span-2 sm:col-span-4">
                 <label class="block text-gray-500 mb-1">Permasalahan</label>
@@ -75,7 +87,7 @@
                     <th class="py-1 pr-3">Target %</th>
                     <th class="py-1 pr-3">Realisasi Fisik</th>
                     <th class="py-1 pr-3">Realisasi Anggaran</th>
-                    <th class="py-1 pr-3">Status</th>
+                    <th class="py-1 pr-3">Bukti</th>
                     <th class="py-1"></th>
                 </tr>
             </thead>
@@ -87,7 +99,13 @@
                         <td class="py-1 pr-3">{{ $p->target_persen !== null ? $p->target_persen.'%' : '-' }}</td>
                         <td class="py-1 pr-3">{{ $p->realisasi_fisik ?? '-' }}</td>
                         <td class="py-1 pr-3">{{ $p->realisasi_anggaran_juta_rp ?? '-' }}</td>
-                        <td class="py-1 pr-3">{{ $p->status ?? '-' }}</td>
+                        <td class="py-1 pr-3">
+                            @if ($p->bukti_pelaporan_path)
+                                <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($p->bukti_pelaporan_path) }}" target="_blank" class="text-blue-700 hover:underline">Lihat</a>
+                            @else
+                                -
+                            @endif
+                        </td>
                         <td class="py-1 text-right">
                             <button wire:click="deletePeriode({{ $p->id }})" wire:confirm="Hapus data periode ini?" class="text-red-700 hover:underline">Hapus</button>
                         </td>

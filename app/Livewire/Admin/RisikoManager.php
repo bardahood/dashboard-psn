@@ -22,6 +22,18 @@ class RisikoManager extends Component
 
     protected const STATUS_PERLAKUAN = ['Selesai' => 'Selesai', 'On Progress' => 'On Progress', 'Belum ada Tindak Lanjut' => 'Belum ada Tindak Lanjut'];
 
+    /** Kategori/aspek risiko baku -- Risalah Rapat 21 Sept 2026 ("Peristiwa Risiko: kategori dibuat dropdown"). */
+    protected const KATEGORI_RISIKO = [
+        'Perizinan' => 'Perizinan',
+        'Pembebasan Lahan' => 'Pembebasan Lahan',
+        'Pendanaan' => 'Pendanaan',
+        'Regulasi' => 'Regulasi',
+        'Teknis' => 'Teknis',
+        'Lingkungan' => 'Lingkungan',
+        'Sosial' => 'Sosial',
+        'Lainnya' => 'Lainnya',
+    ];
+
     #[Locked]
     public Psn $psn;
 
@@ -51,6 +63,7 @@ class RisikoManager extends Component
             'perlakuan_rencana' => null,
             'risiko_residual_harapan' => null,
             'penanggung_jawab_id' => null,
+            'pelaksana_perlakuan_id' => null,
             'target_mulai' => null,
             'target_selesai' => null,
             'ro_id' => null,
@@ -65,7 +78,7 @@ class RisikoManager extends Component
         $this->editingId = $id;
         $this->form = $risiko->only([
             'peristiwa_risiko', 'kategori_risiko', 'level_risiko_awal', 'perlakuan_rencana', 'risiko_residual_harapan',
-            'penanggung_jawab_id', 'target_mulai', 'target_selesai', 'ro_id', 'is_titik_kritis', 'tahun_pelaksanaan_perlakuan',
+            'penanggung_jawab_id', 'pelaksana_perlakuan_id', 'target_mulai', 'target_selesai', 'ro_id', 'is_titik_kritis', 'tahun_pelaksanaan_perlakuan',
         ]);
         $this->form['target_mulai'] = $risiko->target_mulai?->format('Y-m-d');
         $this->form['target_selesai'] = $risiko->target_selesai?->format('Y-m-d');
@@ -142,7 +155,7 @@ class RisikoManager extends Component
 
     public function render()
     {
-        $risikoList = RisikoPsn::where('psn_id', $this->psn->id)->with(['penanggungJawab', 'ro'])->orderByDesc('id')->get();
+        $risikoList = RisikoPsn::where('psn_id', $this->psn->id)->with(['penanggungJawab', 'pelaksanaPerlakuan', 'ro'])->orderByDesc('id')->get();
 
         $statusList = $this->expandedStatusRisikoId
             ? RisikoStatusPeriode::where('risiko_id', $this->expandedStatusRisikoId)->orderByDesc('tahun')->orderByDesc('triwulan')->get()
@@ -152,6 +165,7 @@ class RisikoManager extends Component
             'risikoList' => $risikoList,
             'statusList' => $statusList,
             'levels' => self::LEVELS,
+            'kategoriOptions' => self::KATEGORI_RISIKO,
             'statusPerlakuanOptions' => self::STATUS_PERLAKUAN,
             'picOptions' => RefPic::orderBy('nama_pic')->pluck('nama_pic', 'id'),
             'roOptions' => RoProyek::where('psn_id', $this->psn->id)->orderBy('nama_ro')->pluck('nama_ro', 'id'),

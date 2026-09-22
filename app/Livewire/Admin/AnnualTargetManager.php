@@ -39,6 +39,15 @@ class AnnualTargetManager extends Component
 
     protected array $years = [2025, 2026, 2027, 2028, 2029, 2030];
 
+    /**
+     * Indikator Trisula Kemiskinan & Pertumbuhan Ekonomi sudah baku/terkunci
+     * (Risalah Rapat 21 Sept 2026); hanya Trisula SDM yang tetap free text.
+     */
+    public const PRESET_INDIKATOR_TRISULA = [
+        'Kemiskinan' => 'Penyerapan Tenaga Kerja',
+        'Pertumbuhan Ekonomi' => 'Capex dan Opex',
+    ];
+
     protected function config(): array
     {
         return [
@@ -48,10 +57,12 @@ class AnnualTargetManager extends Component
                 'childModel' => IndikatorPsnTargetTahunan::class,
                 'childFk' => 'indikator_id',
                 'titleField' => 'nama_indikator',
+                'hideStatusCapaian' => true,
                 'parentFields' => [
                     ['name' => 'nama_indikator', 'label' => 'Nama Indikator', 'type' => 'textarea', 'required' => true],
                     ['name' => 'satuan', 'label' => 'Satuan', 'type' => 'text'],
                     ['name' => 'baseline', 'label' => 'Baseline', 'type' => 'text'],
+                    ['name' => 'baseline_tahun', 'label' => 'Tahun Baseline (khusus proyek berjalan sebelum 2026)', 'type' => 'number'],
                 ],
             ],
             'penerima_manfaat' => [
@@ -73,7 +84,7 @@ class AnnualTargetManager extends Component
                 'childFk' => 'kontribusi_id',
                 'titleField' => 'nama_indikator',
                 'parentFields' => [
-                    ['name' => 'kategori_trisula', 'label' => 'Kategori Trisula', 'type' => 'select', 'required' => true, 'options' => [
+                    ['name' => 'kategori_trisula', 'label' => 'Trisula', 'type' => 'select', 'required' => true, 'options' => [
                         'Pertumbuhan Ekonomi' => 'Pertumbuhan Ekonomi Berkualitas (Investasi)',
                         'Kemiskinan' => 'Penurunan Kemiskinan dan Ketimpangan (Serapan Tenaga Kerja)',
                         'Sumber Daya Manusia' => 'Peningkatan Kualitas Sumber Daya Manusia (Indeks Modal Manusia)',
@@ -82,7 +93,8 @@ class AnnualTargetManager extends Component
                         'Pendidikan' => 'Pendidikan (Harapan Lama Sekolah usia 4-18)',
                         'Kesehatan' => 'Kesehatan (Adult Survival Rate/Prevalensi Stunting)',
                     ]],
-                    ['name' => 'nama_indikator', 'label' => 'Nama Indikator', 'type' => 'textarea', 'required' => true],
+                    ['name' => 'nama_indikator', 'label' => 'Indikator', 'type' => 'trisula_indikator', 'required' => true],
+                    ['name' => 'satuan', 'label' => 'Satuan', 'type' => 'text'],
                     ['name' => 'sumber_dana', 'label' => 'Sumber Dana (khusus indikator Investasi)', 'type' => 'select', 'options' => ['APBN' => 'APBN', 'Non-APBN' => 'Non-APBN']],
                     ['name' => 'baseline', 'label' => 'Baseline 2025', 'type' => 'text'],
                 ],
@@ -114,6 +126,19 @@ class AnnualTargetManager extends Component
         }
     }
 
+    /**
+     * Saat kategori Trisula dipilih Kemiskinan/Pertumbuhan Ekonomi, langsung
+     * kunci nama_indikator ke preset baku (Risalah Rapat 21 Sept 2026).
+     */
+    public function updatedParentFormKategoriTrisula(?string $value): void
+    {
+        if ($this->type !== 'trisula') {
+            return;
+        }
+
+        $this->parentForm['nama_indikator'] = self::PRESET_INDIKATOR_TRISULA[$value] ?? null;
+    }
+
     public function editParent(int $id): void
     {
         $model = $this->typeConfig()['parentModel'];
@@ -140,6 +165,10 @@ class AnnualTargetManager extends Component
 
         if ($this->type === 'trisula') {
             $data['sumber_dana'] = $data['sumber_dana'] ?: null;
+            // Pertahanan server-side: preset baku tidak boleh diubah lewat manipulasi form.
+            if (isset(self::PRESET_INDIKATOR_TRISULA[$data['kategori_trisula']])) {
+                $data['nama_indikator'] = self::PRESET_INDIKATOR_TRISULA[$data['kategori_trisula']];
+            }
         }
 
         if ($this->editingParentId) {

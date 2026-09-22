@@ -8,6 +8,12 @@
         <x-input-error :messages="$errors->get('nama_psn')" class="mt-2" />
     </div>
 
+    <div class="sm:col-span-2">
+        <x-input-label for="nama_sub_proyek" value="Sub Proyek" />
+        <p class="text-xs text-gray-400 mb-1">Isi bila PSN ini merupakan salah satu komponen/sub-proyek dari sebuah Program dengan nama PSN yang sama (Risalah Rapat 21 Sept 2026).</p>
+        <x-text-input id="nama_sub_proyek" name="nama_sub_proyek" class="mt-1 block w-full" value="{{ old('nama_sub_proyek', $psn?->nama_sub_proyek) }}" />
+    </div>
+
     <div>
         <x-input-label for="klaster_id" value="Klaster" />
         <select id="klaster_id" name="klaster_id" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">
@@ -66,19 +72,39 @@
         <x-text-input type="number" id="tahun_penyelesaian" name="tahun_penyelesaian" class="mt-1 block w-full" value="{{ old('tahun_penyelesaian', $psn?->tahun_penyelesaian) }}" />
     </div>
 
+    <div>
+        <x-input-label for="bulan_penyelesaian" value="Bulan Penyelesaian" />
+        <select id="bulan_penyelesaian" name="bulan_penyelesaian" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">
+            <option value="">-- Pilih Bulan --</option>
+            @foreach (['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'] as $i => $namaBulan)
+                <option value="{{ $i + 1 }}" @selected(old('bulan_penyelesaian', $psn?->bulan_penyelesaian) == $i + 1)>{{ $namaBulan }}</option>
+            @endforeach
+        </select>
+        <x-input-error :messages="$errors->get('bulan_penyelesaian')" class="mt-2" />
+    </div>
+
     <div class="sm:col-span-2">
-        <x-input-label for="output_akhir" value="Output Akhir" />
-        <textarea id="output_akhir" name="output_akhir" rows="2" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">{{ old('output_akhir', $psn?->output_akhir) }}</textarea>
+        <x-input-label for="output_akhir" value="Output Akhir Tahun yang Dicapai pada Akhir Proyek" />
+        <textarea id="output_akhir" name="output_akhir" rows="2" minlength="20" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">{{ old('output_akhir', $psn?->output_akhir) }}</textarea>
+        <x-input-error :messages="$errors->get('output_akhir')" class="mt-2" />
+    </div>
+
+    <div class="sm:col-span-2">
+        <x-input-label for="data_teknis" value="Data Teknis" />
+        <p class="text-xs text-gray-400 mb-1">Mis. luas kawasan, panjang jalan, kapasitas produksi, dll (Risalah Rapat 21 Sept 2026, pengganti "Spesifikasi Teknis").</p>
+        <textarea id="data_teknis" name="data_teknis" rows="2" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">{{ old('data_teknis', $psn?->data_teknis) }}</textarea>
     </div>
 
     <div class="sm:col-span-2">
         <x-input-label for="tujuan_utama" value="Tujuan Utama" />
-        <textarea id="tujuan_utama" name="tujuan_utama" rows="3" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">{{ old('tujuan_utama', $psn?->tujuan_utama) }}</textarea>
+        <textarea id="tujuan_utama" name="tujuan_utama" rows="3" minlength="20" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">{{ old('tujuan_utama', $psn?->tujuan_utama) }}</textarea>
+        <x-input-error :messages="$errors->get('tujuan_utama')" class="mt-2" />
     </div>
 
     <div class="sm:col-span-2">
         <x-input-label for="urgensi" value="Urgensi & Dasar Hukum" />
-        <textarea id="urgensi" name="urgensi" rows="3" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">{{ old('urgensi', $psn?->urgensi) }}</textarea>
+        <textarea id="urgensi" name="urgensi" rows="3" minlength="20" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">{{ old('urgensi', $psn?->urgensi) }}</textarea>
+        <x-input-error :messages="$errors->get('urgensi')" class="mt-2" />
     </div>
 
     <div>

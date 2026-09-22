@@ -38,6 +38,7 @@ class SubResourceManager extends Component
     protected function config(): array
     {
         $picOptions = fn () => RefPic::orderBy('nama_pic')->pluck('nama_pic', 'id')->all();
+        $instansiOptions = fn () => \App\Models\RefInstansi::orderBy('nama_instansi')->pluck('nama_instansi', 'nama_instansi')->all();
 
         return [
             'dasar_hukum' => [
@@ -56,15 +57,18 @@ class SubResourceManager extends Component
                 'model' => StakeholderPsn::class,
                 'order' => 'level_kelembagaan',
                 'fields' => [
-                    ['name' => 'nama_pemangku_kepentingan', 'label' => 'Nama Pemangku Kepentingan', 'type' => 'text', 'required' => true],
-                    ['name' => 'kategori_aktor', 'label' => 'Kategori Aktor', 'type' => 'select', 'required' => true, 'options' => ['State' => 'State', 'Non-State' => 'Non-State']],
-                    ['name' => 'level_kelembagaan', 'label' => 'Level Kelembagaan', 'type' => 'select', 'options' => [
-                        1 => '1 - Kebijakan/Regulasi/Pengarah',
-                        2 => '2 - Fasilitator Wilayah',
-                        3 => '3 - Operator/Investor/Off-taker',
-                        4 => '4 - Partisipan/Penerima Manfaat/Riset',
+                    ['name' => 'nama_pemangku_kepentingan', 'label' => 'Aktor/Instansi', 'type' => 'select', 'required' => true, 'options' => $instansiOptions],
+                    ['name' => 'kategori_aktor', 'label' => 'Jenis Aktor', 'type' => 'select', 'required' => true, 'options' => ['State' => 'State', 'Non-State' => 'Non-State']],
+                    // Label "Level" sengaja diganti "Pengelompokan Fungsi" (dinilai membingungkan
+                    // -- Risalah Rapat 21 Sept 2026); nilai kolom (1-4) dipertahankan agar
+                    // data existing tidak berubah, hanya label pilihan yang diperjelas.
+                    ['name' => 'level_kelembagaan', 'label' => 'Pengelompokan Fungsi', 'type' => 'select', 'options' => [
+                        1 => 'Kebijakan/Regulasi/Pengarah',
+                        2 => 'Fasilitator Wilayah',
+                        3 => 'Operator/Investor/Off-taker',
+                        4 => 'Partisipan/Penerima Manfaat/Riset',
                     ]],
-                    ['name' => 'peran_deskripsi', 'label' => 'Peran/Deskripsi', 'type' => 'textarea'],
+                    ['name' => 'peran_deskripsi', 'label' => 'Peran/Fungsi', 'type' => 'textarea'],
                 ],
             ],
             'isu_lainnya' => [

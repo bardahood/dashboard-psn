@@ -136,10 +136,13 @@ class PsnController extends Controller
         // banyak data sumber riil belum lengkap (lihat Bagian 8 prompt pengembangan).
         $data = $request->validate([
             'nama_psn' => ['required', 'string'],
-            'urgensi' => ['nullable', 'string'],
-            'tujuan_utama' => ['nullable', 'string'],
+            'nama_sub_proyek' => ['nullable', 'string', 'max:255'],
+            'urgensi' => ['nullable', 'string', 'min:20'],
+            'tujuan_utama' => ['nullable', 'string', 'min:20'],
             'tahun_penyelesaian' => ['nullable', 'integer', 'min:2000', 'max:2100'],
-            'output_akhir' => ['nullable', 'string'],
+            'bulan_penyelesaian' => ['nullable', 'integer', 'between:1,12'],
+            'output_akhir' => ['nullable', 'string', 'min:20'],
+            'data_teknis' => ['nullable', 'string'],
             'nilai_investasi_apbn_rp' => ['nullable', 'numeric', 'min:0'],
             'nilai_investasi_non_apbn_rp' => ['nullable', 'numeric', 'min:0'],
             'asta_cita' => ['nullable', 'string'],

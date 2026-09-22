@@ -3,17 +3,17 @@
         <h3 class="font-semibold text-gray-700 mb-4">{{ $editingId ? 'Ubah' : 'Tambah' }} RO/Proyek/Aktivitas</h3>
 
         <form wire:submit="save" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="sm:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Nama RO/Proyek/Aktivitas <span class="text-red-500">*</span></label>
-                <input type="text" wire:model="form.nama_ro" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
-                @error('form.nama_ro') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
-            </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tipe</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Jenis</label>
                 <select wire:model.live="form.tipe" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                     <option value="RO">RO/Proyek (induk)</option>
                     <option value="Aktivitas">Aktivitas (turunan)</option>
                 </select>
+            </div>
+            <div class="sm:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nama RO/Proyek/Aktivitas (Kegiatan) <span class="text-red-500">*</span></label>
+                <input type="text" wire:model="form.nama_ro" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
+                @error('form.nama_ro') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>
 
             @if ($form['tipe'] === 'Aktivitas')
@@ -32,7 +32,37 @@
                         Critical Path
                     </label>
                 </div>
-            @else
+            @endif
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Lokasi <span class="text-red-500">*</span></label>
+                <input type="text" wire:model="form.lokasi" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
+                @error('form.lokasi') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+            </div>
+            <div class="sm:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Pelaksana</label>
+                <select wire:model="form.instansi_pelaksana_id" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
+                    <option value="">-- Pilih dari Stakeholder Mapping --</option>
+                    @foreach ($instansiOptions as $id => $nama)
+                        <option value="{{ $id }}">{{ $nama }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Target Akhir <span class="text-red-500">*</span> <span class="text-gray-400 font-normal">(s/d akhir 2029)</span></label>
+                <input type="text" wire:model="form.target_akhir" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
+                @error('form.target_akhir') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Satuan</label>
+                <select wire:model="form.satuan" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
+                    <option value="">-- Pilih --</option>
+                    <option value="Unit">Unit</option>
+                    <option value="Persentase">Persentase</option>
+                </select>
+            </div>
+            @if ($form['tipe'] === 'RO')
                 <div class="flex items-end pb-1.5">
                     <label class="inline-flex items-center gap-2 text-sm">
                         <input type="checkbox" wire:model="form.is_ro_kunci" class="rounded border-gray-300">
@@ -42,29 +72,12 @@
             @endif
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Satuan</label>
-                <input type="text" wire:model="form.satuan" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
-            </div>
-            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Baseline</label>
                 <input type="text" wire:model="form.baseline" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Target Akhir</label>
-                <input type="text" wire:model="form.target_akhir" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Lokasi</label>
-                <input type="text" wire:model="form.lokasi" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
-            </div>
-            <div class="sm:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Instansi Pelaksana</label>
-                <select wire:model="form.instansi_pelaksana_id" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
-                    <option value="">-- Pilih Instansi --</option>
-                    @foreach ($instansiOptions as $id => $nama)
-                        <option value="{{ $id }}">{{ $nama }}</option>
-                    @endforeach
-                </select>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tahun Baseline</label>
+                <input type="number" wire:model="form.baseline_tahun" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
             </div>
 
             <div class="sm:col-span-3 flex justify-end gap-3">
@@ -86,6 +99,9 @@
                         <div class="font-medium text-gray-800">
                             {{ $ro->nama_ro }}
                             @if ($ro->is_ro_kunci) <span class="ml-1 text-xs rounded-full bg-red-100 text-red-700 px-2 py-0.5">RO Kunci</span> @endif
+                            @if ($ro->is_ro_kunci && $ro->targetPeriode->isEmpty())
+                                <span class="ml-1 text-xs rounded-full bg-amber-100 text-amber-700 px-2 py-0.5">&#9888; Belum dijabarkan per periode</span>
+                            @endif
                         </div>
                         <div class="text-gray-500 text-xs mt-0.5">
                             {{ $ro->satuan ?? '-' }} &middot; {{ $ro->lokasi ?? '-' }} &middot; {{ $ro->instansiPelaksana?->nama_instansi ?? '-' }}
@@ -109,6 +125,9 @@
                                 <div>
                                     <span class="text-gray-700">&#8618; {{ $aktivitas->nama_ro }}</span>
                                     @if ($aktivitas->is_ro_kunci) <span class="ml-1 text-xs rounded-full bg-red-100 text-red-700 px-2 py-0.5">Critical Path</span> @endif
+                                    @if ($aktivitas->is_ro_kunci && $aktivitas->targetPeriode->isEmpty())
+                                        <span class="ml-1 text-xs rounded-full bg-amber-100 text-amber-700 px-2 py-0.5">&#9888; Belum dijabarkan</span>
+                                    @endif
                                     <span class="text-gray-400 text-xs ml-1">{{ $aktivitas->satuan }}</span>
                                 </div>
                                 <div class="flex gap-3 whitespace-nowrap">

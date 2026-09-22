@@ -13,6 +13,8 @@
             @include('admin.psn._profil-tabs')
 
             @livewire('admin.sub-resource-manager', ['psn' => $psn, 'type' => $type], key($type))
+
+            @include('admin.psn._next-button')
         </div>
     </div>
 </x-app-layout>

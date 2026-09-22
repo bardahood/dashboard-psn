@@ -21,6 +21,7 @@ class RoProyek extends Model
         'is_ro_kunci',
         'satuan',
         'baseline',
+        'baseline_tahun',
         'target_akhir',
         'lokasi',
         'instansi_pelaksana_id',

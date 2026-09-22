@@ -15,10 +15,13 @@ class Psn extends Model
 
     protected $fillable = [
         'nama_psn',
+        'nama_sub_proyek',
         'urgensi',
         'tujuan_utama',
         'tahun_penyelesaian',
+        'bulan_penyelesaian',
         'output_akhir',
+        'data_teknis',
         'nilai_investasi_apbn_rp',
         'nilai_investasi_non_apbn_rp',
         'asta_cita',

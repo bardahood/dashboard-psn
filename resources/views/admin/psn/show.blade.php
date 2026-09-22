@@ -14,6 +14,9 @@
 
             <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
                 <h1 class="text-xl font-bold text-gray-900">{{ $psn->nama_psn }}</h1>
+                @if ($psn->nama_sub_proyek)
+                    <p class="text-sm text-gray-500 mt-0.5">Sub Proyek: {{ $psn->nama_sub_proyek }}</p>
+                @endif
                 <div class="mt-3 flex flex-wrap gap-2 text-xs">
                     @if ($psn->klaster) <span class="rounded-full bg-blue-100 text-blue-800 px-3 py-1">{{ $psn->klaster->nama_klaster }}</span> @endif
                     @if ($psn->statusPsn) <span class="rounded-full bg-green-100 text-green-800 px-3 py-1">{{ $psn->statusPsn->nama_status }}</span> @endif
@@ -23,10 +26,14 @@
 
                 <dl class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
                     <div><dt class="text-gray-500">Provinsi</dt><dd>{{ $psn->provinsi?->nama_provinsi ?? '-' }} @if($psn->kabupaten_kota), {{ $psn->kabupaten_kota }}@endif</dd></div>
-                    <div><dt class="text-gray-500">Tahun Penyelesaian</dt><dd>{{ $psn->tahun_penyelesaian ?? '-' }}</dd></div>
+                    <div><dt class="text-gray-500">Tahun Penyelesaian</dt><dd>
+                        @php $namaBulan = ['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; @endphp
+                        {{ $psn->bulan_penyelesaian ? $namaBulan[$psn->bulan_penyelesaian].' ' : '' }}{{ $psn->tahun_penyelesaian ?? '-' }}
+                    </dd></div>
+                    <div class="sm:col-span-2"><dt class="text-gray-500">Output Akhir Tahun yang Dicapai pada Akhir Proyek</dt><dd>{{ $psn->output_akhir ?? '-' }}</dd></div>
+                    <div class="sm:col-span-2"><dt class="text-gray-500">Data Teknis</dt><dd>{{ $psn->data_teknis ?? '-' }}</dd></div>
                     <div class="sm:col-span-2"><dt class="text-gray-500">Tujuan Utama</dt><dd>{{ $psn->tujuan_utama ?? '-' }}</dd></div>
                     <div class="sm:col-span-2"><dt class="text-gray-500">Urgensi & Dasar Hukum</dt><dd>{{ $psn->urgensi ?? '-' }}</dd></div>
-                    <div class="sm:col-span-2"><dt class="text-gray-500">Output Akhir</dt><dd>{{ $psn->output_akhir ?? '-' }}</dd></div>
                     <div><dt class="text-gray-500">Nilai Investasi APBN</dt><dd>{{ $psn->nilai_investasi_apbn_rp ? 'Rp '.number_format($psn->nilai_investasi_apbn_rp, 0, ',', '.') : '-' }}</dd></div>
                     <div><dt class="text-gray-500">Nilai Investasi Non-APBN</dt><dd>{{ $psn->nilai_investasi_non_apbn_rp ? 'Rp '.number_format($psn->nilai_investasi_non_apbn_rp, 0, ',', '.') : '-' }}</dd></div>
                     <div><dt class="text-gray-500">Pengusul</dt><dd>{{ $psn->pengusulInstansi?->nama_instansi ?? '-' }}</dd></div>
@@ -66,6 +73,8 @@
                     <p class="text-sm text-gray-400">Belum ada data risiko.</p>
                 @endforelse
             </div>
+
+            @include('admin.psn._next-button')
         </div>
     </div>
 </x-app-layout>

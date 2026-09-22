@@ -9,24 +9,11 @@
                 @error('form.peristiwa_risiko') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Kategori Risiko</label>
-                <input type="text" wire:model="form.kategori_risiko" placeholder="Regulasi/Teknis/Finansial/Lingkungan" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Level Risiko Awal</label>
-                <select wire:model="form.level_risiko_awal" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
-                    <option value="">-- Pilih --</option>
-                    @foreach ($levels as $value => $labelText)
-                        <option value="{{ $value }}">{{ $labelText }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Risiko Residual Harapan</label>
-                <select wire:model="form.risiko_residual_harapan" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
-                    <option value="">-- Pilih --</option>
-                    @foreach ($levels as $value => $labelText)
-                        <option value="{{ $value }}">{{ $labelText }}</option>
+                <label class="block text-sm font-medium text-gray-700 mb-1">PJ Risiko <span class="text-xs font-normal text-gray-400">(risk owner)</span></label>
+                <select wire:model="form.penanggung_jawab_id" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
+                    <option value="">-- Pilih PIC --</option>
+                    @foreach ($picOptions as $id => $nama)
+                        <option value="{{ $id }}">{{ $nama }}</option>
                     @endforeach
                 </select>
             </div>
@@ -35,11 +22,29 @@
                 <textarea wire:model="form.perlakuan_rencana" rows="2" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm"></textarea>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">PJ Risiko</label>
-                <select wire:model="form.penanggung_jawab_id" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
+                <label class="block text-sm font-medium text-gray-700 mb-1">PJ Perlakuan <span class="text-xs font-normal text-gray-400">(pelaksana perlakuan)</span></label>
+                <select wire:model="form.pelaksana_perlakuan_id" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                     <option value="">-- Pilih PIC --</option>
                     @foreach ($picOptions as $id => $nama)
                         <option value="{{ $id }}">{{ $nama }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Kategori/Aspek Risiko</label>
+                <select wire:model="form.kategori_risiko" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
+                    <option value="">-- Pilih --</option>
+                    @foreach ($kategoriOptions as $value => $labelText)
+                        <option value="{{ $value }}">{{ $labelText }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Level Risiko Awal</label>
+                <select wire:model="form.level_risiko_awal" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
+                    <option value="">-- Pilih --</option>
+                    @foreach ($levels as $value => $labelText)
+                        <option value="{{ $value }}">{{ $labelText }}</option>
                     @endforeach
                 </select>
             </div>
@@ -98,11 +103,9 @@
                             @if ($risiko->level_risiko_awal)
                                 <span class="rounded-full bg-amber-100 text-amber-700 px-2 py-0.5">{{ $risiko->level_risiko_awal }}</span>
                             @endif
-                            @if ($risiko->risiko_residual_harapan)
-                                <span class="text-gray-400">Harapan residual: {{ $risiko->risiko_residual_harapan }}</span>
-                            @endif
                             @if ($risiko->ro) <span class="text-gray-400">RO: {{ $risiko->ro->nama_ro }}</span> @endif
-                            @if ($risiko->penanggungJawab) <span class="text-gray-400">PJ: {{ $risiko->penanggungJawab->nama_pic }}</span> @endif
+                            @if ($risiko->penanggungJawab) <span class="text-gray-400">PJ Risiko: {{ $risiko->penanggungJawab->nama_pic }}</span> @endif
+                            @if ($risiko->pelaksanaPerlakuan) <span class="text-gray-400">PJ Perlakuan: {{ $risiko->pelaksanaPerlakuan->nama_pic }}</span> @endif
                             @if ($risiko->target_mulai || $risiko->target_selesai)
                                 <span class="text-gray-400">
                                     Target: {{ $risiko->target_mulai?->format('d/m/Y') ?? '-' }} &rarr; {{ $risiko->target_selesai?->format('d/m/Y') ?? '-' }}

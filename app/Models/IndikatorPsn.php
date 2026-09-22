@@ -18,6 +18,7 @@ class IndikatorPsn extends Model
         'nama_indikator',
         'satuan',
         'baseline',
+        'baseline_tahun',
     ];
 
     protected $casts = [];

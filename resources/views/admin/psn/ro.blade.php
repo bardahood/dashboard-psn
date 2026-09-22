@@ -13,6 +13,8 @@
             @include('admin.psn._profil-tabs')
 
             @livewire('admin.ro-proyek-manager', ['psn' => $psn])
+
+            @include('admin.psn._next-button')
         </div>
     </div>
 </x-app-layout>

@@ -28,6 +28,7 @@ class RoTargetPeriode extends Model
         'permasalahan',
         'kebutuhan_dukungan',
         'keterangan',
+        'bukti_pelaporan_path',
     ];
 
     protected $casts = [

@@ -21,6 +21,7 @@ class RisikoPsn extends Model
         'perlakuan_rencana',
         'risiko_residual_harapan',
         'penanggung_jawab_id',
+        'pelaksana_perlakuan_id',
         'target_mulai',
         'target_selesai',
         'ro_id',
@@ -42,6 +43,11 @@ class RisikoPsn extends Model
     public function penanggungJawab(): BelongsTo
     {
         return $this->belongsTo(RefPic::class, 'penanggung_jawab_id');
+    }
+
+    public function pelaksanaPerlakuan(): BelongsTo
+    {
+        return $this->belongsTo(RefPic::class, 'pelaksana_perlakuan_id');
     }
 
     public function ro(): BelongsTo
