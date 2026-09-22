@@ -23,6 +23,8 @@ class AuditLog extends Model
         'record_id',
         'aksi',
         'pic_id',
+        'user_id',
+        'role',
         'nilai_lama',
         'nilai_baru',
     ];
@@ -38,5 +40,10 @@ class AuditLog extends Model
     public function pic(): BelongsTo
     {
         return $this->belongsTo(RefPic::class, 'pic_id');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

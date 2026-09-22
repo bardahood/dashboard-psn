@@ -216,6 +216,18 @@ Otorisasi mengikuti `PsnPolicy` yang sudah ada (`viewAny`/`view`, permission `ps
 
 - Test otomatis: `ProjectProfileTest` (matriks + filter klaster, detail menampilkan seluruh bagian Perencanaan, filter tahun Penjabaran Tahunan menampilkan periode yang sesuai dan menyembunyikan tahun lain, gating akses tanpa `psn.view`) -- total 110 test, seluruhnya hijau.
 
+## Modul Audit Log: Pantau CRUD Lintas Peran
+
+Modul Audit Log (`/admin/audit-log`, permission `audit.view`) sudah ada sejak build awal (satu tabel `audit_log`, `App\Observers\AuditLogObserver` generik didaftarkan per model di `AppServiceProvider::boot()`), tapi cakupannya terbatas pada 6 model inti dan hanya menautkan `pic_id` (kontak instansi) -- banyak user login (terutama peran internal Bappenas) tidak punya `ref_pic` sama sekali, sehingga kolom "oleh" sering kosong dan sebagian besar aksi CRUD nyata (semua sub-resource profil PSN yang ditulis lewat komponen Livewire, Instrumen Kunjungan, Pengguna) sama sekali tidak tercatat. Diperluas jadi:
+
+- **Cakupan model diperluas dari 6 menjadi 32** (`AppServiceProvider::modelDiaudit()`) -- mencakup seluruh sub-resource profil PSN (Dasar Hukum, Stakeholder, Indikator + target tahunan, Trisula + target periode, Penerima Manfaat + target tahunan, Isu Lainnya, Evaluasi Status, Info Memo, Catatan Monev, RO/Proyek + target periode, Risiko + status periode, Kebutuhan Regulasi), seluruh bagian Instrumen Kunjungan Pengendalian & Perencanaan (kelembagaan, fisik, anggaran, risiko, regulasi, dokumentasi, verifikasi kriteria/lokasi/dokumen teknis/trisula, indeks bukti), serta Manajemen Pengguna (`User`, `RefPic`, `HakAkses`). Model pipeline/impor massal (mis. `MatriksSandinganImporter`, seeder) **sengaja tidak diaudit** -- itu bukan aksi CRUD pengguna, dan bulk `->update()` lewat query builder pula tidak memicu event Eloquent yang dibutuhkan observer.
+- **Kolom `user_id` ditambahkan** (`audit_log`, FK ke `users`, existing-first: `pic_id` dipertahankan untuk baris lama) -- menautkan langsung ke akun yang login saat aksi terjadi, tidak lagi bergantung pada apakah user tsb kebetulan punya `ref_pic`.
+- **Kolom `role` ditambahkan** (snapshot nama peran spatie/laravel-permission SAAT aksi terjadi, disimpan sebagai teks bukan FK) -- inti dari permintaan "pantau user dengan peran apa saja": jejak audit harus tetap mencerminkan peran yang berlaku ketika aksi dilakukan, bukan peran user itu sekarang (yang bisa sudah berubah/dicabut).
+- **Password tidak pernah tercatat** -- `AuditLogObserver` menyaring kolom `password`/`remember_token` dari `nilai_lama`/`nilai_baru` sebelum disimpan, khusus untuk model `User` yang kini ikut diaudit (mencegah hash password bocor ke tabel yang bisa dibaca siapa pun dengan izin `audit.view`).
+- **Filter halaman diperluas**: selain per Tabel (sudah ada), ditambahkan filter per Aksi (insert/update/delete), per Peran (dropdown dari `spatie/laravel-permission` Role), dan pencarian nama pengguna. Kolom baru "Peran" ditambahkan di tabel, dan kolom "Oleh" kini mengutamakan nama akun (`user_id`) dengan fallback ke nama PIC lama untuk baris historis yang dibuat sebelum migrasi ini.
+
+- Test otomatis: `AuditLogModulTest` (user + peran tercatat pada setiap aksi, cakupan meluas sampai ke sub-resource bukan cuma tabel induk, password tidak pernah tercatat, filter per peran/aksi/nama pengguna di halaman) -- total 114 test, seluruhnya hijau.
+
 ## Menjalankan Test
 
 ```bash
