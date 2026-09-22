@@ -2,9 +2,12 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Detail PSN</h2>
-            @can('update', $psn)
-                <a href="{{ route('admin.psn.edit', $psn) }}" class="rounded-lg bg-blue-800 text-white shadow-sm hover:shadow transition-all px-4 py-2 text-sm hover:bg-blue-700">Ubah</a>
-            @endcan
+            <div class="flex items-center gap-4">
+                <a href="{{ route('admin.project-profile.show', $psn) }}" class="text-sm text-blue-800 hover:text-blue-900 hover:underline underline-offset-2">Lihat Project Profile Lengkap &rarr;</a>
+                @can('update', $psn)
+                    <a href="{{ route('admin.psn.edit', $psn) }}" class="rounded-lg bg-blue-800 text-white shadow-sm hover:shadow transition-all px-4 py-2 text-sm hover:bg-blue-700">Ubah</a>
+                @endcan
+            </div>
         </div>
     </x-slot>
 

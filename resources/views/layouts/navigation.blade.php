@@ -33,9 +33,9 @@
                             {{ __('Kunjungan Perencanaan') }}
                         </x-nav-link>
                     @endcan
-                    @canany(['pengendalian.manage', 'pengguna.manage', 'audit.view', 'sinkronisasi.manage', 'laporan.export'])
+                    @canany(['psn.view', 'pengendalian.manage', 'pengguna.manage', 'audit.view', 'sinkronisasi.manage', 'laporan.export'])
                         @php
-                            $lainnyaAktif = request()->routeIs('admin.dokumen', 'admin.pengguna.*', 'admin.audit-log', 'admin.sinkronisasi-psi', 'admin.laporan.*');
+                            $lainnyaAktif = request()->routeIs('admin.project-profile.*', 'admin.dokumen', 'admin.pengguna.*', 'admin.audit-log', 'admin.sinkronisasi-psi', 'admin.laporan.*');
                         @endphp
                         <x-dropdown align="left" width="56">
                             <x-slot name="trigger">
@@ -45,6 +45,9 @@
                                 </button>
                             </x-slot>
                             <x-slot name="content">
+                                @can('psn.view')
+                                    <x-dropdown-link :href="route('admin.project-profile.index')">{{ __('Project Profile') }}</x-dropdown-link>
+                                @endcan
                                 @can('pengendalian.manage')
                                     <x-dropdown-link :href="route('admin.dokumen')">{{ __('Dokumen') }}</x-dropdown-link>
                                 @endcan
@@ -133,6 +136,9 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.matriks-sandingan')" :active="request()->routeIs('admin.matriks-sandingan')">
                     {{ __('Matriks Sandingan') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.project-profile.index')" :active="request()->routeIs('admin.project-profile.*')">
+                    {{ __('Project Profile') }}
                 </x-responsive-nav-link>
             @endcan
             @can('pengendalian.manage')

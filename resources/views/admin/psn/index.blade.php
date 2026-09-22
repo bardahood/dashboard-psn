@@ -3,6 +3,9 @@
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Manajemen Data PSN</h2>
             <div class="flex items-center gap-4">
+                <a href="{{ route('admin.project-profile.index') }}" class="text-sm text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">
+                    Project Profile &rarr;
+                </a>
                 @can('profil.manage')
                     <a href="{{ route('admin.evaluasi-keluar') }}" class="text-sm text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">
                         Rekomendasi Keluar dari Daftar &rarr;
@@ -84,6 +87,7 @@
                                     </span>
                                 </td>
                                 <td class="px-4 py-3 text-right space-x-3">
+                                    <a href="{{ route('admin.project-profile.show', $psn) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Project Profile</a>
                                     <a href="{{ route('admin.psn.show', $psn) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Lihat</a>
                                     @can('update', $psn)
                                         <a href="{{ route('admin.psn.edit', $psn) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Ubah</a>

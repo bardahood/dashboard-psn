@@ -200,6 +200,22 @@ Risalah rapat resmi (dilampirkan terpisah, `Risalah_Rapat_21_September_2026_Upda
 - **Rename "Kebutuhan Justifikasi" → "Kebutuhan Status PSN Tahun Selanjutnya"** — penyebutan di risalah rapat ambigu apakah ini sekadar ganti label tab "Evaluasi Status" yang sudah ada atau field yang berbeda; tidak diubah sampai dikonfirmasi.
 - Field/menu publik (`public/psn/show.blade.php`, `public/psn/index.blade.php`) **belum** diperbarui menampilkan Sub Proyek/Data Teknis/Bulan Penyelesaian -- perubahan risalah rapat difokuskan ke sisi pengisian data (admin) dahulu; tampilan publik menyusul bila diperlukan.
 
+## Halaman "Project Profile" (Matriks & Detail Lengkap per PSN)
+
+Ditambahkan halaman baca-saja (read-only) baru, `/admin/project-profile`, yang menyatukan seluruh muatan Project Profile satu PSN ke dalam satu dokumen -- berbeda dari tab-tab `admin.psn.*` yang berorientasi pengisian/edit per-bagian. Strukturnya mengikuti persis slide **"Struktur Project Profile"** pada paparan resmi **"Update Project Profile"** (`Update_Project_Profile_Final_Rapat_9_Sept.pptx`, dilampirkan terpisah), yang membagi Project Profile menjadi dua bagian besar:
+
+- **Perencanaan** — Gambaran Umum (Klaster PKPN/PSN, Status PSN, Diagram Kerangka Kerja Logis via Kode RKP, Tujuan Utama, Urgensi & Dasar Hukum, Lokasi, Tahun & Output Akhir, Data Teknis, Nilai Investasi, Pengusul/Pengelola/Kontraktor/Supervisi, Visualisasi Kerangka Kelembagaan), Dasar Hukum, Stakeholder Mapping & Kerangka Kelembagaan, Indikator Output/Outcome (target tahunan 2025-2030), Kontribusi Terhadap Trisula Pembangunan (target tahunan), Penerima Manfaat (target tahunan), Register Risiko, Kebutuhan Regulasi, dan RO/Proyek/Non RO (ringkasan tahunan).
+- **Penjabaran Tahunan** — Kontribusi Trisula (Target TW, per tahun terpilih), RO/Proyek/Aktivitas & Critical Path (Target Bulanan/Triwulanan, per tahun terpilih, satu blok per RO dengan tabel periode + link Bukti Pelaporan), Deskripsi/Isu Lainnya dan Kebutuhan Dukungan, serta Kebutuhan Status PSN Tahun Selanjutnya/Justifikasi Kebutuhan. Tahun penjabaran dipilih lewat dropdown (2025-2030, default tahun berjalan) tanpa reload halaman penuh (form GET sederhana).
+
+Dua mode tampilan:
+
+- **Matriks** (`/admin/project-profile`) — satu baris per PSN (seluruh 380 PSN, dipaginasi), dengan kolom ringkasan (Klaster, Status, Provinsi, jumlah RO/Proyek, jumlah Risiko) dan dua **skor kelengkapan**: "Kelengkapan Perencanaan" (X/6: Gambaran Umum, RO/Proyek, Risiko, Indikator, Trisula, Penerima Manfaat) dan "Kelengkapan Penjabaran {tahun berjalan}" (X/4: Trisula TW, RO Bulanan/TW, Isu Lainnya, Evaluasi Status tahun berjalan) -- dipilih lewat pertimbangan performa & keterbacaan dibanding satu tabel raksasa berpuluh-puluh kolom untuk 380 baris sekaligus. Filter: cari nama, Klaster, Status, Provinsi, PKPN/PSN. Klik nama PSN atau tombol "Lihat" untuk membuka Detail.
+- **Detail** (`/admin/project-profile/{psn}`) — dokumen lengkap satu PSN seperti dijabarkan di atas, dengan anchor nav "Perencanaan"/"Penjabaran Tahunan" di bagian atas, dan tautan timbal-balik ke/dari halaman edit (`admin.psn.show`/`admin.psn.edit`) serta dari tabel Data PSN dan setiap baris Matriks.
+
+Otorisasi mengikuti `PsnPolicy` yang sudah ada (`viewAny`/`view`, permission `psn.view`) -- tidak ada gate baru, halaman ini murni membaca data existing lewat relasi Eloquent (tidak ada tabel/kolom baru). Ditautkan dari dropdown navigasi "Lainnya" dan dari halaman Data PSN.
+
+- Test otomatis: `ProjectProfileTest` (matriks + filter klaster, detail menampilkan seluruh bagian Perencanaan, filter tahun Penjabaran Tahunan menampilkan periode yang sesuai dan menyembunyikan tahun lain, gating akses tanpa `psn.view`) -- total 110 test, seluruhnya hijau.
+
 ## Menjalankan Test
 
 ```bash

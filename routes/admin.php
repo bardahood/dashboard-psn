@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\KunjunganPerencanaanController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\MatriksSandinganController;
 use App\Http\Controllers\Admin\PenggunaController;
+use App\Http\Controllers\Admin\ProjectProfileController;
 use App\Http\Controllers\Admin\PsnController;
 use App\Http\Controllers\Admin\SinkronisasiPsiController;
 use App\Http\Controllers\Admin\VerifikasiUsulanController;
@@ -30,6 +31,11 @@ Route::middleware(['auth', 'akun.aktif'])->prefix('admin')->name('admin.')->grou
     Route::get('/psn/{psn}/profil/{type}', fn (Psn $psn, string $type) => view('admin.psn.profil', compact('psn', 'type')))->name('psn.profil');
 
     Route::get('/matriks-sandingan', [MatriksSandinganController::class, 'index'])->name('matriks-sandingan');
+
+    Route::prefix('project-profile')->name('project-profile.')->group(function () {
+        Route::get('/', [ProjectProfileController::class, 'index'])->name('index');
+        Route::get('/{psn}', [ProjectProfileController::class, 'show'])->name('show');
+    });
 
     Route::middleware('permission:pengendalian.manage')->prefix('kunjungan-pengendalian')->name('kunjungan-pengendalian.')->group(function () {
         Route::get('/', [KunjunganPengendalianController::class, 'index'])->name('index');
