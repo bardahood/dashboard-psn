@@ -118,4 +118,79 @@ class AuditLogModulTest extends TestCase
         $responseAksi->assertOk();
         $responseAksi->assertSee('insert');
     }
+
+    public function test_halaman_index_menautkan_ke_detail_audit_log(): void
+    {
+        $this->actingAsRole('Super Admin');
+        Psn::create(['nama_psn' => 'Contoh PSN']);
+
+        $log = AuditLog::firstOrFail();
+
+        $this->get('/admin/audit-log')
+            ->assertOk()
+            ->assertSee(route('admin.audit-log.show', $log), false);
+    }
+
+    public function test_detail_audit_log_update_menampilkan_nilai_lama_dan_baru_secara_utuh_tanpa_terpotong(): void
+    {
+        $this->actingAsRole('Super Admin');
+        $psn = Psn::create(['nama_psn' => 'Contoh PSN']);
+
+        $urgensiPanjang = 'Urgensi yang sengaja dibuat sangat panjang melebihi 25 karakter agar bisa memastikan halaman detail tidak memotong isi datanya sama sekali, berbeda dari pratinjau ringkas di halaman daftar.';
+        $psn->update(['urgensi' => $urgensiPanjang]);
+
+        $log = AuditLog::where('nama_tabel', 'psn')->where('aksi', 'update')->firstOrFail();
+
+        $response = $this->get(route('admin.audit-log.show', $log));
+
+        $response->assertOk();
+        $response->assertSee($urgensiPanjang);
+        $response->assertSee('urgensi');
+    }
+
+    public function test_detail_audit_log_insert_menampilkan_seluruh_kolom_data_baru(): void
+    {
+        $this->actingAsRole('Super Admin');
+        $psn = Psn::create(['nama_psn' => 'PSN Baru Lengkap', 'kabupaten_kota' => 'Kabupaten Contoh']);
+
+        $log = AuditLog::where('nama_tabel', 'psn')->where('aksi', 'insert')->firstOrFail();
+
+        $response = $this->get(route('admin.audit-log.show', $log));
+
+        $response->assertOk();
+        $response->assertSee('PSN Baru Lengkap');
+        $response->assertSee('Kabupaten Contoh');
+        $response->assertSee('nama_psn');
+        $response->assertSee('kabupaten_kota');
+    }
+
+    public function test_detail_audit_log_delete_menampilkan_nilai_terakhir_sebelum_dihapus(): void
+    {
+        $this->actingAsRole('Super Admin');
+        $psn = Psn::create(['nama_psn' => 'PSN Akan Dihapus']);
+        $psnId = $psn->id;
+        $psn->delete();
+
+        $log = AuditLog::where('nama_tabel', 'psn')->where('record_id', $psnId)->where('aksi', 'delete')->firstOrFail();
+
+        $response = $this->get(route('admin.audit-log.show', $log));
+
+        $response->assertOk();
+        $response->assertSee('PSN Akan Dihapus');
+    }
+
+    public function test_detail_audit_log_ditolak_tanpa_izin_audit_view(): void
+    {
+        $superAdmin = $this->actingAsRole('Super Admin');
+        $psn = Psn::create(['nama_psn' => 'Contoh PSN']);
+        $log = AuditLog::firstOrFail();
+
+        // User tanpa peran sama sekali (tidak punya permission apa pun,
+        // termasuk audit.view yang justru sengaja diberikan ke Viewer Internal).
+        $tanpaPeran = User::factory()->create();
+
+        $this->actingAs($tanpaPeran)
+            ->get(route('admin.audit-log.show', $log))
+            ->assertForbidden();
+    }
 }

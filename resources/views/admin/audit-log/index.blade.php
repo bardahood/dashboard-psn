@@ -43,6 +43,7 @@
                             <th class="px-4 py-3">Oleh</th>
                             <th class="px-4 py-3">Peran</th>
                             <th class="px-4 py-3">Perubahan</th>
+                            <th class="px-4 py-3"></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y">
@@ -68,17 +69,26 @@
                                 <td class="px-4 py-3 max-w-md">
                                     @if ($log->aksi === 'update' && $log->nilai_baru)
                                         <ul class="text-xs space-y-0.5">
-                                            @foreach ($log->nilai_baru as $field => $value)
-                                                <li><span class="text-gray-500">{{ $field }}:</span> {{ \Illuminate\Support\Str::limit((string) ($log->nilai_lama[$field] ?? '-'), 25) }} &rarr; {{ \Illuminate\Support\Str::limit((string) $value, 25) }}</li>
+                                            @foreach (array_slice($log->nilai_baru, 0, 3, true) as $field => $value)
+                                                <li><span class="text-gray-500">{{ $field }}:</span> {{ \Illuminate\Support\Str::limit((string) ($log->nilai_lama[$field] ?? '-'), 25) }} &rarr; {{ \Illuminate\Support\Str::limit(is_array($value) ? json_encode($value) : (string) $value, 25) }}</li>
                                             @endforeach
+                                            @if (count($log->nilai_baru) > 3)
+                                                <li class="text-gray-400">+{{ count($log->nilai_baru) - 3 }} kolom lainnya&hellip;</li>
+                                            @endif
                                         </ul>
                                     @else
-                                        <span class="text-xs text-gray-400">{{ $log->aksi === 'insert' ? 'Data baru dibuat' : 'Data dihapus' }}</span>
+                                        <span class="text-xs text-gray-400">
+                                            {{ $log->aksi === 'insert' ? count($log->nilai_baru ?? []) : count($log->nilai_lama ?? []) }}
+                                            kolom {{ $log->aksi === 'insert' ? 'terisi' : 'terhapus' }}
+                                        </span>
                                     @endif
+                                </td>
+                                <td class="px-4 py-3 text-right">
+                                    <a href="{{ route('admin.audit-log.show', $log) }}" class="text-blue-800 hover:text-blue-900 hover:underline underline-offset-2 text-sm font-medium whitespace-nowrap">Lihat Detail &rarr;</a>
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="7" class="px-4 py-6 text-center text-gray-400">Belum ada catatan audit.</td></tr>
+                            <tr><td colspan="8" class="px-4 py-6 text-center text-gray-400">Belum ada catatan audit.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

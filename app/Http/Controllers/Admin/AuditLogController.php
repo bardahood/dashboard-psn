@@ -41,4 +41,15 @@ class AuditLogController extends Controller
 
         return view('admin.audit-log.index', compact('daftarAudit', 'daftarTabel', 'daftarRole'));
     }
+
+    /**
+     * Detail satu baris audit: seluruh isi data yang berubah field demi
+     * field, tanpa pemotongan teks seperti pada pratinjau di halaman index.
+     */
+    public function show(AuditLog $auditLog)
+    {
+        $auditLog->load(['user', 'pic']);
+
+        return view('admin.audit-log.show', compact('auditLog'));
+    }
 }

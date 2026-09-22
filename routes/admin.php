@@ -68,7 +68,10 @@ Route::middleware(['auth', 'akun.aktif'])->prefix('admin')->name('admin.')->grou
         Route::put('/{pengguna}', [PenggunaController::class, 'update'])->name('update');
     });
 
-    Route::middleware('permission:audit.view')->get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log');
+    Route::middleware('permission:audit.view')->group(function () {
+        Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log');
+        Route::get('/audit-log/{auditLog}', [AuditLogController::class, 'show'])->name('audit-log.show');
+    });
 
     Route::middleware('permission:pengendalian.manage')->get('/dokumen', [DokumenController::class, 'index'])->name('dokumen');
 
