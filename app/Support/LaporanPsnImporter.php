@@ -100,6 +100,164 @@ class LaporanPsnImporter
     }
 
     /**
+     * Impor "Hasil Sandingan Laporan PSN dan Matrix Pembangunan RKP 2026" --
+     * berbeda dari importKatalogRo()/pengayaanMatrixRkp() di atas, file ini
+     * SUDAH berisi hasil pencocokan manual antara laporan_PSN.xlsx dan
+     * matrix_pembangunan_rkp2026.xlsx (kolom nama_psn bersih tanpa kode
+     * prefiks, dan kode_output_or_ro sudah berupa kode hierarkis RKP
+     * langsung per baris, bukan hasil rekonstruksi "Kode Source"). Karena
+     * nama PSN-nya sudah bersih, penautan psn_id di sini pakai pencocokan
+     * ketat (persis atau prefiks setelah normalisasi spasi/kapital) --
+     * BUKAN fuzzy scorer di cariPsnTerbaik() -- supaya tidak mengulang
+     * risiko false-positive yang pernah ditemukan pada importKatalogRo().
+     *
+     * Baris yang sama persis dengan katalog yang sudah ada (psn_id + ro +
+     * lokasi setelah normalisasi) TIDAK membuat baris baru -- tapi kalau
+     * baris lama itu belum punya kode RKP (prop_kode_rkp masih kosong,
+     * krn pengayaanMatrixRkp() berbasis rekonstruksi "Kode Source" hanya
+     * berhasil untuk sebagian baris), baris lama itu DIPERKAYA dengan kode
+     * dari sumber sandingan ini (sudah langsung tersedia per baris di sini,
+     * tidak perlu rekonstruksi) -- existing-first, tidak pernah menimpa
+     * kode yang sudah terisi. Lokasi WAJIB ikut jadi kunci dedup -- RO
+     * bernama sama (mis. "Pelatihan Pertanian bagi Non Aparatur") lazim
+     * muncul berkali-kali dengan lokasi kabupaten/provinsi berbeda di
+     * sumber ini, dan itu adalah entri katalog yang berbeda (bukan baris
+     * duplikat) -- dedup hanya berdasar nama RO saja sempat salah membuang
+     * seluruh varian lokasi ini, ditemukan & diperbaiki saat verifikasi.
+     * File ini tidak punya kolom volume/satuan/kementerian (beda struktur
+     * dari laporan_PSN.xlsx) sehingga field itu dibiarkan kosong pada baris
+     * BARU yang diimpor dari sini -- field lain (Nama RO dropdown, kode
+     * RKP, lokasi) tetap terisi penuh.
+     *
+     * @return array{baris_diimpor: int, baris_dilewati_duplikat: int, baris_diperkaya_kode: int, psn_tertaut: int, psn_tidak_ditemukan: array<string>}
+     */
+    public function importHasilSandingan(string $path): array
+    {
+        $sheet = IOFactory::load($path)->getActiveSheet();
+        $baris = $sheet->toArray(null, true, true, false);
+        $header = array_map('trim', array_shift($baris));
+
+        $daftarPsn = Psn::query()->select('id', 'nama_psn')->get();
+
+        // Baris lama dari importKatalogRo() menyimpan `ro` dengan kode depan
+        // (mis. "001-Bantuan Tenaga Kerja Mandiri..."), sedangkan sumber
+        // sandingan ini sudah bersih tanpa kode -- kode itu harus dibuang
+        // dulu sebelum dibandingkan, kalau tidak dedup gagal mendeteksi
+        // baris yang sebenarnya sama (ditemukan saat verifikasi manual).
+        // Nilai peta = id baris (dipakai utk pengayaan kode RKP di bawah).
+        $roTersimpan = [];
+        foreach (RefRoKrisna::query()->whereNotNull('psn_id')->get(['id', 'psn_id', 'ro', 'lokasi_ro', 'prop_kode_rkp']) as $r) {
+            $roTersimpan[$this->kunciDedupRo($r->psn_id, (string) $r->ro, (string) $r->lokasi_ro)] = $r;
+        }
+
+        $diimpor = 0;
+        $dilewatiDuplikat = 0;
+        $diperkayaKode = 0;
+        $psnTertautUnik = [];
+        $psnTidakDitemukan = [];
+
+        foreach ($baris as $row) {
+            $data = array_combine($header, $row);
+            $namaPsn = trim((string) ($data['nama_psn'] ?? ''));
+            if ($namaPsn === '') {
+                continue;
+            }
+
+            $psn = $this->cariPsnKetat($namaPsn, $daftarPsn);
+            if (! $psn) {
+                $psnTidakDitemukan[$namaPsn] = true;
+
+                continue;
+            }
+            $psnTertautUnik[$psn->id] = true;
+
+            $ro = trim((string) ($data['ro'] ?? ''));
+            if ($ro === '') {
+                continue;
+            }
+
+            $kodeRkp = $data['kode_output_or_ro'] ?? null;
+            $kunciDedup = $this->kunciDedupRo($psn->id, $ro, (string) ($data['lokasi_ro'] ?? ''));
+
+            if (isset($roTersimpan[$kunciDedup])) {
+                $dilewatiDuplikat++;
+                $existing = $roTersimpan[$kunciDedup];
+                if (empty($existing->prop_kode_rkp) && ! empty($kodeRkp)) {
+                    $existing->update(['prop_kode_rkp' => $kodeRkp]);
+                    $diperkayaKode++;
+                }
+
+                continue;
+            }
+            $roTersimpan[$kunciDedup] = (object) ['prop_kode_rkp' => $kodeRkp];
+
+            RefRoKrisna::create([
+                'sektor_psn' => $data['sektor_psn'] ?? null,
+                'project_psn' => $namaPsn,
+                'project_rkp' => $ro,
+                'ro' => $ro,
+                'lokasi_ro' => $data['lokasi_ro'] ?? null,
+                'prop' => $data['ppn'] ?? null,
+                'prop_kode_rkp' => $kodeRkp,
+                'psn_id' => $psn->id,
+            ]);
+            $diimpor++;
+        }
+
+        return [
+            'baris_diimpor' => $diimpor,
+            'baris_dilewati_duplikat' => $dilewatiDuplikat,
+            'baris_diperkaya_kode' => $diperkayaKode,
+            'psn_tertaut' => count($psnTertautUnik),
+            'psn_tidak_ditemukan' => array_keys($psnTidakDitemukan),
+        ];
+    }
+
+    /**
+     * Pencocokan ketat nama_psn (BUKAN fuzzy scorer) -- dipakai khusus oleh
+     * importHasilSandingan() karena sumbernya sudah berisi nama PSN bersih.
+     * Coba persis dulu, lalu persis setelah normalisasi spasi/kapital/tanda
+     * hubung, lalu sebagai upaya terakhir: prefiks (nama sumber adalah awal
+     * dari nama_psn asli, mis. PSN nasional yang di sumber ditulis tanpa
+     * daftar provinsi di belakangnya) -- dengan batas panjang minimum supaya
+     * tidak salah cocok ke prefiks pendek yang kebetulan sama.
+     */
+    private function cariPsnKetat(string $namaSumber, Collection $daftarPsn): ?Psn
+    {
+        $exact = $daftarPsn->first(fn (Psn $p) => $p->nama_psn === $namaSumber);
+        if ($exact) {
+            return $exact;
+        }
+
+        $normSumber = $this->normalisasiRingan($namaSumber);
+        $normMatch = $daftarPsn->first(fn (Psn $p) => $this->normalisasiRingan($p->nama_psn) === $normSumber);
+        if ($normMatch) {
+            return $normMatch;
+        }
+
+        if (mb_strlen($normSumber) < 15) {
+            return null;
+        }
+
+        return $daftarPsn->first(fn (Psn $p) => str_starts_with($this->normalisasiRingan($p->nama_psn), $normSumber));
+    }
+
+    /** Kunci dedup RO: psn + nama RO (kode depan dibuang) + lokasi, semua dinormalisasi. */
+    private function kunciDedupRo(int $psnId, string $ro, string $lokasi): string
+    {
+        return $psnId.'|'.$this->normalisasi($this->buangKodeAwal($ro)).'|'.$this->normalisasiRingan($lokasi);
+    }
+
+    /** Normalisasi ringan (bukan stopword-stripping skorKemiripan()): rapikan spasi/tanda hubung & kapital saja, urutan kata tetap dipertahankan. */
+    private function normalisasiRingan(string $s): string
+    {
+        $s = mb_strtolower(trim($s));
+        $s = preg_replace('/\s*-\s*/', '-', $s);
+
+        return preg_replace('/\s+/', ' ', $s);
+    }
+
+    /**
      * Pengayaan jalur PN/PP/KP/ProP dari matriks nasional RKP 2026.
      *
      * BATASAN: matrix_pembangunan_rkp2026.xlsx mencakup ~10.800 baris seluruh

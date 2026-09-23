@@ -32,5 +32,11 @@ class LaporanPsnKatalogSeeder extends Seeder
             $hasilMatrix = $importer->pengayaanMatrixRkp($matrixPath);
             $this->command?->info("Katalog RO Krisna: {$hasilMatrix['baris_diperkaya']} baris diperkaya jalur PN/PP/KP/ProP.");
         }
+
+        $sandinganPath = database_path('seeders/data/Hasil_Sandingan_Laporan_PSN_dan_Matrix_Pemb_rkp2026.xlsx');
+        if (is_file($sandinganPath)) {
+            $hasilSandingan = $importer->importHasilSandingan($sandinganPath);
+            $this->command?->info("Hasil Sandingan: {$hasilSandingan['baris_diimpor']} baris RO tambahan diimpor untuk {$hasilSandingan['psn_tertaut']} PSN, {$hasilSandingan['baris_diperkaya_kode']} baris lama diperkaya kode RKP ({$hasilSandingan['baris_dilewati_duplikat']} duplikat dilewati).");
+        }
     }
 }

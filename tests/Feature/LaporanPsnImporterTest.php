@@ -12,6 +12,8 @@ use Database\Seeders\RefProvinsiSeeder;
 use Database\Seeders\RefStatusKetersediaanSeeder;
 use Database\Seeders\RefSumberDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Tests\TestCase;
 
 /**
@@ -133,5 +135,69 @@ class LaporanPsnImporterTest extends TestCase
 
         $this->assertNotNull($roMultiLokasi);
         $this->assertLessThan(255, strlen($roMultiLokasi->lokasi));
+    }
+
+    /**
+     * @return string path file .xlsx sementara (dihapus otomatis oleh OS/tmp)
+     */
+    private function buatFixtureSandingan(array $baris): string
+    {
+        $sheet = new Spreadsheet;
+        $ws = $sheet->getActiveSheet();
+        $ws->fromArray(['sektor_psn', 'nama_psn', 'ppn', 'ro', 'kode_output_or_ro', 'PN_PP_KP_ProP', 'lokasi_ro'], null, 'A1');
+        $ws->fromArray($baris, null, 'A2');
+
+        $path = tempnam(sys_get_temp_dir(), 'sandingan_').'.xlsx';
+        (new Xlsx($sheet))->save($path);
+
+        return $path;
+    }
+
+    public function test_import_hasil_sandingan_menautkan_persis_dan_prefiks_lalu_mengisi_ref_ro_krisna(): void
+    {
+        $bendungan = Psn::create(['nama_psn' => 'Bendungan Tiga Dihaji']);
+        $gasKota = Psn::create(['nama_psn' => 'Pembangunan Jaringan Gas Kota Provinsi DKI Jakarta, Provinsi Kepulauan Riau']);
+
+        $path = $this->buatFixtureSandingan([
+            ['E-Swasembada Air', 'Bendungan Tiga Dihaji', '01-Pembangunan tampungan air', 'Bendungan Tiga Dihaji', '02.10.03.01.015', 'Bendungan Tiga Dihaji', 'Pusat'],
+            // nama_psn di sumber adalah prefiks dari nama_psn asli (tanpa daftar provinsi di belakang) -- harus tetap tertaut.
+            ['A-Direktif Presiden', 'Pembangunan Jaringan Gas Kota', '02-Distribusi Gas', 'Jaringan Distribusi Gas Kota', '02.09.01.02.010', 'Jaringan Distribusi Gas Kota', 'Provinsi DKI Jakarta'],
+            // nama_psn tidak dikenal sama sekali -- harus dilewati, tidak membuat baris & tidak error.
+            ['X-Tidak Dikenal', 'PSN Yang Tidak Ada Di Database Ini', '01-Entah', 'RO Entah', '99.99.99.99.999', 'RO Entah', 'Pusat'],
+        ]);
+
+        $hasil = app(LaporanPsnImporter::class)->importHasilSandingan($path);
+
+        $this->assertSame(2, $hasil['baris_diimpor']);
+        $this->assertSame(2, $hasil['psn_tertaut']);
+        $this->assertSame(['PSN Yang Tidak Ada Di Database Ini'], $hasil['psn_tidak_ditemukan']);
+
+        $this->assertDatabaseHas('ref_ro_krisna', ['psn_id' => $bendungan->id, 'ro' => 'Bendungan Tiga Dihaji', 'prop_kode_rkp' => '02.10.03.01.015']);
+        $this->assertDatabaseHas('ref_ro_krisna', ['psn_id' => $gasKota->id, 'ro' => 'Jaringan Distribusi Gas Kota']);
+        $this->assertDatabaseMissing('ref_ro_krisna', ['ro' => 'RO Entah']);
+    }
+
+    public function test_import_hasil_sandingan_melewati_baris_duplikat_terhadap_katalog_yang_sudah_ada(): void
+    {
+        $psn = Psn::create(['nama_psn' => 'Bendungan Tiga Dihaji']);
+        $existing = RefRoKrisna::create(['psn_id' => $psn->id, 'ro' => '001-Bendungan Tiga Dihaji', 'project_rkp' => '001-Bendungan Tiga Dihaji', 'lokasi_ro' => 'Pusat']);
+
+        $path = $this->buatFixtureSandingan([
+            // RO + lokasi sama persis (setelah normalisasi & kode depan dibuang) dengan yang sudah ada -- tidak membuat
+            // baris baru, tapi baris lama diperkaya kode RKP-nya karena sebelumnya masih kosong.
+            ['E-Swasembada Air', 'Bendungan Tiga Dihaji', '01-Pembangunan tampungan air', '  bendungan tiga dihaji  ', '02.10.03.01.015', 'Bendungan Tiga Dihaji', 'Pusat'],
+            // RO sama tapi lokasi BEDA -- harus tetap diimpor sebagai entri katalog terpisah, bukan dianggap duplikat.
+            ['E-Swasembada Air', 'Bendungan Tiga Dihaji', '01-Pembangunan tampungan air', 'Bendungan Tiga Dihaji', '02.10.03.01.017', 'Bendungan Tiga Dihaji', 'Kab. Ogan Komering Ulu Selatan'],
+            ['E-Swasembada Air', 'Bendungan Tiga Dihaji', '01-Pembangunan tampungan air', 'Pengadaan Lahan Bendungan Tiga Dihaji', '02.10.03.01.016', 'Pengadaan Lahan Bendungan Tiga Dihaji', 'Pusat'],
+        ]);
+
+        $hasil = app(LaporanPsnImporter::class)->importHasilSandingan($path);
+
+        $this->assertSame(2, $hasil['baris_diimpor']);
+        $this->assertSame(1, $hasil['baris_dilewati_duplikat']);
+        $this->assertSame(1, $hasil['baris_diperkaya_kode']);
+        $this->assertSame(3, RefRoKrisna::where('psn_id', $psn->id)->count());
+        $this->assertDatabaseHas('ref_ro_krisna', ['psn_id' => $psn->id, 'ro' => 'Bendungan Tiga Dihaji', 'lokasi_ro' => 'Kab. Ogan Komering Ulu Selatan']);
+        $this->assertSame('02.10.03.01.015', $existing->refresh()->prop_kode_rkp);
     }
 }

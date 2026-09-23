@@ -16,7 +16,16 @@
                     <select wire:model.live="krisnaTerpilihId" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                         <option value="">-- Pilih RO dari Katalog Krisna --</option>
                         @foreach ($krisnaOptions as $k)
-                            <option value="{{ $k->id }}">{{ \Illuminate\Support\Str::limit($k->project_rkp, 90) }} @if($k->volume) (Vol: {{ rtrim(rtrim($k->volume, '0'), '.') }} {{ $k->satuan }}) @endif</option>
+                            @php
+                                $labelKrisna = \Illuminate\Support\Str::limit($k->project_rkp, 70);
+                                if ($k->volume) {
+                                    $labelKrisna .= ' (Vol: '.rtrim(rtrim((string) $k->volume, '0'), '.').' '.$k->satuan.')';
+                                }
+                                if ($k->lokasi_ro) {
+                                    $labelKrisna .= ' — '.\Illuminate\Support\Str::limit($k->lokasi_ro, 40);
+                                }
+                            @endphp
+                            <option value="{{ $k->id }}">{{ $labelKrisna }}</option>
                         @endforeach
                     </select>
                     @error('form.nama_ro') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
