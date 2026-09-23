@@ -44,7 +44,7 @@
                                 <td class="px-4 py-3 max-w-lg">{{ $evaluasi->justifikasi ?? '-' }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     @if ($evaluasi->psn)
-                                        <a href="{{ route('admin.psn.profil', [$evaluasi->psn, 'evaluasi_status']) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Lihat Detail</a>
+                                        <a href="{{ route('admin.psn.penjabaran', $evaluasi->psn) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Lihat Detail</a>
                                     @endif
                                 </td>
                             </tr>

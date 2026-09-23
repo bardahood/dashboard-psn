@@ -10,7 +10,7 @@ Laravel 11 (PHP 8.2+) · Blade + Tailwind + Alpine (via Breeze) · MySQL 8.0+/Ma
 
 Logo dan palet warna aplikasi (publik & admin) mengikuti identitas visual **Kementerian PPN/Bappenas**, diambil dari materi resmi yang dilampirkan pada prompt pengembangan (`Update_Project_Profile_Final_Rapat_9_Sept.pptx`):
 
-- Logo (`public/images/logo-bappenas.png`) menggantikan logo Laravel bawaan Breeze di `resources/views/components/application-logo.blade.php` — dipakai di halaman login/register (`layouts/guest.blade.php`), nav admin (`layouts/navigation.blade.php`), dan header situs publik (`layouts/public.blade.php`, ditaruh di atas chip putih agar kontras dengan header navy).
+- Logo aplikasi memakai **logo eMonev** (`public/images/logo-emonev.png`, sebelumnya logo Bappenas biasa — diganti sesuai permintaan agar identik dengan branding sistem eMonev) lewat `resources/views/components/application-logo.blade.php` — satu titik ubah ini otomatis dipakai di halaman login/register (`layouts/guest.blade.php`), nav admin (`layouts/navigation.blade.php`), dan header situs publik (`layouts/public.blade.php`). Berkas lama `logo-bappenas.png` tetap dibiarkan ada di `public/images/` (tidak dipakai lagi, tidak dihapus).
 - Skala warna `blue` bawaan Tailwind di-override di `tailwind.config.js` dengan navy resmi logo (`#346698` sebagai `blue-600`), sehingga seluruh kelas `bg-blue-*`/`text-blue-*` yang sudah dipakai di ~48 file Blade otomatis mengikuti warna korporat tanpa perlu diedit satu per satu. Ditambahkan pula skala `gold` (`#ca9934`, elemen emas pada logo) untuk aksen terbatas: garis atas nav admin dan status tab aktif (menggantikan `indigo` bawaan Breeze).
 - Setelah mengubah `tailwind.config.js`, jalankan `npm run build` (atau `npm run dev` saat development) agar CSS terkompilasi ulang.
 
@@ -246,6 +246,26 @@ Tindak lanjut poin "Penjabaran" pada Risalah Rapat 21 September 2026, dengan dat
 
 - Artisan: `php artisan psn:import-laporan-psn [file] [--matrix=path|0]` (dipanggil otomatis via `LaporanPsnKatalogSeeder` + `RoProyekDariKrisnaSeeder` setiap `migrate:fresh --seed`).
 - Test otomatis: `LaporanPsnImporterTest` (impor katalog + tautan PSN, regresi false-positive pencocokan nama, pengayaan jalur ProP, seeding RO existing-first termasuk kasus PSN yang sudah punya RO manual, peringkasan lokasi multi-provinsi yang sangat panjang) dan penambahan pada `RisalahRapat21SeptTest` (isi-cepat dropdown Krisna mengisi field dengan benar + tetap bisa diubah manual, RO tanpa katalog Krisna tetap bisa diisi manual) -- total 126 test, seluruhnya hijau.
+
+## Restrukturisasi Menu Profil PSN Jadi 5 Tab (Sesuai Paparan Update Project Profile)
+
+Menu profil per-PSN sebelumnya terpecah jadi ~13 tab/rute terpisah (Gambaran Umum, RO/Proyek, Risiko, Indikator, Penerima Manfaat, Trisula, Dasar Hukum, Stakeholder, Kebutuhan Regulasi, Isu Lainnya, Kebutuhan Status PSN Tahun Selanjutnya, Info Memo, Catatan Monev). Dirombak menjadi **5 tab konsolidasi** sesuai referensi tampilan yang dilampirkan (breadcrumb "Beranda > Profile PSN > Input") dan struktur "Project Profile" pada paparan *Update Project Profile*:
+
+| Tab baru | Isi (konsolidasi dari tab lama) |
+| --- | --- |
+| **Gambaran Umum** | Form data dasar PSN (nama, klaster, lokasi, status, dll — `_form.blade.php`), Dasar Hukum, Stakeholder Mapping. Sesuai bullet "Pengusul; Penanggung Jawab; Stakeholders Mapping" pada paparan. |
+| **Perencanaan** | Indikator Output/Outcome, Penerima Manfaat, Risiko, Kebutuhan Regulasi, plus ringkasan tahunan RO/Proyek/Non-RO (baca-saja, dengan tautan ke tab Penjabaran untuk kelola detail). |
+| **Trisula** | Kontribusi Trisula Pembangunan (Kemiskinan/Ekonomi/SDM) — tab tersendiri karena sudah menggabungkan target tahunan & triwulanan dalam satu komponen (`AnnualTargetManager`), sesuai posisinya sebagai elemen tersendiri pada tampilan referensi. |
+| **Penjabaran** | RO/Proyek/Aktivitas lengkap dengan target bulanan/triwulanan (`RoProyekManager`), Isu Lainnya, Kebutuhan Status PSN Tahun Selanjutnya — sesuai bucket "Penjabaran Tahunan" pada paparan. |
+| **Upload Dokumen** | Diagram Kerangka Kelembagaan (dipindah dari form utama ke mini-form sendiri, `_form-diagram.blade.php`), rekap Bukti Pelaporan RO/Proyek (baca-saja, dari seluruh periode RO), Info Memo, Catatan Monev — dikumpulkan di sini karena tidak disebut eksplisit pada struktur Project Profile di paparan. |
+
+Detail teknis:
+
+- Rute baru: `admin.psn.gambaran-umum`, `admin.psn.perencanaan`, `admin.psn.trisula`, `admin.psn.penjabaran`, `admin.psn.dokumen` (semua `GET /admin/psn/{psn}/...`). Rute lama `admin.psn.ro`, `admin.psn.risiko`, `admin.psn.capaian`, `admin.psn.profil` dihapus; `admin.psn.show`/`admin.psn.edit` (dan tombol "Lihat"/"Ubah" di halaman Data PSN) kini redirect ke `admin.psn.gambaran-umum` alih-alih merender view sendiri.
+- Navigasi tab (`_profil-tabs.blade.php`) dan tombol "Lanjutkan ke {tab berikutnya}" (`_next-button.blade.php`) dirombak total mengikuti urutan 5-tab ini, lengkap dengan ikon per tab.
+- Upload diagram kelembagaan tetap submit ke rute `admin.psn.update` yang sama (field/kolom/validasi tidak berubah), hanya dipindah lokasinya ke tab Upload Dokumen lewat mini-form dengan hidden input `nama_psn`/`sumber_input` agar validasi form utama tidak terpengaruh.
+- Data RO dari katalog Krisna (lihat bagian di atas) sudah diverifikasi tampil benar pada tab Perencanaan (ringkasan) maupun Penjabaran (kelola detail) lewat QA visual Playwright, memakai contoh "Jalan Tol Semarang - Demak" (2 RO per ruas, 2,6 km & 1 km).
+- Test otomatis (`RisalahRapat21SeptTest`) disesuaikan mengikuti rute & label tab baru; total 126 test, seluruhnya hijau.
 
 ## Menjalankan Test
 

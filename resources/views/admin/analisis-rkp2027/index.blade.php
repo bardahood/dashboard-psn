@@ -99,7 +99,7 @@
                                     <td class="px-4 py-2">{{ $psn->nama_psn }}</td>
                                     <td class="px-4 py-2">{{ $psn->klaster?->nama_klaster ?? '-' }}</td>
                                     <td class="px-4 py-2 whitespace-nowrap">
-                                        <a href="{{ route('admin.psn.show', $psn) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Lihat Detail</a>
+                                        <a href="{{ route('admin.psn.gambaran-umum', $psn) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Lihat Detail</a>
                                     </td>
                                 </tr>
                             @empty

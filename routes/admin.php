@@ -23,12 +23,17 @@ Route::middleware(['auth', 'akun.aktif'])->prefix('admin')->name('admin.')->grou
 
     Route::resource('psn', PsnController::class);
 
-    // Sub-profil PSN: dirender via komponen Livewire (lihat app/Livewire/Admin),
-    // otorisasi ditegakkan di dalam masing-masing komponen (Gate::authorize('update', $psn)).
-    Route::get('/psn/{psn}/ro', fn (Psn $psn) => view('admin.psn.ro', compact('psn')))->name('psn.ro');
-    Route::get('/psn/{psn}/risiko', fn (Psn $psn) => view('admin.psn.risiko', compact('psn')))->name('psn.risiko');
-    Route::get('/psn/{psn}/capaian/{type}', fn (Psn $psn, string $type) => view('admin.psn.capaian', compact('psn', 'type')))->name('psn.capaian');
-    Route::get('/psn/{psn}/profil/{type}', fn (Psn $psn, string $type) => view('admin.psn.profil', compact('psn', 'type')))->name('psn.profil');
+    // Profil PSN disusun jadi 5 tab konsolidasi mengikuti struktur resmi
+    // paparan "Update Project Profile": Gambaran Umum, Perencanaan, Trisula,
+    // Penjabaran, Upload Dokumen -- menggantikan tab-tab terpisah per
+    // sub-resource sebelumnya. Dirender via komponen Livewire (lihat
+    // app/Livewire/Admin), otorisasi ditegakkan di dalam masing-masing
+    // komponen (Gate::authorize('update', $psn)).
+    Route::get('/psn/{psn}/gambaran-umum', [PsnController::class, 'gambaranUmum'])->name('psn.gambaran-umum');
+    Route::get('/psn/{psn}/perencanaan', fn (Psn $psn) => view('admin.psn.perencanaan', compact('psn')))->name('psn.perencanaan');
+    Route::get('/psn/{psn}/trisula', fn (Psn $psn) => view('admin.psn.trisula', compact('psn')))->name('psn.trisula');
+    Route::get('/psn/{psn}/penjabaran', fn (Psn $psn) => view('admin.psn.penjabaran', compact('psn')))->name('psn.penjabaran');
+    Route::get('/psn/{psn}/dokumen', fn (Psn $psn) => view('admin.psn.dokumen', compact('psn')))->name('psn.dokumen');
 
     Route::get('/matriks-sandingan', [MatriksSandinganController::class, 'index'])->name('matriks-sandingan');
 

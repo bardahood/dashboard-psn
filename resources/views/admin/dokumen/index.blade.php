@@ -41,7 +41,7 @@
                             <tr class="hover:bg-gray-50">
                                 <td class="px-4 py-3">
                                     @if ($doc->kunjungan?->psn)
-                                        <a href="{{ route('admin.psn.show', $doc->kunjungan->psn) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">
+                                        <a href="{{ route('admin.psn.gambaran-umum', $doc->kunjungan->psn) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">
                                             {{ $doc->kunjungan->psn->nama_psn }}
                                         </a>
                                     @else

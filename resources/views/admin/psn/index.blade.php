@@ -88,9 +88,9 @@
                                 </td>
                                 <td class="px-4 py-3 text-right space-x-3">
                                     <a href="{{ route('admin.project-profile.show', $psn) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Project Profile</a>
-                                    <a href="{{ route('admin.psn.show', $psn) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Lihat</a>
+                                    <a href="{{ route('admin.psn.gambaran-umum', $psn) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Lihat</a>
                                     @can('update', $psn)
-                                        <a href="{{ route('admin.psn.edit', $psn) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Ubah</a>
+                                        <a href="{{ route('admin.psn.gambaran-umum', $psn) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Ubah</a>
                                     @endcan
                                     @can('delete', $psn)
                                         <form method="POST" action="{{ route('admin.psn.destroy', $psn) }}" class="inline" onsubmit="return confirm('Hapus data PSN ini?');">

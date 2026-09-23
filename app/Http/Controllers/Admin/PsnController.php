@@ -58,23 +58,35 @@ class PsnController extends Controller
 
         $this->flushDashboardCache();
 
-        return redirect()->route('admin.psn.edit', $psn)->with('status', 'Data PSN berhasil ditambahkan.');
+        return redirect()->route('admin.psn.gambaran-umum', $psn)->with('status', 'Data PSN berhasil ditambahkan.');
     }
 
+    /**
+     * Detail/Ubah PSN sudah disatukan ke tab "Gambaran Umum" pada struktur
+     * profil PSN 5-tab (Gambaran Umum, Perencanaan, Trisula, Penjabaran,
+     * Upload Dokumen) -- route show/edit dipertahankan untuk kompatibilitas
+     * tautan lama, cukup alihkan ke sana.
+     */
     public function show(Psn $psn)
     {
         $this->authorize('view', $psn);
 
-        $psn->load(['klaster', 'provinsi', 'statusPsn', 'pengusulInstansi', 'pengelolaInstansi', 'kontraktorInstansi', 'supervisiInstansi', 'roProyek', 'risiko']);
-
-        return view('admin.psn.show', compact('psn'));
+        return redirect()->route('admin.psn.gambaran-umum', $psn);
     }
 
     public function edit(Psn $psn)
     {
         $this->authorize('update', $psn);
 
-        return view('admin.psn.edit', $this->formOptions() + ['psn' => $psn]);
+        return redirect()->route('admin.psn.gambaran-umum', $psn);
+    }
+
+    /** Tab "Gambaran Umum" pada struktur profil PSN 5-tab. */
+    public function gambaranUmum(Psn $psn)
+    {
+        $this->authorize('update', $psn);
+
+        return view('admin.psn.gambaran-umum', $this->formOptions() + ['psn' => $psn]);
     }
 
     public function update(Request $request, Psn $psn)
@@ -93,7 +105,7 @@ class PsnController extends Controller
 
         $this->flushDashboardCache();
 
-        return redirect()->route('admin.psn.edit', $psn)->with('status', 'Data PSN berhasil disimpan.');
+        return redirect()->route('admin.psn.gambaran-umum', $psn)->with('status', 'Data PSN berhasil disimpan.');
     }
 
     /**

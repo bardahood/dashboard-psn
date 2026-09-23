@@ -64,10 +64,11 @@ class RisalahRapat21SeptTest extends TestCase
         $this->assertSame(6, $psn->bulan_penyelesaian);
         $this->assertSame('Kapasitas tampung 50 juta m3, tinggi bendungan 80 meter.', $psn->data_teknis);
 
-        $this->get("/admin/psn/{$psn->id}")
+        $this->get(route('admin.psn.gambaran-umum', $psn))
             ->assertOk()
             ->assertSee('Paket 1 - Bendungan Utama')
-            ->assertSee('Juni 2028')
+            ->assertSee('Juni')
+            ->assertSee('2028')
             ->assertSee('Kapasitas tampung 50 juta m3');
     }
 
@@ -376,12 +377,12 @@ class RisalahRapat21SeptTest extends TestCase
         $this->actingAsSuperAdmin();
         $psn = Psn::create(['nama_psn' => 'Bendungan Contoh']);
 
-        $this->get("/admin/psn/{$psn->id}")
+        $this->get(route('admin.psn.gambaran-umum', $psn))
             ->assertOk()
-            ->assertSee('Lanjutkan ke RO/Proyek')
-            ->assertSee(route('admin.psn.ro', $psn), false);
+            ->assertSee('Lanjutkan ke Perencanaan')
+            ->assertSee(route('admin.psn.perencanaan', $psn), false);
 
-        $this->get(route('admin.psn.profil', [$psn, 'catatan_monev']))
+        $this->get(route('admin.psn.dokumen', $psn))
             ->assertOk()
             ->assertDontSee('Lanjutkan ke');
     }
