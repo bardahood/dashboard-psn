@@ -10,22 +10,32 @@
                     <option value="Aktivitas">Aktivitas (turunan)</option>
                 </select>
             </div>
-            @if ($form['tipe'] === 'RO' && $krisnaOptions->isNotEmpty())
-                <div class="sm:col-span-3">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Isi Cepat dari Krisna <span class="text-gray-400 font-normal">(opsional -- mengisi Nama/Satuan/Lokasi/Target Akhir di bawah, tetap bisa diubah manual)</span></label>
+            @if ($form['tipe'] === 'RO' && $krisnaOptions->isNotEmpty() && ! $modeManualRo)
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama RO/Proyek/Aktivitas (Kegiatan) <span class="text-red-500">*</span> <span class="text-gray-400 font-normal">(dropdown, ditarik dari katalog Krisna)</span></label>
                     <select wire:model.live="krisnaTerpilihId" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
-                        <option value="">-- Tidak ada di daftar Krisna / isi manual di bawah --</option>
+                        <option value="">-- Pilih RO dari Katalog Krisna --</option>
                         @foreach ($krisnaOptions as $k)
                             <option value="{{ $k->id }}">{{ \Illuminate\Support\Str::limit($k->project_rkp, 90) }} @if($k->volume) (Vol: {{ rtrim(rtrim($k->volume, '0'), '.') }} {{ $k->satuan }}) @endif</option>
                         @endforeach
                     </select>
+                    @error('form.nama_ro') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    <button type="button" wire:click="$set('modeManualRo', true)" class="mt-1 text-xs text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">
+                        RO tidak ada di daftar Krisna / ini Proyek atau Non-RO? Isi manual &rarr;
+                    </button>
+                </div>
+            @else
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama RO/Proyek/Aktivitas (Kegiatan) <span class="text-red-500">*</span></label>
+                    <input type="text" wire:model="form.nama_ro" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
+                    @error('form.nama_ro') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    @if ($form['tipe'] === 'RO' && $krisnaOptions->isNotEmpty())
+                        <button type="button" wire:click="$set('modeManualRo', false)" class="mt-1 text-xs text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">
+                            &larr; Pilih dari dropdown katalog Krisna
+                        </button>
+                    @endif
                 </div>
             @endif
-            <div class="sm:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Nama RO/Proyek/Aktivitas (Kegiatan) <span class="text-red-500">*</span></label>
-                <input type="text" wire:model="form.nama_ro" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
-                @error('form.nama_ro') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
-            </div>
 
             @if ($form['tipe'] === 'Aktivitas')
                 <div class="sm:col-span-2">

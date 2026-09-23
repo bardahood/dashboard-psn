@@ -30,13 +30,21 @@ class RoProyekManager extends Component
     public ?int $editingId = null;
 
     /**
-     * Pilihan dropdown "isi cepat dari Krisna" (Risalah Rapat 21 Sept 2026:
-     * "RO pilihannya dropdown, pilihan ditarik dari krisna"). Hanya sebagai
-     * bantuan pengisian awal Nama RO/Satuan/Lokasi/Target Akhir -- field
-     * tetap bebas teks dan bisa diubah manual sesudahnya, dan RO yang tidak
-     * ada di katalog Krisna tetap bisa ditambahkan langsung lewat form.
+     * Pilihan dropdown Nama RO, ditarik dari katalog Krisna (Risalah Rapat
+     * 21 Sept 2026: "RO pilihannya dropdown, pilihan ditarik dari krisna").
+     * Ini adalah field input utama untuk Nama RO saat tipe=RO dan PSN punya
+     * katalog Krisna -- bukan sekadar bantuan isi-cepat di samping field
+     * teks. Memilih satu entri mengisi Nama/Satuan/Lokasi/Target Akhir.
      */
     public ?int $krisnaTerpilihId = null;
+
+    /**
+     * true = form Nama RO ditampilkan sebagai isian bebas teks, dipakai utk
+     * "Proyek"/Non-RO/RO yang tidak ter-tagging di katalog Krisna (tetap
+     * bisa ditambahkan langsung) serta saat mengubah data RO yang sudah ada.
+     * false (default saat tambah RO baru) = dropdown Krisna jadi input utama.
+     */
+    public bool $modeManualRo = false;
 
     public ?int $expandedPeriodeRoId = null;
 
@@ -54,6 +62,7 @@ class RoProyekManager extends Component
     {
         $this->editingId = null;
         $this->krisnaTerpilihId = null;
+        $this->modeManualRo = false;
         $this->form = [
             'nama_ro' => null,
             'tipe' => 'RO',
@@ -72,6 +81,11 @@ class RoProyekManager extends Component
     {
         $ro = RoProyek::where('psn_id', $this->psn->id)->findOrFail($id);
         $this->editingId = $id;
+        $this->krisnaTerpilihId = null;
+        // Data yang sudah tersimpan selalu ditampilkan sebagai teks bebas
+        // saat diubah (tetap bisa diedit manual), dropdown Krisna hanya
+        // dipakai sebagai jalur cepat untuk menambah RO baru.
+        $this->modeManualRo = true;
         $this->form = $ro->only(['nama_ro', 'tipe', 'ro_induk_id', 'is_ro_kunci', 'satuan', 'baseline', 'baseline_tahun', 'target_akhir', 'lokasi', 'instansi_pelaksana_id']);
     }
 

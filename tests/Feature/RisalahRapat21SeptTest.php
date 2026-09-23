@@ -439,4 +439,37 @@ class RisalahRapat21SeptTest extends TestCase
 
         $this->assertDatabaseHas('ro_proyek', ['psn_id' => $psn->id, 'nama_ro' => 'RO Manual Bebas Teks']);
     }
+
+    public function test_nama_ro_tampil_sebagai_dropdown_krisna_secara_default_dan_bisa_dialihkan_manual(): void
+    {
+        $this->actingAsSuperAdmin();
+        $psn = Psn::create(['nama_psn' => 'Jalan Tol Semarang - Demak']);
+
+        \App\Models\RefRoKrisna::create([
+            'project_psn' => 'G10-Jalan Tol Semarang - Demak',
+            'project_rkp' => '3903-Pembangunan Jalan Bebas Hambatan - TOL SEMARANG - DEMAK 1B',
+            'kementerian' => 'KEMENTERIAN PEKERJAAN UMUM',
+            'ro' => '001-Pembangunan Jalan Bebas Hambatan',
+            'lokasi_ro' => 'TOL SEMARANG - DEMAK 1B',
+            'volume' => 2.6,
+            'satuan' => 'km',
+            'psn_id' => $psn->id,
+        ]);
+
+        // Default: tipe=RO & katalog Krisna tersedia -> Nama RO tampil sebagai
+        // dropdown (bukan input teks bebas), sesuai Risalah Rapat 21 Sept 2026.
+        Livewire::test(RoProyekManager::class, ['psn' => $psn])
+            ->assertSet('modeManualRo', false)
+            ->assertSee('dropdown, ditarik dari katalog Krisna')
+            ->assertSee('Pilih RO dari Katalog Krisna')
+            ->assertDontSee('Pilih dari dropdown katalog Krisna')
+            // beralih ke isian manual (RO tak ter-tagging / Proyek / Non-RO)
+            ->set('modeManualRo', true)
+            ->assertDontSee('dropdown, ditarik dari katalog Krisna')
+            ->assertSee('Pilih dari dropdown katalog Krisna')
+            // tipe Aktivitas selalu bebas teks meski PSN ini punya katalog Krisna
+            ->set('modeManualRo', false)
+            ->set('form.tipe', 'Aktivitas')
+            ->assertDontSee('dropdown, ditarik dari katalog Krisna');
+    }
 }
