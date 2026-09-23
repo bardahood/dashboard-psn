@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Psn;
 use App\Models\RefInstansi;
+use App\Models\RefRoKrisna;
 use App\Models\RoProyek;
 use App\Models\RoTargetPeriode;
 use App\Models\StakeholderPsn;
@@ -28,6 +29,15 @@ class RoProyekManager extends Component
 
     public ?int $editingId = null;
 
+    /**
+     * Pilihan dropdown "isi cepat dari Krisna" (Risalah Rapat 21 Sept 2026:
+     * "RO pilihannya dropdown, pilihan ditarik dari krisna"). Hanya sebagai
+     * bantuan pengisian awal Nama RO/Satuan/Lokasi/Target Akhir -- field
+     * tetap bebas teks dan bisa diubah manual sesudahnya, dan RO yang tidak
+     * ada di katalog Krisna tetap bisa ditambahkan langsung lewat form.
+     */
+    public ?int $krisnaTerpilihId = null;
+
     public ?int $expandedPeriodeRoId = null;
 
     public array $periodeForm = [];
@@ -43,6 +53,7 @@ class RoProyekManager extends Component
     public function resetForm(): void
     {
         $this->editingId = null;
+        $this->krisnaTerpilihId = null;
         $this->form = [
             'nama_ro' => null,
             'tipe' => 'RO',
@@ -62,6 +73,55 @@ class RoProyekManager extends Component
         $ro = RoProyek::where('psn_id', $this->psn->id)->findOrFail($id);
         $this->editingId = $id;
         $this->form = $ro->only(['nama_ro', 'tipe', 'ro_induk_id', 'is_ro_kunci', 'satuan', 'baseline', 'baseline_tahun', 'target_akhir', 'lokasi', 'instansi_pelaksana_id']);
+    }
+
+    /**
+     * Isi cepat Nama RO/Satuan/Lokasi/Target Akhir dari katalog Krisna yang
+     * dipilih -- field tetap bisa diubah manual sesudahnya (bukan mode
+     * kunci/readonly), sehingga "proyek dan non-RO" yang memang harus bebas
+     * teks tidak terganggu (Risalah Rapat 21 Sept 2026).
+     */
+    public function updatedKrisnaTerpilihId(?int $value): void
+    {
+        if (! $value) {
+            return;
+        }
+
+        $krisna = RefRoKrisna::find($value);
+        if (! $krisna) {
+            return;
+        }
+
+        $this->form['nama_ro'] = $this->buangKodeAwal((string) $krisna->project_rkp) ?: $krisna->ro;
+        $this->form['satuan'] = $krisna->satuan;
+        $this->form['lokasi'] = $krisna->lokasi_ro;
+        if ($krisna->volume !== null) {
+            $this->form['target_akhir'] = rtrim(rtrim((string) $krisna->volume, '0'), '.');
+        }
+
+        $namaInstansi = $this->cariInstansiCocok((string) $krisna->kementerian);
+        if ($namaInstansi) {
+            $this->form['instansi_pelaksana_id'] = $namaInstansi->id;
+        }
+    }
+
+    private function buangKodeAwal(string $teks): string
+    {
+        return trim(preg_replace('/^[\w.]+-\s*/', '', $teks, 1));
+    }
+
+    private function cariInstansiCocok(string $kementerian): ?RefInstansi
+    {
+        if ($kementerian === '') {
+            return null;
+        }
+
+        // "KEMENTERIAN PEKERJAAN UMUM" (Krisna) vs "Menteri Pekerjaan Umum"
+        // (ref_instansi) -- normalisasi kedua sisi sebelum dibandingkan.
+        $bersih = fn (string $s) => trim(preg_replace('/^(kementerian|menteri)\s+/i', '', $s));
+        $target = mb_strtolower($bersih($kementerian));
+
+        return RefInstansi::all()->first(fn ($i) => mb_strtolower($bersih($i->nama_instansi)) === $target);
     }
 
     public function save(): void
@@ -231,6 +291,8 @@ class RoProyekManager extends Component
             ? RoTargetPeriode::where('ro_id', $this->expandedPeriodeRoId)->orderByDesc('tahun')->orderByDesc('triwulan')->orderByDesc('bulan')->get()
             : collect();
 
-        return view('livewire.admin.ro-proyek-manager', compact('roIndukList', 'roIndukOptions', 'instansiOptions', 'periodeList'));
+        $krisnaOptions = RefRoKrisna::where('psn_id', $this->psn->id)->orderBy('project_rkp')->get();
+
+        return view('livewire.admin.ro-proyek-manager', compact('roIndukList', 'roIndukOptions', 'instansiOptions', 'periodeList', 'krisnaOptions'));
     }
 }

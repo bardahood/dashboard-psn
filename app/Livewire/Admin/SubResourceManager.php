@@ -81,14 +81,19 @@ class SubResourceManager extends Component
                     ['name' => 'kebutuhan_dukungan', 'label' => 'Kebutuhan Dukungan', 'type' => 'textarea'],
                 ],
             ],
+            // Label relabel dari "Evaluasi Kebutuhan Status PSN" mengikuti istilah
+            // resmi paparan Project Profile (Risalah Rapat 21 Sept 2026:
+            // "Kebutuhan Justifikasi diganti Kebutuhan Status PSN Tahun
+            // Selanjutnya") -- struktur data tidak berubah, sudah persis sesuai
+            // sejak awal (tahun_evaluasi + masih_butuh_status_psn + justifikasi).
             'evaluasi_status' => [
-                'label' => 'Evaluasi Kebutuhan Status PSN',
+                'label' => 'Kebutuhan Status PSN Tahun Selanjutnya',
                 'model' => PsnEvaluasiStatus::class,
                 'order' => 'tahun_evaluasi',
                 'fields' => [
                     ['name' => 'tahun_evaluasi', 'label' => 'Tahun Evaluasi', 'type' => 'number', 'required' => true],
                     ['name' => 'masih_butuh_status_psn', 'label' => 'Masih Butuh Status PSN?', 'type' => 'select', 'options' => [1 => 'Ya', 0 => 'Tidak']],
-                    ['name' => 'justifikasi', 'label' => 'Justifikasi', 'type' => 'textarea'],
+                    ['name' => 'justifikasi', 'label' => 'Justifikasi Kebutuhan Status PSN', 'type' => 'textarea'],
                 ],
             ],
             'regulasi' => [

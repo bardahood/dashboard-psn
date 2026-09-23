@@ -385,4 +385,57 @@ class RisalahRapat21SeptTest extends TestCase
             ->assertOk()
             ->assertDontSee('Lanjutkan ke');
     }
+
+    public function test_pilih_krisna_mengisi_cepat_nama_satuan_lokasi_dan_target_akhir_ro(): void
+    {
+        $this->actingAsSuperAdmin();
+        $psn = Psn::create(['nama_psn' => 'Jalan Tol Semarang - Demak']);
+        $pupr = RefInstansi::create(['nama_instansi' => 'Menteri Pekerjaan Umum']);
+
+        $krisna = \App\Models\RefRoKrisna::create([
+            'project_psn' => 'G10-Jalan Tol Semarang - Demak',
+            'project_rkp' => '3903-Pembangunan Jalan Bebas Hambatan - TOL SEMARANG - DEMAK 1B',
+            'kementerian' => 'KEMENTERIAN PEKERJAAN UMUM',
+            'ro' => '001-Pembangunan Jalan Bebas Hambatan',
+            'lokasi_ro' => 'TOL SEMARANG - DEMAK 1B',
+            'volume' => 2.6,
+            'satuan' => 'km',
+            'psn_id' => $psn->id,
+        ]);
+
+        Livewire::test(RoProyekManager::class, ['psn' => $psn])
+            ->set('form.tipe', 'RO')
+            ->set('krisnaTerpilihId', $krisna->id)
+            ->assertSet('form.nama_ro', 'Pembangunan Jalan Bebas Hambatan - TOL SEMARANG - DEMAK 1B')
+            ->assertSet('form.satuan', 'km')
+            ->assertSet('form.lokasi', 'TOL SEMARANG - DEMAK 1B')
+            ->assertSet('form.target_akhir', '2.6')
+            ->assertSet('form.instansi_pelaksana_id', $pupr->id)
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('ro_proyek', [
+            'psn_id' => $psn->id,
+            'nama_ro' => 'Pembangunan Jalan Bebas Hambatan - TOL SEMARANG - DEMAK 1B',
+            'lokasi' => 'TOL SEMARANG - DEMAK 1B',
+            'satuan' => 'km',
+        ]);
+    }
+
+    public function test_ro_tanpa_katalog_krisna_tetap_bisa_diisi_manual(): void
+    {
+        $this->actingAsSuperAdmin();
+        $psn = Psn::create(['nama_psn' => 'PSN Tanpa Katalog Krisna']);
+
+        Livewire::test(RoProyekManager::class, ['psn' => $psn])
+            ->assertViewHas('krisnaOptions', fn ($options) => $options->isEmpty())
+            ->set('form.nama_ro', 'RO Manual Bebas Teks')
+            ->set('form.tipe', 'RO')
+            ->set('form.target_akhir', '10 unit')
+            ->set('form.lokasi', 'Lokasi Manual')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('ro_proyek', ['psn_id' => $psn->id, 'nama_ro' => 'RO Manual Bebas Teks']);
+    }
 }

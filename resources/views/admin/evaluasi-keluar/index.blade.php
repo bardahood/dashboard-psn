@@ -7,8 +7,8 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-4">
             <p class="text-sm text-gray-500">
                 Rekapitulasi PSN yang pada evaluasi status tahunan ditandai <strong>"tidak lagi membutuhkan status PSN"</strong>
-                beserta justifikasinya (Bagian 3c KAK Laporan Penyusunan Daftar PSN) -- diambil dari data Evaluasi Status
-                pada profil masing-masing PSN, bukan tabel terpisah.
+                beserta justifikasinya (Bagian 3c KAK Laporan Penyusunan Daftar PSN) -- diambil dari data
+                Kebutuhan Status PSN Tahun Selanjutnya pada profil masing-masing PSN, bukan tabel terpisah.
             </p>
 
             <form method="GET" class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-4 flex flex-wrap items-center gap-3">

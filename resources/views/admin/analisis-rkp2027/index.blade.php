@@ -83,7 +83,7 @@
                     <div class="px-4 py-3 border-b font-semibold text-gray-700">Tidak Ditemukan Lagi di RKP 2027 ({{ $hasil['tidak_ditemukan_lagi']->count() }})</div>
                     <p class="px-4 pt-3 text-xs text-gray-400">
                         PSN ini ada di data dashboard (RKP Pemutakhiran 2026) tetapi tidak terdeteksi pada lampiran RKP 2027 --
-                        kandidat untuk ditindaklanjuti lewat menu Evaluasi Status/Rekomendasi Keluar dari Daftar PSN.
+                        kandidat untuk ditindaklanjuti lewat menu Kebutuhan Status PSN Tahun Selanjutnya/Rekomendasi Keluar dari Daftar PSN.
                     </p>
                     <table class="min-w-full text-sm mt-2">
                         <thead class="bg-gray-50 text-left text-gray-500">

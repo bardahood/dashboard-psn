@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
  * eksekutif dan rekomendasi ... untuk PSN carry-over yang dikeluarkan dari
  * daftar". Mekanismenya sudah ada di tabel psn_evaluasi_status
  * (masih_butuh_status_psn=false + justifikasi, diisi lewat SubResourceManager
- * "Evaluasi Status" pada profil tiap PSN) -- yang belum ada hanyalah
+ * "Kebutuhan Status PSN Tahun Selanjutnya" pada profil tiap PSN) -- yang belum ada hanyalah
  * rekapitulasi lintas-PSN-nya. Halaman ini murni menyaring data yang sudah
  * ada, tanpa tabel baru.
  */

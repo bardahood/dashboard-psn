@@ -50,6 +50,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             MatriksSandinganPsnSeeder::class,
             Rkp2027CarryoverSeeder::class,
+            LaporanPsnKatalogSeeder::class,
+            RoProyekDariKrisnaSeeder::class,
         ]);
 
         foreach (self::AKUN_DEMO as $akun) {

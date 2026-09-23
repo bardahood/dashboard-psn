@@ -10,6 +10,17 @@
                     <option value="Aktivitas">Aktivitas (turunan)</option>
                 </select>
             </div>
+            @if ($form['tipe'] === 'RO' && $krisnaOptions->isNotEmpty())
+                <div class="sm:col-span-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Isi Cepat dari Krisna <span class="text-gray-400 font-normal">(opsional -- mengisi Nama/Satuan/Lokasi/Target Akhir di bawah, tetap bisa diubah manual)</span></label>
+                    <select wire:model.live="krisnaTerpilihId" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
+                        <option value="">-- Tidak ada di daftar Krisna / isi manual di bawah --</option>
+                        @foreach ($krisnaOptions as $k)
+                            <option value="{{ $k->id }}">{{ \Illuminate\Support\Str::limit($k->project_rkp, 90) }} @if($k->volume) (Vol: {{ rtrim(rtrim($k->volume, '0'), '.') }} {{ $k->satuan }}) @endif</option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
             <div class="sm:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama RO/Proyek/Aktivitas (Kegiatan) <span class="text-red-500">*</span></label>
                 <input type="text" wire:model="form.nama_ro" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
@@ -56,11 +67,11 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Satuan</label>
-                <select wire:model="form.satuan" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
-                    <option value="">-- Pilih --</option>
-                    <option value="Unit">Unit</option>
-                    <option value="Persentase">Persentase</option>
-                </select>
+                <input type="text" list="satuan-umum" wire:model="form.satuan" placeholder="mis. Unit, Km, Orang, Persentase"
+                       class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
+                <datalist id="satuan-umum">
+                    <option value="Unit"><option value="Persentase"><option value="Km"><option value="Paket">
+                </datalist>
             </div>
             @if ($form['tipe'] === 'RO')
                 <div class="flex items-end pb-1.5">

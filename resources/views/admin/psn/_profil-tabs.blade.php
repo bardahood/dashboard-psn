@@ -10,7 +10,7 @@
         ['label' => 'Stakeholder', 'route' => 'admin.psn.profil', 'params' => [$psn, 'stakeholder']],
         ['label' => 'Kebutuhan Regulasi', 'route' => 'admin.psn.profil', 'params' => [$psn, 'regulasi']],
         ['label' => 'Isu Lainnya', 'route' => 'admin.psn.profil', 'params' => [$psn, 'isu_lainnya']],
-        ['label' => 'Evaluasi Status', 'route' => 'admin.psn.profil', 'params' => [$psn, 'evaluasi_status']],
+        ['label' => 'Kebutuhan Status PSN Tahun Selanjutnya', 'route' => 'admin.psn.profil', 'params' => [$psn, 'evaluasi_status']],
         ['label' => 'Info Memo', 'route' => 'admin.psn.profil', 'params' => [$psn, 'info_memo']],
         ['label' => 'Catatan Monev', 'route' => 'admin.psn.profil', 'params' => [$psn, 'catatan_monev']],
     ];
