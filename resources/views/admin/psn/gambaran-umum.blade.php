@@ -27,9 +27,17 @@
                 </div>
             </form>
 
+            @if ($psn->tipe_hierarki === 'PKPN')
+                @livewire('admin.annual-target-manager', ['psn' => $psn, 'type' => 'indikator_pp'], key('indikator_pp'))
+            @endif
+
+            @livewire('admin.sub-resource-manager', ['psn' => $psn, 'type' => 'penanggung_jawab'], key('penanggung_jawab'))
+
             @livewire('admin.sub-resource-manager', ['psn' => $psn, 'type' => 'dasar_hukum'], key('dasar_hukum'))
 
             @livewire('admin.sub-resource-manager', ['psn' => $psn, 'type' => 'stakeholder'], key('stakeholder'))
+
+            @include('admin.psn._form-diagram')
 
             @include('admin.psn._next-button')
         </div>

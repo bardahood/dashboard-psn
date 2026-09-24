@@ -15,7 +15,7 @@
     </div>
 
     <div>
-        <x-input-label for="klaster_id" value="Klaster" />
+        <x-input-label for="klaster_id" value="Klaster PSN" />
         <select id="klaster_id" name="klaster_id" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">
             <option value="">-- Pilih Klaster --</option>
             @foreach ($klasterOptions as $k)
@@ -59,7 +59,7 @@
     </div>
 
     <div>
-        <x-input-label for="tipe_hierarki" value="Tipe Hierarki" />
+        <x-input-label for="tipe_hierarki" value="Klaster PKPN" />
         <select id="tipe_hierarki" name="tipe_hierarki" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">
             <option value="">-- Tidak Ditetapkan --</option>
             <option value="PKPN" @selected(old('tipe_hierarki', $psn?->tipe_hierarki) == 'PKPN')>PKPN (wajib lapor bulanan)</option>
@@ -118,6 +118,16 @@
     </div>
 
     <div>
+        <x-input-label for="indikasi_sumber_pendanaan" value="Indikasi Sumber Pendanaan" />
+        <select id="indikasi_sumber_pendanaan" name="indikasi_sumber_pendanaan" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">
+            <option value="">-- Pilih --</option>
+            @foreach (['APBN', 'APBD', 'BUMN', 'BU-Swasta', 'Lainnya'] as $sumber)
+                <option value="{{ $sumber }}" @selected(old('indikasi_sumber_pendanaan', $psn?->indikasi_sumber_pendanaan) == $sumber)>{{ $sumber }}</option>
+            @endforeach
+        </select>
+    </div>
+
+    <div>
         <x-input-label for="pengusul_instansi_id" value="Pengusul" />
         <select id="pengusul_instansi_id" name="pengusul_instansi_id" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">
             <option value="">-- Pilih Instansi --</option>
@@ -158,7 +168,7 @@
     </div>
 
     <div>
-        <x-input-label for="kode_rkp" value="Kode RKP" />
+        <x-input-label for="kode_rkp" value="Diagram Kerangka Kerja Logis (Kode RKP)" />
         <x-text-input id="kode_rkp" name="kode_rkp" class="mt-1 block w-full" value="{{ old('kode_rkp', $psn?->kode_rkp) }}" />
     </div>
 
@@ -180,6 +190,3 @@
         <textarea id="asta_cita" name="asta_cita" rows="2" class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">{{ old('asta_cita', $psn?->asta_cita) }}</textarea>
     </div>
 </div>
-
-{{-- Upload Visualisasi Kerangka Kelembagaan dipindah ke tab "Upload Dokumen"
-     (struktur 5-tab Project Profile) -- lihat admin.psn._form-diagram. --}}

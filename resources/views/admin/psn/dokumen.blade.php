@@ -9,11 +9,14 @@
     </x-slot>
 
     @php
-        // Diagram Kerangka Kelembagaan & Info Memo/Catatan Monev bersifat file/
-        // dokumentasi pendukung, tidak masuk struktur "Struktur Project Profile"
-        // (Gambaran Umum/Perencanaan/Trisula/Penjabaran) secara eksplisit --
-        // dikumpulkan di tab ini bersama rekap Bukti Pelaporan RO supaya semua
-        // berkas pendukung PSN ada di satu tempat.
+        // Info Memo/Catatan Monev bersifat dokumentasi pendukung, tidak masuk
+        // struktur "Struktur Project Profile" (Gambaran Umum/Perencanaan/
+        // Penjabaran) secara eksplisit -- dikumpulkan di tab ini bersama rekap
+        // Bukti Pelaporan RO supaya semua berkas pendukung PSN ada di satu
+        // tempat. Diagram Kerangka Kelembagaan (Visualisasi Kerangka
+        // Kelembagaan) SEBALIKNYA dipindah ke tab Gambaran Umum -- diagram
+        // resmi Struktur Project Profile menempatkannya di sana, bukan di
+        // tab dokumen generik ini.
         $buktiPelaporan = \App\Models\RoTargetPeriode::query()
             ->whereIn('ro_id', $psn->roProyek()->pluck('id'))
             ->whereNotNull('bukti_pelaporan_path')
@@ -29,8 +32,6 @@
             @if (session('status'))
                 <div class="rounded-md bg-green-50 text-green-700 px-4 py-3 text-sm">{{ session('status') }}</div>
             @endif
-
-            @include('admin.psn._form-diagram')
 
             <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
                 <h3 class="font-semibold text-gray-700 mb-3">Bukti Pelaporan RO/Proyek</h3>

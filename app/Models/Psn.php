@@ -24,6 +24,7 @@ class Psn extends Model
         'data_teknis',
         'nilai_investasi_apbn_rp',
         'nilai_investasi_non_apbn_rp',
+        'indikasi_sumber_pendanaan',
         'asta_cita',
         'diagram_kelembagaan_path',
         'pengusul_instansi_id',

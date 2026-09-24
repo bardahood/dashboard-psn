@@ -76,8 +76,35 @@ class AnnualTargetManager extends Component
                 'childFk' => 'indikator_id',
                 'titleField' => 'nama_indikator',
                 'hideStatusCapaian' => true,
+                // Membedakan dari Indikator PP khusus PKPN (lihat config
+                // 'indikator_pp' di bawah) -- satu tabel dipakai bersama
+                // (komentar migrasi indikator_psn: "juga menampung Indikator
+                // PP khusus PKPN"), dipisah lewat kolom jenis_indikator.
+                'scope' => ['jenis_indikator' => null],
+                'forceAttributes' => ['jenis_indikator' => null],
                 'parentFields' => [
                     ['name' => 'nama_indikator', 'label' => 'Nama Indikator', 'type' => 'textarea', 'required' => true],
+                    ['name' => 'satuan', 'label' => 'Satuan', 'type' => 'text'],
+                    ['name' => 'baseline', 'label' => 'Baseline', 'type' => 'text'],
+                    ['name' => 'baseline_tahun', 'label' => 'Tahun Baseline (khusus proyek berjalan sebelum 2026)', 'type' => 'number'],
+                ],
+            ],
+            // Gambaran Umum, khusus PSN bertipe hierarki PKPN (Struktur Project
+            // Profile: "Indikator PP (Khusus PKPN level PP)") -- struktur
+            // field & target tahunan sama persis dengan Indikator Output/
+            // Outcome, hanya beda kolom jenis_indikator agar tidak tercampur
+            // dengan daftar Indikator Output/Outcome di tab Perencanaan.
+            'indikator_pp' => [
+                'label' => 'Indikator PP',
+                'parentModel' => IndikatorPsn::class,
+                'childModel' => IndikatorPsnTargetTahunan::class,
+                'childFk' => 'indikator_id',
+                'titleField' => 'nama_indikator',
+                'hideStatusCapaian' => true,
+                'scope' => ['jenis_indikator' => 'PP'],
+                'forceAttributes' => ['jenis_indikator' => 'PP'],
+                'parentFields' => [
+                    ['name' => 'nama_indikator', 'label' => 'Nama Indikator PP', 'type' => 'textarea', 'required' => true],
                     ['name' => 'satuan', 'label' => 'Satuan', 'type' => 'text'],
                     ['name' => 'baseline', 'label' => 'Baseline', 'type' => 'text'],
                     ['name' => 'baseline_tahun', 'label' => 'Tahun Baseline (khusus proyek berjalan sebelum 2026)', 'type' => 'number'],
@@ -136,6 +163,18 @@ class AnnualTargetManager extends Component
         return $this->config()[$this->type];
     }
 
+    /**
+     * Terapkan filter 'scope' config (mis. jenis_indikator) ke query parent
+     * -- dipakai supaya config yang berbagi 1 tabel (indikator vs
+     * indikator_pp) tidak saling bocor lewat manipulasi ID dari sisi client.
+     */
+    protected function applyScope($query): void
+    {
+        foreach ($this->typeConfig()['scope'] ?? [] as $kolom => $nilai) {
+            $nilai === null ? $query->whereNull($kolom) : $query->where($kolom, $nilai);
+        }
+    }
+
     public function resetParentForm(): void
     {
         $this->editingParentId = null;
@@ -161,7 +200,9 @@ class AnnualTargetManager extends Component
     public function editParent(int $id): void
     {
         $model = $this->typeConfig()['parentModel'];
-        $record = $model::where('psn_id', $this->psn->id)->findOrFail($id);
+        $query = $model::where('psn_id', $this->psn->id);
+        $this->applyScope($query);
+        $record = $query->findOrFail($id);
 
         $this->editingParentId = $id;
         foreach ($this->typeConfig()['parentFields'] as $field) {
@@ -190,8 +231,15 @@ class AnnualTargetManager extends Component
             }
         }
 
+        // Pertahanan server-side: kolom scope (mis. jenis_indikator) dipaksa
+        // dari config, tidak pernah dari form -- config ini tidak punya field
+        // untuk itu sehingga $data tidak berisi kolomnya sama sekali.
+        $data = array_merge($data, $this->typeConfig()['forceAttributes'] ?? []);
+
         if ($this->editingParentId) {
-            $model::where('psn_id', $this->psn->id)->findOrFail($this->editingParentId)->update($data);
+            $query = $model::where('psn_id', $this->psn->id);
+            $this->applyScope($query);
+            $query->findOrFail($this->editingParentId)->update($data);
         } else {
             $model::create($data + ['psn_id' => $this->psn->id]);
         }
@@ -204,7 +252,9 @@ class AnnualTargetManager extends Component
         Gate::authorize('update', $this->psn);
 
         $model = $this->typeConfig()['parentModel'];
-        $model::where('psn_id', $this->psn->id)->findOrFail($id)->delete();
+        $query = $model::where('psn_id', $this->psn->id);
+        $this->applyScope($query);
+        $query->findOrFail($id)->delete();
 
         if ($this->expandedParentId === $id) {
             $this->expandedParentId = null;
@@ -343,7 +393,9 @@ class AnnualTargetManager extends Component
         $config = $this->typeConfig();
         $parentModel = $config['parentModel'];
 
-        $parents = $parentModel::where('psn_id', $this->psn->id)->orderBy('id')->get();
+        $parentQuery = $parentModel::where('psn_id', $this->psn->id);
+        $this->applyScope($parentQuery);
+        $parents = $parentQuery->orderBy('id')->get();
 
         $twList = ($this->type === 'trisula' && $this->expandedParentId)
             ? TrisulaTargetPeriode::where('kontribusi_id', $this->expandedParentId)

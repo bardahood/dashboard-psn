@@ -63,8 +63,8 @@ class PsnController extends Controller
 
     /**
      * Detail/Ubah PSN sudah disatukan ke tab "Gambaran Umum" pada struktur
-     * profil PSN 5-tab (Gambaran Umum, Perencanaan, Trisula, Penjabaran,
-     * Upload Dokumen) -- route show/edit dipertahankan untuk kompatibilitas
+     * profil PSN 4-tab (Gambaran Umum, Perencanaan, Penjabaran, Upload
+     * Dokumen) -- route show/edit dipertahankan untuk kompatibilitas
      * tautan lama, cukup alihkan ke sana.
      */
     public function show(Psn $psn)
@@ -81,7 +81,7 @@ class PsnController extends Controller
         return redirect()->route('admin.psn.gambaran-umum', $psn);
     }
 
-    /** Tab "Gambaran Umum" pada struktur profil PSN 5-tab. */
+    /** Tab "Gambaran Umum" pada struktur profil PSN 4-tab. */
     public function gambaranUmum(Psn $psn)
     {
         $this->authorize('update', $psn);
@@ -157,6 +157,7 @@ class PsnController extends Controller
             'data_teknis' => ['nullable', 'string'],
             'nilai_investasi_apbn_rp' => ['nullable', 'numeric', 'min:0'],
             'nilai_investasi_non_apbn_rp' => ['nullable', 'numeric', 'min:0'],
+            'indikasi_sumber_pendanaan' => ['nullable', 'in:APBN,APBD,BUMN,BU-Swasta,Lainnya'],
             'asta_cita' => ['nullable', 'string'],
             'pengusul_instansi_id' => ['nullable', 'exists:ref_instansi,id'],
             'pengelola_instansi_id' => ['nullable', 'exists:ref_instansi,id'],

@@ -9,6 +9,8 @@ use App\Models\KebutuhanRegulasi;
 use App\Models\Psn;
 use App\Models\PsnEvaluasiStatus;
 use App\Models\PsnIsuLainnya;
+use App\Models\PsnPenanggungJawab;
+use App\Models\RefInstansi;
 use App\Models\RefPic;
 use App\Models\StakeholderPsn;
 use Illuminate\Support\Facades\Gate;
@@ -41,6 +43,19 @@ class SubResourceManager extends Component
         $instansiOptions = fn () => \App\Models\RefInstansi::orderBy('nama_instansi')->pluck('nama_instansi', 'nama_instansi')->all();
 
         return [
+            // Gambaran Umum: "Pengusul; Penanggung Jawab; Stakeholders Mapping;
+            // Kerangka Kelembagaan" -- psn_penanggung_jawab (multi-instansi per
+            // PSN) sudah ada di skema & diisi otomatis lewat impor Matrik
+            // Sandingan, tapi sebelumnya tidak punya UI untuk dilihat/diubah
+            // manual sama sekali.
+            'penanggung_jawab' => [
+                'label' => 'Penanggung Jawab',
+                'model' => PsnPenanggungJawab::class,
+                'order' => 'id',
+                'fields' => [
+                    ['name' => 'instansi_id', 'label' => 'Instansi Penanggung Jawab', 'type' => 'select', 'required' => true, 'options' => fn () => RefInstansi::orderBy('nama_instansi')->pluck('nama_instansi', 'id')->all()],
+                ],
+            ],
             'dasar_hukum' => [
                 'label' => 'Dasar Hukum',
                 'model' => DasarHukumPsn::class,
