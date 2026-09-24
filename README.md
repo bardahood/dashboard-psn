@@ -265,25 +265,29 @@ Berkas: `database/seeders/data/Hasil_Sandingan_Laporan_PSN_dan_Matrix_Pemb_rkp20
 - Artisan: `php artisan psn:import-laporan-psn [file] [--matrix=path|0]` (dipanggil otomatis via `LaporanPsnKatalogSeeder` + `RoProyekDariKrisnaSeeder` setiap `migrate:fresh --seed`).
 - Test otomatis: `LaporanPsnImporterTest` (impor katalog + tautan PSN, regresi false-positive pencocokan nama, pengayaan jalur ProP, seeding RO existing-first termasuk kasus PSN yang sudah punya RO manual, peringkasan lokasi multi-provinsi yang sangat panjang) dan penambahan pada `RisalahRapat21SeptTest` (isi-cepat dropdown Krisna mengisi field dengan benar + tetap bisa diubah manual, RO tanpa katalog Krisna tetap bisa diisi manual) -- total 126 test, seluruhnya hijau.
 
-## Restrukturisasi Menu Profil PSN Jadi 5 Tab (Sesuai Paparan Update Project Profile)
+## Restrukturisasi Menu Profil PSN Jadi 4 Tab (Sesuai Paparan Update Project Profile)
 
-Menu profil per-PSN sebelumnya terpecah jadi ~13 tab/rute terpisah (Gambaran Umum, RO/Proyek, Risiko, Indikator, Penerima Manfaat, Trisula, Dasar Hukum, Stakeholder, Kebutuhan Regulasi, Isu Lainnya, Kebutuhan Status PSN Tahun Selanjutnya, Info Memo, Catatan Monev). Dirombak menjadi **5 tab konsolidasi** sesuai referensi tampilan yang dilampirkan (breadcrumb "Beranda > Profile PSN > Input") dan struktur "Project Profile" pada paparan *Update Project Profile*:
+Menu profil per-PSN sebelumnya terpecah jadi ~13 tab/rute terpisah (Gambaran Umum, RO/Proyek, Risiko, Indikator, Penerima Manfaat, Trisula, Dasar Hukum, Stakeholder, Kebutuhan Regulasi, Isu Lainnya, Kebutuhan Status PSN Tahun Selanjutnya, Info Memo, Catatan Monev). Dirombak menjadi **4 tab konsolidasi** sesuai referensi tampilan yang dilampirkan (breadcrumb "Beranda > Profile PSN > Input") dan struktur "Project Profile" pada paparan *Update Project Profile*:
 
 | Tab baru | Isi (konsolidasi dari tab lama) |
 | --- | --- |
 | **Gambaran Umum** | Form data dasar PSN (nama, klaster, lokasi, status, dll — `_form.blade.php`), Dasar Hukum, Stakeholder Mapping. Sesuai bullet "Pengusul; Penanggung Jawab; Stakeholders Mapping" pada paparan. |
-| **Perencanaan** | Indikator Output/Outcome, Penerima Manfaat, Risiko, Kebutuhan Regulasi, plus ringkasan tahunan RO/Proyek/Non-RO (baca-saja, dengan tautan ke tab Penjabaran untuk kelola detail). |
-| **Trisula** | Kontribusi Trisula Pembangunan (Kemiskinan/Ekonomi/SDM) — tab tersendiri karena sudah menggabungkan target tahunan & triwulanan dalam satu komponen (`AnnualTargetManager`), sesuai posisinya sebagai elemen tersendiri pada tampilan referensi. |
-| **Penjabaran** | RO/Proyek/Aktivitas lengkap dengan target bulanan/triwulanan (`RoProyekManager`), Isu Lainnya, Kebutuhan Status PSN Tahun Selanjutnya — sesuai bucket "Penjabaran Tahunan" pada paparan. |
+| **Perencanaan** | Indikator Output/Outcome, **Kontribusi Trisula Pembangunan (target tahunan)**, Penerima Manfaat, Risiko, Kebutuhan Regulasi, plus ringkasan tahunan RO/Proyek/Non-RO (baca-saja, dengan tautan ke tab Penjabaran untuk kelola detail). |
+| **Penjabaran** | **Kontribusi Trisula (target triwulanan)**, RO/Proyek/Aktivitas lengkap dengan target bulanan/triwulanan (`RoProyekManager`), Isu Lainnya, Kebutuhan Status PSN Tahun Selanjutnya — sesuai bucket "Penjabaran Tahunan" pada paparan. |
 | **Upload Dokumen** | Diagram Kerangka Kelembagaan (dipindah dari form utama ke mini-form sendiri, `_form-diagram.blade.php`), rekap Bukti Pelaporan RO/Proyek (baca-saja, dari seluruh periode RO), Info Memo, Catatan Monev — dikumpulkan di sini karena tidak disebut eksplisit pada struktur Project Profile di paparan. |
 
-Detail teknis:
+**Koreksi (dicek ulang terhadap Project Profile): Trisula bukan tab tersendiri.** Rombakan awal sempat menjadikan Trisula tab ke-5 tersendiri karena `AnnualTargetManager` sudah menggabungkan target tahunan & triwulanan dalam satu komponen -- tapi slide resmi "Struktur Project Profile" (sudah lebih dulu tercermin benar di halaman baca-saja `/admin/project-profile`, lihat bagian di atas) justru membagi Trisula dua arah: target **tahunan** masuk **Perencanaan**, target **triwulanan** masuk **Penjabaran Tahunan** -- persis pola yang sama dipakai Indikator Output/Outcome & Penerima Manfaat (tahunan saja, tanpa breakdown TW). Diperbaiki dengan menambahkan mode `tampilan` pada `AnnualTargetManager` (`'tahunan'`/`'triwulanan'`/`'lengkap'` default) supaya satu komponen yang sama bisa dipasang dua kali di dua tab tanpa duplikasi logic:
+- Tab **Perencanaan** memasang `type=trisula, tampilan=tahunan`: form tambah/ubah/hapus Kontribusi Trisula + grid target tahunan (2025-2030), panel triwulanan disembunyikan.
+- Tab **Penjabaran** memasang `type=trisula, tampilan=triwulanan`: daftar Kontribusi Trisula yang sudah ada (baca-saja, tombol Ubah/Hapus master disembunyikan -- itu tanggung jawab tab Perencanaan) + panel "Target/Realisasi Triwulanan" per item; kalau belum ada data sama sekali, tampil tautan ke tab Perencanaan.
+- Route `admin.psn.trisula` dan `resources/views/admin/psn/trisula.blade.php` dihapus.
 
-- Rute baru: `admin.psn.gambaran-umum`, `admin.psn.perencanaan`, `admin.psn.trisula`, `admin.psn.penjabaran`, `admin.psn.dokumen` (semua `GET /admin/psn/{psn}/...`). Rute lama `admin.psn.ro`, `admin.psn.risiko`, `admin.psn.capaian`, `admin.psn.profil` dihapus; `admin.psn.show`/`admin.psn.edit` (dan tombol "Lihat"/"Ubah" di halaman Data PSN) kini redirect ke `admin.psn.gambaran-umum` alih-alih merender view sendiri.
-- Navigasi tab (`_profil-tabs.blade.php`) dan tombol "Lanjutkan ke {tab berikutnya}" (`_next-button.blade.php`) dirombak total mengikuti urutan 5-tab ini, lengkap dengan ikon per tab.
+Detail teknis (restrukturisasi tab secara umum):
+
+- Rute: `admin.psn.gambaran-umum`, `admin.psn.perencanaan`, `admin.psn.penjabaran`, `admin.psn.dokumen` (semua `GET /admin/psn/{psn}/...`). Rute lama `admin.psn.ro`, `admin.psn.risiko`, `admin.psn.capaian`, `admin.psn.profil`, `admin.psn.trisula` dihapus; `admin.psn.show`/`admin.psn.edit` (dan tombol "Lihat"/"Ubah" di halaman Data PSN) kini redirect ke `admin.psn.gambaran-umum` alih-alih merender view sendiri.
+- Navigasi tab (`_profil-tabs.blade.php`) dan tombol "Lanjutkan ke {tab berikutnya}" (`_next-button.blade.php`) mengikuti urutan 4-tab ini, lengkap dengan ikon per tab.
 - Upload diagram kelembagaan tetap submit ke rute `admin.psn.update` yang sama (field/kolom/validasi tidak berubah), hanya dipindah lokasinya ke tab Upload Dokumen lewat mini-form dengan hidden input `nama_psn`/`sumber_input` agar validasi form utama tidak terpengaruh.
 - Data RO dari katalog Krisna (lihat bagian di atas) sudah diverifikasi tampil benar pada tab Perencanaan (ringkasan) maupun Penjabaran (kelola detail) lewat QA visual Playwright, memakai contoh "Jalan Tol Semarang - Demak" (2 RO per ruas, 2,6 km & 1 km).
-- Test otomatis (`RisalahRapat21SeptTest`) disesuaikan mengikuti rute & label tab baru; total 126 test, seluruhnya hijau.
+- Test otomatis: `RisalahRapat21SeptTest` (rute & label tab) dan `TrisulaMenuSplitTest` (route lama terhapus, tab Perencanaan/Penjabaran menampilkan bagian Trisula yang benar, mode `tampilan` menyembunyikan bagian yang tidak relevan) -- total 135 test, seluruhnya hijau.
 
 ## Menjalankan Test
 

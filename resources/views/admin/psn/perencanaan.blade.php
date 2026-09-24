@@ -14,6 +14,8 @@
 
             @livewire('admin.annual-target-manager', ['psn' => $psn, 'type' => 'indikator'], key('indikator'))
 
+            @livewire('admin.annual-target-manager', ['psn' => $psn, 'type' => 'trisula', 'tampilan' => 'tahunan'], key('trisula-tahunan'))
+
             @livewire('admin.annual-target-manager', ['psn' => $psn, 'type' => 'penerima_manfaat'], key('penerima_manfaat'))
 
             @livewire('admin.risiko-manager', ['psn' => $psn])

@@ -27,6 +27,24 @@ class AnnualTargetManager extends Component
     #[Locked]
     public string $type;
 
+    /**
+     * Hanya berlaku efektif untuk type=trisula (Catatan Project Profile:
+     * Trisula bukan tab tersendiri, tapi tersebar mengikuti struktur resmi
+     * -- target TAHUNAN ada di tab Perencanaan, target TRIWULANAN di tab
+     * Penjabaran):
+     * - 'lengkap' (default, dipakai indikator/penerima_manfaat): form
+     *   tambah/ubah + grid tahunan + (khusus trisula) panel triwulanan,
+     *   semua dalam satu tempat -- perilaku lama sebelum pemisahan ini.
+     * - 'tahunan' (trisula @ Perencanaan): form tambah/ubah/hapus + grid
+     *   tahunan saja, panel triwulanan disembunyikan.
+     * - 'triwulanan' (trisula @ Penjabaran): form tambah/ubah/hapus dan
+     *   grid tahunan disembunyikan -- hanya daftar & panel triwulanan,
+     *   karena mengelola master Kontribusi Trisula adalah tanggung jawab
+     *   tab Perencanaan.
+     */
+    #[Locked]
+    public string $tampilan = 'lengkap';
+
     public array $parentForm = [];
 
     public ?int $editingParentId = null;
@@ -102,13 +120,14 @@ class AnnualTargetManager extends Component
         ];
     }
 
-    public function mount(Psn $psn, string $type): void
+    public function mount(Psn $psn, string $type, string $tampilan = 'lengkap'): void
     {
         abort_unless(array_key_exists($type, $this->config()), 404);
         Gate::authorize('update', $psn);
 
         $this->psn = $psn;
         $this->type = $type;
+        $this->tampilan = $tampilan;
         $this->resetParentForm();
     }
 

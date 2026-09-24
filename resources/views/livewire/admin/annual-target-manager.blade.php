@@ -1,50 +1,52 @@
 <div class="space-y-6">
-    <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
-        <h3 class="font-semibold text-gray-700 mb-4">{{ $editingParentId ? 'Ubah' : 'Tambah' }} {{ $config['label'] }}</h3>
+    @if ($tampilan !== 'triwulanan')
+        <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
+            <h3 class="font-semibold text-gray-700 mb-4">{{ $editingParentId ? 'Ubah' : 'Tambah' }} {{ $config['label'] }}</h3>
 
-        <form wire:submit="saveParent" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            @foreach ($config['parentFields'] as $field)
-                <div class="{{ $field['type'] === 'textarea' ? 'sm:col-span-2' : '' }}">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        {{ $field['label'] }}@if($field['required'] ?? false) <span class="text-red-500">*</span>@endif
-                    </label>
+            <form wire:submit="saveParent" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                @foreach ($config['parentFields'] as $field)
+                    <div class="{{ $field['type'] === 'textarea' ? 'sm:col-span-2' : '' }}">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            {{ $field['label'] }}@if($field['required'] ?? false) <span class="text-red-500">*</span>@endif
+                        </label>
 
-                    @if ($field['type'] === 'textarea')
-                        <textarea wire:model="parentForm.{{ $field['name'] }}" rows="2" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm"></textarea>
-                    @elseif ($field['type'] === 'trisula_indikator')
-                        @if (isset($parentForm['kategori_trisula']) && array_key_exists($parentForm['kategori_trisula'], \App\Livewire\Admin\AnnualTargetManager::PRESET_INDIKATOR_TRISULA))
-                            <input type="text" readonly wire:model="parentForm.{{ $field['name'] }}" class="block w-full rounded-lg border-gray-200 bg-gray-50 text-gray-500 shadow-sm text-sm">
-                            <p class="mt-1 text-xs text-gray-400">Indikator sudah baku untuk kategori Trisula ini.</p>
-                        @else
+                        @if ($field['type'] === 'textarea')
                             <textarea wire:model="parentForm.{{ $field['name'] }}" rows="2" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm"></textarea>
+                        @elseif ($field['type'] === 'trisula_indikator')
+                            @if (isset($parentForm['kategori_trisula']) && array_key_exists($parentForm['kategori_trisula'], \App\Livewire\Admin\AnnualTargetManager::PRESET_INDIKATOR_TRISULA))
+                                <input type="text" readonly wire:model="parentForm.{{ $field['name'] }}" class="block w-full rounded-lg border-gray-200 bg-gray-50 text-gray-500 shadow-sm text-sm">
+                                <p class="mt-1 text-xs text-gray-400">Indikator sudah baku untuk kategori Trisula ini.</p>
+                            @else
+                                <textarea wire:model="parentForm.{{ $field['name'] }}" rows="2" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm"></textarea>
+                            @endif
+                        @elseif ($field['type'] === 'select')
+                            <select wire:model.live="parentForm.{{ $field['name'] }}" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
+                                <option value="">-- Pilih --</option>
+                                @foreach ($field['options'] as $value => $labelText)
+                                    <option value="{{ $value }}">{{ $labelText }}</option>
+                                @endforeach
+                            </select>
+                        @else
+                            <input type="{{ $field['type'] === 'number' ? 'number' : 'text' }}" wire:model="parentForm.{{ $field['name'] }}" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
                         @endif
-                    @elseif ($field['type'] === 'select')
-                        <select wire:model.live="parentForm.{{ $field['name'] }}" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
-                            <option value="">-- Pilih --</option>
-                            @foreach ($field['options'] as $value => $labelText)
-                                <option value="{{ $value }}">{{ $labelText }}</option>
-                            @endforeach
-                        </select>
-                    @else
-                        <input type="{{ $field['type'] === 'number' ? 'number' : 'text' }}" wire:model="parentForm.{{ $field['name'] }}" class="block w-full rounded-lg border-gray-300 transition-colors shadow-sm text-sm">
+
+                        @error('parentForm.'.$field['name'])
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                @endforeach
+
+                <div class="sm:col-span-2 flex justify-end gap-3">
+                    @if ($editingParentId)
+                        <button type="button" wire:click="resetParentForm" class="rounded-md border px-4 py-2 text-sm">Batal</button>
                     @endif
-
-                    @error('parentForm.'.$field['name'])
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                    @enderror
+                    <button type="submit" class="rounded-lg bg-blue-800 text-white shadow-sm hover:shadow transition-all px-4 py-2 text-sm hover:bg-blue-700">
+                        {{ $editingParentId ? 'Simpan Perubahan' : 'Tambah' }}
+                    </button>
                 </div>
-            @endforeach
-
-            <div class="sm:col-span-2 flex justify-end gap-3">
-                @if ($editingParentId)
-                    <button type="button" wire:click="resetParentForm" class="rounded-md border px-4 py-2 text-sm">Batal</button>
-                @endif
-                <button type="submit" class="rounded-lg bg-blue-800 text-white shadow-sm hover:shadow transition-all px-4 py-2 text-sm hover:bg-blue-700">
-                    {{ $editingParentId ? 'Simpan Perubahan' : 'Tambah' }}
-                </button>
-            </div>
-        </form>
-    </div>
+            </form>
+        </div>
+    @endif
 
     <div class="space-y-3">
         @forelse ($parents as $parent)
@@ -59,14 +61,25 @@
                     </div>
                     <div class="flex gap-3 text-sm whitespace-nowrap">
                         <button wire:click="toggleYears({{ $parent->id }})" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">
-                            {{ $expandedParentId === $parent->id ? 'Tutup' : ($type === 'trisula' ? 'Target/Realisasi Tahunan & Triwulanan' : 'Target/Realisasi Tahunan') }}
+                            @if ($expandedParentId === $parent->id)
+                                Tutup
+                            @elseif ($tampilan === 'triwulanan')
+                                Kelola Target Triwulanan
+                            @elseif ($type === 'trisula')
+                                Target/Realisasi Tahunan & Triwulanan
+                            @else
+                                Target/Realisasi Tahunan
+                            @endif
                         </button>
-                        <button wire:click="editParent({{ $parent->id }})" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Ubah</button>
-                        <button wire:click="deleteParent({{ $parent->id }})" wire:confirm="Hapus data ini beserta seluruh target tahunannya?" class="text-red-700 hover:underline">Hapus</button>
+                        @if ($tampilan !== 'triwulanan')
+                            <button wire:click="editParent({{ $parent->id }})" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Ubah</button>
+                            <button wire:click="deleteParent({{ $parent->id }})" wire:confirm="Hapus data ini beserta seluruh target tahunannya?" class="text-red-700 hover:underline">Hapus</button>
+                        @endif
                     </div>
                 </div>
 
                 @if ($expandedParentId === $parent->id)
+                    @if ($tampilan !== 'triwulanan')
                     <form wire:submit="saveYears" class="mt-4 border-t pt-4 overflow-x-auto">
                         <table class="min-w-full text-xs">
                             <thead class="text-left text-gray-500">
@@ -103,8 +116,9 @@
                         </div>
                         <p class="mt-2 text-xs text-gray-400">% Realisasi dihitung otomatis dari Target &amp; Realisasi. Kosongkan seluruh kolom pada satu tahun untuk menghapus baris tahun tersebut.</p>
                     </form>
+                    @endif
 
-                    @if ($type === 'trisula')
+                    @if ($type === 'trisula' && $tampilan !== 'tahunan')
                         <div class="mt-4 border-t pt-4">
                             <h4 class="text-sm font-medium text-gray-700 mb-2">Target/Realisasi Triwulanan</h4>
                             <form wire:submit="saveTw" class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
@@ -171,7 +185,12 @@
                 @endif
             </div>
         @empty
-            <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6 text-center text-gray-400 text-sm">Belum ada data {{ $config['label'] }}.</div>
+            <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6 text-center text-gray-400 text-sm">
+                Belum ada data {{ $config['label'] }}.
+                @if ($tampilan === 'triwulanan')
+                    Tambahkan lewat tab <a href="{{ route('admin.psn.perencanaan', $psn) }}" class="text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Perencanaan</a> terlebih dahulu.
+                @endif
+            </div>
         @endforelse
     </div>
 </div>

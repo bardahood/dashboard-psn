@@ -1,10 +1,9 @@
 @php
-    // Urutan linear 5-tab Project Profile. Dipertahankan sinkron manual
+    // Urutan linear 4-tab Project Profile. Dipertahankan sinkron manual
     // dengan _profil-tabs.blade.php.
     $tabsUrutan = [
         ['label' => 'Gambaran Umum', 'route' => 'admin.psn.gambaran-umum'],
         ['label' => 'Perencanaan', 'route' => 'admin.psn.perencanaan'],
-        ['label' => 'Trisula', 'route' => 'admin.psn.trisula'],
         ['label' => 'Penjabaran', 'route' => 'admin.psn.penjabaran'],
         ['label' => 'Upload Dokumen', 'route' => 'admin.psn.dokumen'],
     ];

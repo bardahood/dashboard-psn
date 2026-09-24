@@ -31,7 +31,6 @@ Route::middleware(['auth', 'akun.aktif'])->prefix('admin')->name('admin.')->grou
     // komponen (Gate::authorize('update', $psn)).
     Route::get('/psn/{psn}/gambaran-umum', [PsnController::class, 'gambaranUmum'])->name('psn.gambaran-umum');
     Route::get('/psn/{psn}/perencanaan', fn (Psn $psn) => view('admin.psn.perencanaan', compact('psn')))->name('psn.perencanaan');
-    Route::get('/psn/{psn}/trisula', fn (Psn $psn) => view('admin.psn.trisula', compact('psn')))->name('psn.trisula');
     Route::get('/psn/{psn}/penjabaran', fn (Psn $psn) => view('admin.psn.penjabaran', compact('psn')))->name('psn.penjabaran');
     Route::get('/psn/{psn}/dokumen', fn (Psn $psn) => view('admin.psn.dokumen', compact('psn')))->name('psn.dokumen');
 
