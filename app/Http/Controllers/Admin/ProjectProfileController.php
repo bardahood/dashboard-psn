@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\ProjectProfileListExport;
 use App\Http\Controllers\Controller;
 use App\Models\Psn;
 use App\Models\RefKlaster;
 use App\Models\RefProvinsi;
 use App\Models\RefStatusPsn;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 /**
  * Halaman "Project Profile" -- rekap baca-saja (read-only) seluruh muatan
@@ -20,37 +23,58 @@ use Illuminate\Http\Request;
  */
 class ProjectProfileController extends Controller
 {
-    /** Komponen "Perencanaan" pada Struktur Project Profile, dipakai untuk skor kelengkapan matriks. */
-    private const KOMPONEN_PERENCANAAN = ['gambaran_umum', 'ro_proyek', 'risiko', 'indikator', 'trisula_kontribusi', 'penerima_manfaat'];
+    /** Kolom yang boleh dipakai untuk urutkan tabel (whitelist, cegah SQL injection lewat parameter `sort`). */
+    private const KOLOM_URUT = ['kode_rkp', 'nama_psn', 'tahun_penyelesaian'];
 
-    /** Komponen "Penjabaran Tahunan", dipakai untuk skor kelengkapan matriks. */
-    private const KOMPONEN_PENJABARAN = ['ro_penjabaran_tahun_ini', 'trisula_tw_tahun_ini', 'isu_lainnya', 'evaluasi_status_tahun_ini'];
+    /** Pilihan "entries per page" ala DataTables pada tabel Profile PSN. */
+    private const PILIHAN_PER_HALAMAN = [10, 25, 50, 100];
 
     public function index(Request $request)
     {
         $this->authorize('viewAny', Psn::class);
 
-        $tahunIni = now()->year;
+        $query = $this->query($request);
 
-        $query = Psn::query()
-            ->with(['klaster', 'provinsi', 'statusPsn'])
-            ->withCount([
-                'roProyek',
-                'risiko',
-                'indikator',
-                'trisulaKontribusi',
-                'penerimaManfaat',
-                'isuLainnya',
-                'roProyek as ro_penjabaran_tahun_ini_count' => fn ($q) => $q->whereHas(
-                    'targetPeriode',
-                    fn ($qq) => $qq->where('tahun', $tahunIni)->whereIn('tipe_periode', ['BULANAN', 'TRIWULANAN'])
-                ),
-                'trisulaKontribusi as trisula_tw_tahun_ini_count' => fn ($q) => $q->whereHas(
-                    'targetPeriode',
-                    fn ($qq) => $qq->where('tahun', $tahunIni)->where('tipe_periode', 'TRIWULANAN')
-                ),
-                'evaluasiStatus as evaluasi_status_tahun_ini_count' => fn ($q) => $q->where('tahun_evaluasi', $tahunIni),
-            ]);
+        $kolomUrut = in_array($request->string('sort')->toString(), self::KOLOM_URUT, true)
+            ? $request->string('sort')->toString()
+            : 'nama_psn';
+        $arahUrut = $request->string('direction')->toString() === 'desc' ? 'desc' : 'asc';
+
+        $perHalaman = in_array($request->integer('per_page'), self::PILIHAN_PER_HALAMAN, true)
+            ? $request->integer('per_page')
+            : 10;
+
+        $daftarPsn = $query->orderBy($kolomUrut, $arahUrut)->paginate($perHalaman)->withQueryString();
+
+        return view('admin.project-profile.index', [
+            'daftarPsn' => $daftarPsn,
+            'klasterOptions' => RefKlaster::orderBy('nama_klaster')->get(),
+            'statusOptions' => RefStatusPsn::orderBy('urutan')->get(),
+            'provinsiOptions' => RefProvinsi::orderBy('nama_provinsi')->get(),
+            'kolomUrut' => $kolomUrut,
+            'arahUrut' => $arahUrut,
+            'perHalaman' => $perHalaman,
+            'pilihanPerHalaman' => self::PILIHAN_PER_HALAMAN,
+        ]);
+    }
+
+    /** Unduh Excel dari daftar Profile PSN, mengikuti filter/pencarian yang sedang aktif di halaman. */
+    public function export(Request $request)
+    {
+        $this->authorize('viewAny', Psn::class);
+
+        $daftarPsn = $this->query($request)->orderBy('nama_psn')->get();
+
+        return Excel::download(new ProjectProfileListExport($daftarPsn), 'profile-psn-'.now()->format('Y-m-d').'.xlsx');
+    }
+
+    private function query(Request $request): Builder
+    {
+        $query = Psn::query()->with([
+            'klaster', 'provinsi', 'statusPsn',
+            'pengusulInstansi', 'pengelolaInstansi', 'kontraktorInstansi', 'supervisiInstansi',
+            'penanggungJawab.instansi',
+        ]);
 
         if ($request->filled('klaster_id')) {
             $query->where('klaster_id', $request->integer('klaster_id'));
@@ -68,38 +92,7 @@ class ProjectProfileController extends Controller
             $query->whereFullText('nama_psn', $request->string('q'));
         }
 
-        $daftarPsn = $query->orderBy('nama_psn')->paginate(20)->withQueryString();
-
-        // Skor kelengkapan dihitung di controller (bukan view) supaya definisi
-        // "lengkap" konsisten dengan yang dipakai pada halaman detail per-PSN.
-        $daftarPsn->getCollection()->transform(function (Psn $psn) {
-            $psn->skor_perencanaan = collect([
-                (bool) ($psn->tujuan_utama && $psn->output_akhir),
-                $psn->ro_proyek_count > 0,
-                $psn->risiko_count > 0,
-                $psn->indikator_count > 0,
-                $psn->trisula_kontribusi_count > 0,
-                $psn->penerima_manfaat_count > 0,
-            ])->filter()->count();
-
-            $psn->skor_penjabaran = collect([
-                $psn->trisula_tw_tahun_ini_count > 0,
-                $psn->ro_penjabaran_tahun_ini_count > 0,
-                $psn->isu_lainnya_count > 0,
-                $psn->evaluasi_status_tahun_ini_count > 0,
-            ])->filter()->count();
-
-            return $psn;
-        });
-
-        return view('admin.project-profile.index', [
-            'daftarPsn' => $daftarPsn,
-            'klasterOptions' => RefKlaster::orderBy('nama_klaster')->get(),
-            'statusOptions' => RefStatusPsn::orderBy('urutan')->get(),
-            'provinsiOptions' => RefProvinsi::orderBy('nama_provinsi')->get(),
-            'totalKomponenPerencanaan' => count(self::KOMPONEN_PERENCANAAN),
-            'totalKomponenPenjabaran' => count(self::KOMPONEN_PENJABARAN),
-        ]);
+        return $query;
     }
 
     public function show(Request $request, Psn $psn)

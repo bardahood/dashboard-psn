@@ -40,7 +40,7 @@ class ProjectProfileTest extends TestCase
         return $user;
     }
 
-    public function test_matriks_project_profile_menampilkan_daftar_psn_dengan_skor_kelengkapan(): void
+    public function test_matriks_project_profile_menampilkan_daftar_psn(): void
     {
         $this->actingAsSuperAdmin();
         $klaster = RefKlaster::create(['nama_klaster' => 'Energi']);
@@ -64,6 +64,89 @@ class ProjectProfileTest extends TestCase
         $response->assertSee('PSN Lengkap');
         $response->assertSee('PSN Kosong');
         $response->assertSee(route('admin.project-profile.show', $psnLengkap), false);
+    }
+
+    /**
+     * Kolom daftar Profile PSN disesuaikan dengan diagram referensi yang
+     * dilampirkan: No, Kode PSN, Nama PSN, Sub Proyek, Lokasi, Klaster PSN,
+     * Klaster PKPN, Status PSN, Pendanaan, Pengusul, Penanggung Jawab,
+     * Pengelola, Kontraktor, Supervisi, Tahun Selesai.
+     */
+    public function test_daftar_project_profile_menampilkan_kolom_sesuai_diagram(): void
+    {
+        $this->actingAsSuperAdmin();
+        $klaster = RefKlaster::create(['nama_klaster' => 'Direktif Presiden']);
+        $status = \App\Models\RefStatusPsn::create(['nama_status' => 'Proyek Dalam Tahap Transaksi', 'urutan' => 1]);
+        $provinsi = \App\Models\RefProvinsi::create(['nama_provinsi' => 'Aceh']);
+        $pengusul = RefInstansi::create(['nama_instansi' => 'Kepala Badan Gizi Nasional']);
+        $pengelola = RefInstansi::create(['nama_instansi' => 'Menteri Pekerjaan Umum']);
+        $kontraktor = RefInstansi::create(['nama_instansi' => 'PT Kontraktor Contoh']);
+        $supervisi = RefInstansi::create(['nama_instansi' => 'PT Supervisi Contoh']);
+        $pj1 = RefInstansi::create(['nama_instansi' => 'Kepala Badan Gizi Nasional PJ']);
+        $pj2 = RefInstansi::create(['nama_instansi' => 'Menteri Sosial']);
+
+        $psn = Psn::create([
+            'nama_psn' => 'Makan Bergizi Gratis',
+            'nama_sub_proyek' => 'Sub Proyek Contoh',
+            'kode_rkp' => 'DP.1-2026.1-01',
+            'klaster_id' => $klaster->id,
+            'status_psn_id' => $status->id,
+            'provinsi_id' => $provinsi->id,
+            'kabupaten_kota' => 'Kab. Aceh Selatan',
+            'tipe_hierarki' => 'PKPN',
+            'indikasi_sumber_pendanaan' => 'APBD',
+            'pengusul_instansi_id' => $pengusul->id,
+            'pengelola_instansi_id' => $pengelola->id,
+            'kontraktor_instansi_id' => $kontraktor->id,
+            'supervisi_instansi_id' => $supervisi->id,
+            'tahun_penyelesaian' => 2027,
+        ]);
+        \App\Models\PsnPenanggungJawab::create(['psn_id' => $psn->id, 'instansi_id' => $pj1->id]);
+        \App\Models\PsnPenanggungJawab::create(['psn_id' => $psn->id, 'instansi_id' => $pj2->id]);
+
+        $response = $this->get(route('admin.project-profile.index'));
+
+        $response->assertOk();
+        $response->assertSeeInOrder(['No', 'Kode PSN', 'Nama PSN', 'Sub Proyek', 'Lokasi', 'Klaster PSN', 'Klaster PKPN', 'Status PSN', 'Pendanaan', 'Pengusul', 'Penanggung Jawab', 'Pengelola', 'Kontraktor', 'Supervisi', 'Tahun Selesai']);
+        $response->assertSee('DP.1-2026.1-01');
+        $response->assertSee('Sub Proyek Contoh');
+        $response->assertSee('Aceh - Kab. Aceh Selatan');
+        $response->assertSee('Direktif Presiden');
+        $response->assertSee('PKPN');
+        $response->assertSee('Proyek Dalam Tahap Transaksi');
+        $response->assertSee('APBD');
+        $response->assertSee('Kepala Badan Gizi Nasional PJ, Menteri Sosial');
+        $response->assertSee('PT Kontraktor Contoh');
+        $response->assertSee('PT Supervisi Contoh');
+        $response->assertSee('2027');
+        $response->assertSee(route('admin.project-profile.show', $psn), false);
+        $response->assertSee(route('admin.psn.gambaran-umum', $psn), false);
+    }
+
+    public function test_daftar_project_profile_bisa_diurutkan_dan_diatur_jumlah_per_halaman(): void
+    {
+        $this->actingAsSuperAdmin();
+        Psn::create(['nama_psn' => 'Bendungan B', 'tahun_penyelesaian' => 2028]);
+        Psn::create(['nama_psn' => 'Bendungan A', 'tahun_penyelesaian' => 2027]);
+
+        $response = $this->get(route('admin.project-profile.index', ['sort' => 'nama_psn', 'direction' => 'asc', 'per_page' => 25]));
+
+        $response->assertOk();
+        $response->assertSeeInOrder(['Bendungan A', 'Bendungan B']);
+    }
+
+    public function test_download_xls_project_profile_mengikuti_filter_klaster_aktif(): void
+    {
+        $this->actingAsSuperAdmin();
+        $energi = RefKlaster::create(['nama_klaster' => 'Energi']);
+        $pangan = RefKlaster::create(['nama_klaster' => 'Pangan']);
+        Psn::create(['nama_psn' => 'PSN Energi', 'klaster_id' => $energi->id]);
+        Psn::create(['nama_psn' => 'PSN Pangan', 'klaster_id' => $pangan->id]);
+
+        $response = $this->get(route('admin.project-profile.export', ['klaster_id' => $energi->id]));
+
+        $response->assertOk();
+        $response->assertHeader('content-disposition');
     }
 
     public function test_matriks_project_profile_bisa_difilter_per_klaster(): void

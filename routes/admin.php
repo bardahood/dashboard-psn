@@ -23,8 +23,8 @@ Route::middleware(['auth', 'akun.aktif'])->prefix('admin')->name('admin.')->grou
 
     Route::resource('psn', PsnController::class);
 
-    // Profil PSN disusun jadi 5 tab konsolidasi mengikuti struktur resmi
-    // paparan "Update Project Profile": Gambaran Umum, Perencanaan, Trisula,
+    // Profil PSN disusun jadi 4 tab konsolidasi mengikuti struktur resmi
+    // paparan "Update Project Profile": Gambaran Umum, Perencanaan,
     // Penjabaran, Upload Dokumen -- menggantikan tab-tab terpisah per
     // sub-resource sebelumnya. Dirender via komponen Livewire (lihat
     // app/Livewire/Admin), otorisasi ditegakkan di dalam masing-masing
@@ -38,6 +38,7 @@ Route::middleware(['auth', 'akun.aktif'])->prefix('admin')->name('admin.')->grou
 
     Route::prefix('project-profile')->name('project-profile.')->group(function () {
         Route::get('/', [ProjectProfileController::class, 'index'])->name('index');
+        Route::get('/export', [ProjectProfileController::class, 'export'])->name('export');
         Route::get('/{psn}', [ProjectProfileController::class, 'show'])->name('show');
     });
 

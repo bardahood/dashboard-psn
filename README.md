@@ -317,6 +317,19 @@ Diagram resmi bagian Perencanaan (kotak-kotak: Indikator (Target Tahunan/Agregat
 
 Test otomatis: `PerencanaanProjectProfileTest` (judul ringkasan sesuai diagram, badge Critical Path tampil untuk Aktivitas bertanda kunci) dan penambahan pada `TrisulaMenuSplitTest` (agregasi realisasi tahunan dari triwulanan, termasuk regresi saat salah satu triwulan dihapus) -- total 146 test, seluruhnya hijau.
 
+## Daftar Project Profile Disesuaikan dengan Mockup "PROFILE PSN"
+
+Halaman daftar `admin.project-profile.index` dirombak agar sama persis dengan mockup layar "PROFILE PSN" yang dilampirkan (judul biru tebal + tombol hijau "Download Xls", selector "entries per page", kotak "Search:", header kolom bisa diurutkan dengan tanda panah, dua ikon aksi berwarna per baris, paginasi):
+
+- **Kolom tabel diganti persis 15 kolom yang diminta**: No, Kode PSN, Nama PSN, Sub Proyek, Lokasi, Klaster PSN, Klaster PKPN, Status PSN, Pendanaan, Pengusul, Penanggung Jawab, Pengelola, Kontraktor, Supervisi, Tahun Selesai -- diambil lewat relasi Eloquent yang sudah ada (`klaster`, `provinsi`, `statusPsn`, `pengusulInstansi`, `pengelolaInstansi`, `kontraktorInstansi`, `supervisiInstansi`, `penanggungJawab.instansi`), tanpa migrasi baru.
+- **Fitur "Kelengkapan Perencanaan/Penjabaran" (badge skor) yang lama dihapus** dari halaman ini karena tidak ada di mockup dan tidak diminta -- fitur pengecekan kelengkapan tetap bisa dicek lewat halaman Project Profile detail per-PSN yang tidak berubah.
+- **Sort & entries-per-page ala DataTables tanpa library DataTables.js** (proyek ini tidak memakai library tersebut di mana pun) -- memakai pola server-side yang sudah dipakai di halaman lain (query param `sort`/`direction`/`per_page`/`q`, whitelist kolom `kode_rkp`/`nama_psn`/`tahun_penyelesaian` dan pilihan per-halaman `10/25/50/100` untuk mencegah injeksi lewat parameter).
+- **Tombol "Download Xls" baru** (`admin.project-profile.export`) mengunduh persis kolom & baris yang sedang tampil di layar (ikut filter klaster/status/provinsi/tipe hierarki & pencarian aktif) lewat `ProjectProfileListExport` (Maatwebsite Excel, `FromCollection` dari koleksi yang sama dipakai controller, bukan query terpisah, supaya hasil unduhan selalu selaras dengan yang tampil).
+- **Dua ikon aksi per baris** sesuai mockup: ikon dokumen biru ke Project Profile lengkap (`admin.project-profile.show`), ikon mata oranye ke halaman kelola/ubah (`admin.psn.gambaran-umum`).
+- **Catatan interpretasi "Klaster PKPN"**: mockup mencontohkan nilai seperti "Kedaulatan Pangan" untuk kolom ini, tapi tidak ada field di skema yang menampung nilai tersebut maupun berkas sumber untuk mengisinya. Kolom ini memakai `tipe_hierarki` (PKPN/PSN) -- field yang sama yang sebelumnya sudah dipakai untuk label "Klaster PKPN" pada tab Gambaran Umum -- supaya konsisten dengan keputusan fase sebelumnya. Bila dimaksudkan sebagai field klasifikasi terpisah, perlu berkas sumber data untuk mengisinya.
+
+Test otomatis: `ProjectProfileTest` (kolom tabel sesuai urutan diagram, sort & per-page, Download Xls mengikuti filter aktif) -- total 150 test, seluruhnya hijau.
+
 ## Menjalankan Test
 
 ```bash
