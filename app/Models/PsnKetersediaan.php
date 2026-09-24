@@ -15,6 +15,7 @@ class PsnKetersediaan extends Model
     protected $fillable = [
         'psn_id',
         'status_ketersediaan_id',
+        'jenis_ketersediaan',
         'keterangan',
         'periode_pemutakhiran',
     ];

@@ -15,13 +15,18 @@ class Psn extends Model
 
     protected $fillable = [
         'nama_psn',
+        'nama_sub_proyek',
         'urgensi',
         'tujuan_utama',
         'tahun_penyelesaian',
+        'bulan_penyelesaian',
         'output_akhir',
+        'data_teknis',
         'nilai_investasi_apbn_rp',
         'nilai_investasi_non_apbn_rp',
+        'indikasi_sumber_pendanaan',
         'asta_cita',
+        'diagram_kelembagaan_path',
         'pengusul_instansi_id',
         'pengelola_instansi_id',
         'kontraktor_instansi_id',
@@ -29,9 +34,12 @@ class Psn extends Model
         'klaster_id',
         'provinsi_id',
         'status_psn_id',
+        'kategori_usulan',
         'tipe_hierarki',
         'kabupaten_kota',
         'kode_rkp',
+        'peks',
+        'unit_kerja',
         'sumber_input',
         'periode_update',
     ];
@@ -160,5 +168,34 @@ class Psn extends Model
     public function kunjunganPerencanaan(): HasMany
     {
         return $this->hasMany(KunjunganPerencanaan::class, 'psn_id');
+    }
+
+    /**
+     * Cek kepatuhan frekuensi pelaporan RO/Proyek milik PSN ini terhadap
+     * aturan Project Profile Final: PKPN wajib diisi bulanan, PSN boleh
+     * bulanan atau triwulanan (lihat komentar kolom psn.tipe_hierarki dan
+     * Bagian 15 ilustrasi Project Profile). Dipakai sebagai saran otomatis
+     * pada Bagian A Instrumen Kunjungan Pengendalian -- tetap dapat diubah
+     * manual oleh verifikator berdasarkan temuan lapangan.
+     */
+    public function cekKepatuhanFrekuensiPelaporan(): ?string
+    {
+        if (! $this->tipe_hierarki) {
+            return null;
+        }
+
+        $tipePeriodeTahunIni = RoTargetPeriode::whereIn('ro_id', $this->roProyek()->pluck('id'))
+            ->where('tahun', now()->year)
+            ->pluck('tipe_periode');
+
+        if ($tipePeriodeTahunIni->isEmpty()) {
+            return null;
+        }
+
+        if ($this->tipe_hierarki === 'PKPN') {
+            return $tipePeriodeTahunIni->every(fn ($tipe) => $tipe === 'BULANAN') ? 'Sesuai' : 'Tidak Sesuai';
+        }
+
+        return 'Sesuai';
     }
 }

@@ -15,9 +15,11 @@ class IndikatorPsn extends Model
 
     protected $fillable = [
         'psn_id',
+        'jenis_indikator',
         'nama_indikator',
         'satuan',
         'baseline',
+        'baseline_tahun',
     ];
 
     protected $casts = [];

@@ -5,17 +5,17 @@
     <h1 class="text-2xl font-bold text-blue-900">Statistik PSN</h1>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div class="bg-white rounded-lg shadow p-6">
+        <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
             <h2 class="font-semibold text-gray-700 mb-4">Distribusi per Klaster</h2>
             <canvas id="chartKlaster" height="260"></canvas>
         </div>
-        <div class="bg-white rounded-lg shadow p-6">
+        <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
             <h2 class="font-semibold text-gray-700 mb-4">Distribusi per Status Lifecycle</h2>
             <canvas id="chartStatus" height="260"></canvas>
         </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow p-6">
+    <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
         <h2 class="font-semibold text-gray-700 mb-4">10 Provinsi dengan PSN Terbanyak</h2>
         <canvas id="chartProvinsi" height="120"></canvas>
     </div>

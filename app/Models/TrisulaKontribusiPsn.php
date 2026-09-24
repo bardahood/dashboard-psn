@@ -16,7 +16,9 @@ class TrisulaKontribusiPsn extends Model
     protected $fillable = [
         'psn_id',
         'kategori_trisula',
+        'sub_kategori_sdm',
         'nama_indikator',
+        'satuan',
         'sumber_dana',
         'baseline',
     ];

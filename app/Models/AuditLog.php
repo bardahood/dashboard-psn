@@ -12,11 +12,19 @@ class AuditLog extends Model
 
     protected $table = 'audit_log';
 
+    /**
+     * Tabel ini hanya punya kolom created_at (DEFAULT CURRENT_TIMESTAMP di
+     * database, lihat migration) -- tidak ada updated_at.
+     */
+    public $timestamps = false;
+
     protected $fillable = [
         'nama_tabel',
         'record_id',
         'aksi',
         'pic_id',
+        'user_id',
+        'role',
         'nilai_lama',
         'nilai_baru',
     ];
@@ -24,10 +32,18 @@ class AuditLog extends Model
     protected $casts = [
         'nilai_lama' => 'array',
         'nilai_baru' => 'array',
+        // $timestamps=false menonaktifkan auto-cast created_at bawaan Eloquent
+        // (lihat Model::getDates()), jadi ditambahkan eksplisit di sini.
+        'created_at' => 'datetime',
     ];
 
     public function pic(): BelongsTo
     {
         return $this->belongsTo(RefPic::class, 'pic_id');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

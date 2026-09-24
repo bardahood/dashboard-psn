@@ -10,6 +10,7 @@ use App\Models\RefProvinsi;
 use App\Models\RefStatusPsn;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class PsnController extends Controller
 {
@@ -24,6 +25,9 @@ class PsnController extends Controller
         }
         if ($request->filled('status_psn_id')) {
             $query->where('status_psn_id', $request->integer('status_psn_id'));
+        }
+        if ($request->filled('kategori_usulan')) {
+            $query->where('kategori_usulan', $request->string('kategori_usulan'));
         }
         if ($request->filled('q')) {
             $query->whereFullText('nama_psn', $request->string('q'));
@@ -50,25 +54,39 @@ class PsnController extends Controller
         $data = $this->validated($request);
         $psn = Psn::create($data);
 
+        $this->simpanDiagramKelembagaan($request, $psn);
+
         $this->flushDashboardCache();
 
-        return redirect()->route('admin.psn.edit', $psn)->with('status', 'Data PSN berhasil ditambahkan.');
+        return redirect()->route('admin.psn.gambaran-umum', $psn)->with('status', 'Data PSN berhasil ditambahkan.');
     }
 
+    /**
+     * Detail/Ubah PSN sudah disatukan ke tab "Gambaran Umum" pada struktur
+     * profil PSN 4-tab (Gambaran Umum, Perencanaan, Penjabaran, Upload
+     * Dokumen) -- route show/edit dipertahankan untuk kompatibilitas
+     * tautan lama, cukup alihkan ke sana.
+     */
     public function show(Psn $psn)
     {
         $this->authorize('view', $psn);
 
-        $psn->load(['klaster', 'provinsi', 'statusPsn', 'pengusulInstansi', 'pengelolaInstansi', 'kontraktorInstansi', 'supervisiInstansi', 'roProyek', 'risiko']);
-
-        return view('admin.psn.show', compact('psn'));
+        return redirect()->route('admin.psn.gambaran-umum', $psn);
     }
 
     public function edit(Psn $psn)
     {
         $this->authorize('update', $psn);
 
-        return view('admin.psn.edit', $this->formOptions() + ['psn' => $psn]);
+        return redirect()->route('admin.psn.gambaran-umum', $psn);
+    }
+
+    /** Tab "Gambaran Umum" pada struktur profil PSN 4-tab. */
+    public function gambaranUmum(Psn $psn)
+    {
+        $this->authorize('update', $psn);
+
+        return view('admin.psn.gambaran-umum', $this->formOptions() + ['psn' => $psn]);
     }
 
     public function update(Request $request, Psn $psn)
@@ -78,14 +96,44 @@ class PsnController extends Controller
         $data = $this->validated($request);
         $psn->update($data);
 
+        $this->simpanDiagramKelembagaan($request, $psn);
+
+        if ($request->boolean('hapus_diagram_kelembagaan') && $psn->diagram_kelembagaan_path) {
+            Storage::disk('public')->delete($psn->diagram_kelembagaan_path);
+            $psn->update(['diagram_kelembagaan_path' => null]);
+        }
+
         $this->flushDashboardCache();
 
-        return redirect()->route('admin.psn.edit', $psn)->with('status', 'Data PSN berhasil disimpan.');
+        return redirect()->route('admin.psn.gambaran-umum', $psn)->with('status', 'Data PSN berhasil disimpan.');
+    }
+
+    /**
+     * "Visualisasi Kerangka Kelembagaan" -- diagram skematik hubungan antar
+     * pihak, komponen wajib Project Profile PSN sesuai Pedoman Project
+     * Profile PSN yang sebelumnya tidak punya tempat penyimpanan.
+     */
+    protected function simpanDiagramKelembagaan(Request $request, Psn $psn): void
+    {
+        if (! $request->hasFile('diagram_kelembagaan')) {
+            return;
+        }
+
+        if ($psn->diagram_kelembagaan_path) {
+            Storage::disk('public')->delete($psn->diagram_kelembagaan_path);
+        }
+
+        $path = $request->file('diagram_kelembagaan')->store('psn-diagram-kelembagaan/'.$psn->id, 'public');
+        $psn->update(['diagram_kelembagaan_path' => $path]);
     }
 
     public function destroy(Psn $psn)
     {
         $this->authorize('delete', $psn);
+
+        if ($psn->diagram_kelembagaan_path) {
+            Storage::disk('public')->delete($psn->diagram_kelembagaan_path);
+        }
 
         $psn->delete();
 
@@ -98,14 +146,18 @@ class PsnController extends Controller
     {
         // Validasi longgar-tapi-terarah: hanya nama_psn yang wajib diisi, karena
         // banyak data sumber riil belum lengkap (lihat Bagian 8 prompt pengembangan).
-        return $request->validate([
+        $data = $request->validate([
             'nama_psn' => ['required', 'string'],
-            'urgensi' => ['nullable', 'string'],
-            'tujuan_utama' => ['nullable', 'string'],
+            'nama_sub_proyek' => ['nullable', 'string', 'max:255'],
+            'urgensi' => ['nullable', 'string', 'min:20'],
+            'tujuan_utama' => ['nullable', 'string', 'min:20'],
             'tahun_penyelesaian' => ['nullable', 'integer', 'min:2000', 'max:2100'],
-            'output_akhir' => ['nullable', 'string'],
+            'bulan_penyelesaian' => ['nullable', 'integer', 'between:1,12'],
+            'output_akhir' => ['nullable', 'string', 'min:20'],
+            'data_teknis' => ['nullable', 'string'],
             'nilai_investasi_apbn_rp' => ['nullable', 'numeric', 'min:0'],
             'nilai_investasi_non_apbn_rp' => ['nullable', 'numeric', 'min:0'],
+            'indikasi_sumber_pendanaan' => ['nullable', 'in:APBN,APBD,BUMN,BU-Swasta,Lainnya'],
             'asta_cita' => ['nullable', 'string'],
             'pengusul_instansi_id' => ['nullable', 'exists:ref_instansi,id'],
             'pengelola_instansi_id' => ['nullable', 'exists:ref_instansi,id'],
@@ -114,12 +166,22 @@ class PsnController extends Controller
             'klaster_id' => ['nullable', 'exists:ref_klaster,id'],
             'provinsi_id' => ['nullable', 'exists:ref_provinsi,id'],
             'status_psn_id' => ['nullable', 'exists:ref_status_psn,id'],
+            'kategori_usulan' => ['nullable', 'in:Carryover,Usulan Baru'],
             'tipe_hierarki' => ['nullable', 'in:PKPN,PSN'],
             'kabupaten_kota' => ['nullable', 'string', 'max:150'],
             'kode_rkp' => ['nullable', 'string', 'max:30'],
+            'peks' => ['nullable', 'string', 'max:100'],
+            'unit_kerja' => ['nullable', 'string', 'max:255'],
             'sumber_input' => ['required', 'in:API PSI,Manual'],
             'periode_update' => ['nullable', 'date'],
+            'diagram_kelembagaan' => ['nullable', 'image', 'max:4096'],
         ]);
+
+        // diagram_kelembagaan (file upload) ditangani terpisah di simpanDiagramKelembagaan(),
+        // bukan lewat mass-assignment biasa -- kolomnya (diagram_kelembagaan_path) berbeda nama.
+        unset($data['diagram_kelembagaan']);
+
+        return $data;
     }
 
     protected function formOptions(): array
