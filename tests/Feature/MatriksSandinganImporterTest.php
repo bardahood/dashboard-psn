@@ -10,6 +10,8 @@ use Database\Seeders\RefStatusKetersediaanSeeder;
 use Database\Seeders\RefSumberDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Tests\TestCase;
 
 class MatriksSandinganImporterTest extends TestCase
@@ -83,11 +85,43 @@ class MatriksSandinganImporterTest extends TestCase
 
         $hasil = $importer->importKodeRkp($kodePath);
 
-        $this->assertSame(378, $hasil['cocok']);
-        $this->assertSame(0, $hasil['tidak_cocok']);
-        $this->assertSame(378, Psn::whereNotNull('kode_rkp')->count());
+        $this->assertSame(379, $hasil['cocok']);
+        $this->assertSame(1, $hasil['tidak_cocok']);
+        $this->assertSame(379, Psn::whereNotNull('kode_rkp')->count());
 
         $mbg = Psn::where('nama_psn', 'Makan Bergizi Gratis')->firstOrFail();
         $this->assertSame('DP.1-2026.1-01', $mbg->kode_rkp);
+        $this->assertSame('PEKS 4', $mbg->peks);
+        $this->assertSame('Direktorat Kesehatan dan Gizi Masyarakat', $mbg->unit_kerja);
+    }
+
+    /**
+     * Kolom C ("Nama PSN") pada pembaruan 24 Sept 2026 ditemukan terpotong
+     * (truncated) untuk nama PSN yang sangat panjang -- pencocokan HARUS
+     * memakai kolom B ("PSN") yang berisi nama lengkap, bukan kolom C.
+     */
+    public function test_import_kode_rkp_mencocokkan_lewat_kolom_psn_bukan_nama_psn_yang_terpotong(): void
+    {
+        $namaPanjang = str_repeat('Program Pembangunan Smelter Sangat Panjang ', 10);
+        Psn::create(['nama_psn' => $namaPanjang]);
+
+        $sheet = new Spreadsheet;
+        $ws = $sheet->getActiveSheet();
+        $ws->fromArray(['Kode_PSI', 'PSN', 'Nama PSN', 'Peks', 'Unit_Kerja'], null, 'A1');
+        $ws->fromArray([null, null, null, null, null], null, 'A2');
+        $ws->fromArray(['J1-2026.1-01', $namaPanjang, mb_substr($namaPanjang, 0, 50), 'PEKS 2 dan PEKS 4', 'Direktorat Industri'], null, 'A3');
+
+        $path = tempnam(sys_get_temp_dir(), 'kode_psn_').'.xlsx';
+        (new Xlsx($sheet))->save($path);
+
+        $hasil = app(MatriksSandinganImporter::class)->importKodeRkp($path);
+
+        $this->assertSame(1, $hasil['cocok']);
+        $this->assertSame(0, $hasil['tidak_cocok']);
+
+        $psn = Psn::where('nama_psn', $namaPanjang)->firstOrFail();
+        $this->assertSame('J1-2026.1-01', $psn->kode_rkp);
+        $this->assertSame('PEKS 2 dan PEKS 4', $psn->peks);
+        $this->assertSame('Direktorat Industri', $psn->unit_kerja);
     }
 }

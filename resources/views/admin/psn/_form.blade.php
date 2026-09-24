@@ -173,6 +173,17 @@
     </div>
 
     <div>
+        <x-input-label for="peks" value="PEKS Penanggung Jawab" />
+        <p class="text-xs text-gray-400 mb-1">Unit PEKS internal Kementerian PPN/Bappenas yang menangani PSN ini (Master Data PSN Kode).</p>
+        <x-text-input id="peks" name="peks" class="mt-1 block w-full" value="{{ old('peks', $psn?->peks) }}" />
+    </div>
+
+    <div>
+        <x-input-label for="unit_kerja" value="Unit Kerja" />
+        <x-text-input id="unit_kerja" name="unit_kerja" class="mt-1 block w-full" value="{{ old('unit_kerja', $psn?->unit_kerja) }}" />
+    </div>
+
+    <div>
         <x-input-label for="sumber_input" value="Sumber Input" />
         <select id="sumber_input" name="sumber_input" required class="mt-1 block w-full rounded-lg border-gray-300 transition-colors shadow-sm">
             <option value="Manual" @selected(old('sumber_input', $psn?->sumber_input ?? 'Manual') == 'Manual')>Manual</option>

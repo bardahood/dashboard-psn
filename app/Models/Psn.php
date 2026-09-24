@@ -38,6 +38,8 @@ class Psn extends Model
         'tipe_hierarki',
         'kabupaten_kota',
         'kode_rkp',
+        'peks',
+        'unit_kerja',
         'sumber_input',
         'periode_update',
     ];

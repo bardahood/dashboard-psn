@@ -170,6 +170,8 @@ class PsnController extends Controller
             'tipe_hierarki' => ['nullable', 'in:PKPN,PSN'],
             'kabupaten_kota' => ['nullable', 'string', 'max:150'],
             'kode_rkp' => ['nullable', 'string', 'max:30'],
+            'peks' => ['nullable', 'string', 'max:100'],
+            'unit_kerja' => ['nullable', 'string', 'max:255'],
             'sumber_input' => ['required', 'in:API PSI,Manual'],
             'periode_update' => ['nullable', 'date'],
             'diagram_kelembagaan' => ['nullable', 'image', 'max:4096'],

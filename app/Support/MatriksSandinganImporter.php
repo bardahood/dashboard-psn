@@ -168,11 +168,16 @@ class MatriksSandinganImporter
     }
 
     /**
-     * Isi psn.kode_rkp dari "Master Data PSN Kode" (Kode_PSI + Nama PSN),
+     * Isi psn.kode_rkp (+ peks/unit_kerja sejak pembaruan 24 Sept 2026) dari
+     * "Master Data PSN Kode" (Kode_PSI + PSN [+ Nama PSN + Peks + Unit_Kerja]),
      * dicocokkan lewat nama_psn persis sama (kedua file terbukti selaras
      * baris-demi-baris pada sumber 17 Sept 2026 -- dicocokkan lewat nama,
      * bukan urutan baris, agar tahan bila urutan berubah pada pembaruan
-     * berikutnya).
+     * berikutnya). Kolom B ("PSN") dipakai untuk pencocokan, BUKAN kolom C
+     * ("Nama PSN") yang ditemukan sudah terpotong (truncated) pada baris
+     * dengan nama sangat panjang di pembaruan 24 Sept 2026 -- pakai kolom C
+     * untuk pencocokan akan gagal mencocokkan baris-baris tsb ke psn.nama_psn
+     * yang tersimpan lengkap.
      */
     public function importKodeRkp(string $path): array
     {
@@ -191,7 +196,14 @@ class MatriksSandinganImporter
                 continue;
             }
 
-            $terupdate = DB::table('psn')->where('nama_psn', $namaPsn)->update(['kode_rkp' => $kode]);
+            $peks = trim((string) $sheet->getCell('D'.$row)->getFormattedValue());
+            $unitKerja = trim((string) $sheet->getCell('E'.$row)->getFormattedValue());
+
+            $terupdate = DB::table('psn')->where('nama_psn', $namaPsn)->update([
+                'kode_rkp' => $kode,
+                'peks' => $peks !== '' ? $peks : null,
+                'unit_kerja' => $unitKerja !== '' ? $unitKerja : null,
+            ]);
 
             if ($terupdate > 0) {
                 $jumlahCocok++;

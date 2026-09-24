@@ -154,6 +154,13 @@ Dua file resmi dianalisis dan diterapkan langsung ke database: **`Master_Data_PS
 - File bundel lama (388 baris, nama terpotong) diganti isinya dengan file 17 Sept di path yang sama (`database/seeders/data/Matrik_Sandingan_Data_PSN_2026.xlsx`) supaya seluruh referensi (`psn:import-matriks`, seeder, test) tidak perlu diubah path-nya.
 - Test otomatis: `MatriksSandinganImporterTest` (angka-angka disesuaikan ke 380 PSN, ditambah test `importKodeRkp`).
 
+**Pembaruan lanjutan (24 Sept 2026):** `Master_Data_PSN_Kode.xlsx` diperbarui lagi -- filenya diganti isinya di path bundel yang sama, hasilnya:
+
+- **Kecocokan `kode_rkp` naik dari 378 jadi 379 dari 380 PSN** (1 PSN memang tidak ada pada sumber Master Kode versi ini).
+- **2 kolom baru diimpor**: `psn.peks` (unit PEKS internal Kementerian PPN/Bappenas penanggung jawab, mis. "PEKS 4", kadang gabungan mis. "PEKS 2 dan PEKS 4" -- 249 dari 380 PSN terisi, sisanya memang kosong pada sumber) dan `psn.unit_kerja` (nama Direktorat spesifik, mis. "Direktorat Kesehatan dan Gizi Masyarakat" -- 283 dari 380 terisi). Ditambahkan sebagai field baru pada tab Gambaran Umum (`_form.blade.php`), setelah field Kode RKP.
+- **Bug ditemukan & diperbaiki saat pengembangan**: file versi ini menambahkan kolom "Nama PSN" (kolom C) yang ternyata **terpotong (truncated)** untuk nama PSN sangat panjang (mis. deretan proyek smelter multi-baris), berbeda dari kolom "PSN" (kolom B) yang tetap lengkap. `importKodeRkp()` sejak awal sudah memakai kolom B untuk pencocokan (posisi kolom tidak berubah dari versi sebelumnya), jadi tidak terdampak -- tapi ditambahkan test regresi (`test_import_kode_rkp_mencocokkan_lewat_kolom_psn_bukan_nama_psn_yang_terpotong`) untuk memastikan pembaruan berikutnya tidak diam-diam beralih memakai kolom C yang berisiko truncated.
+- Migrasi: `2026_09_24_191300_add_peks_unit_kerja_to_psn_table.php`. Field disimpan bebas teks (bukan FK ke tabel referensi baru) karena Peks cuma ~5 varian termasuk gabungan (bukan enum tunggal murni) dan Unit_Kerja adalah sub-unit internal granular yang tidak cocok disamakan dengan `ref_instansi` (itu instansi K/L eksternal).
+
 ## Verifikasi Menu "Penjabaran Tahunan" (4 kebutuhan)
 
 Permintaan verifikasi terhadap 4 menu "Penjabaran Tahunan" berikut dicek langsung terhadap kode & skema (bukan asumsi):
