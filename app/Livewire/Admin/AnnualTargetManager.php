@@ -340,6 +340,8 @@ class AnnualTargetManager extends Component
             ]
         );
 
+        $this->agregasiRealisasiTahunanTrisula($this->expandedParentId, (int) $this->twForm['tahun']);
+
         $this->resetTwForm();
     }
 
@@ -347,9 +349,46 @@ class AnnualTargetManager extends Component
     {
         Gate::authorize('update', $this->psn);
 
-        TrisulaTargetPeriode::where('kontribusi_id', $this->expandedParentId)
+        $tw = TrisulaTargetPeriode::where('kontribusi_id', $this->expandedParentId)
             ->where('tipe_periode', 'TRIWULANAN')
-            ->findOrFail($id)->delete();
+            ->findOrFail($id);
+        $tahun = $tw->tahun;
+        $tw->delete();
+
+        $this->agregasiRealisasiTahunanTrisula($this->expandedParentId, (int) $tahun);
+    }
+
+    /**
+     * Realisasi TAHUNAN Kontribusi Trisula untuk tahun berjalan dihitung
+     * otomatis dari jumlah realisasi TRIWULANAN tahun tsb -- Struktur Project
+     * Profile: "Kontribusi Terhadap Trisula Pembangunan (Target Tahunan/
+     * Agregat dari Target TW)", pola yang sama seperti realisasi RO/Proyek
+     * (RoProyekManager::agregasiRealisasiTahunan()). Hanya berlaku utk tahun
+     * berjalan agar tidak menimpa realisasi tahun lampau yang sudah
+     * final/diaudit secara manual; target tahunan tidak ikut diagregasi
+     * (tetap diisi manual top-down, hanya realisasi yang bottom-up dari TW).
+     */
+    private function agregasiRealisasiTahunanTrisula(int $kontribusiId, int $tahun): void
+    {
+        if ($tahun !== now()->year) {
+            return;
+        }
+
+        $totalRealisasi = TrisulaTargetPeriode::where('kontribusi_id', $kontribusiId)
+            ->where('tahun', $tahun)
+            ->where('tipe_periode', 'TRIWULANAN')
+            ->sum('realisasi');
+
+        $tahunan = TrisulaTargetPeriode::firstOrNew([
+            'kontribusi_id' => $kontribusiId,
+            'tipe_periode' => 'TAHUNAN',
+            'tahun' => $tahun,
+        ]);
+        $tahunan->realisasi = $totalRealisasi;
+        $tahunan->persen_realisasi = ($tahunan->target && $totalRealisasi !== null)
+            ? round(($totalRealisasi / $tahunan->target) * 100, 2)
+            : $tahunan->persen_realisasi;
+        $tahunan->save();
     }
 
     public function saveYears(): void

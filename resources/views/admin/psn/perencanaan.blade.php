@@ -24,7 +24,7 @@
 
             <div class="bg-white shadow-sm ring-1 ring-gray-950/5 rounded-xl p-6">
                 <div class="flex items-center justify-between mb-3">
-                    <h3 class="font-semibold text-gray-700">RO/Proyek/Non RO (Ringkasan Tahunan)</h3>
+                    <h3 class="font-semibold text-gray-700">Critical Path RO/Proyek/Non RO (Tahunan)</h3>
                     <a href="{{ route('admin.psn.penjabaran', $psn) }}" class="text-sm text-blue-700 font-medium hover:text-blue-900 hover:underline underline-offset-2 transition-colors">Kelola RO & Target Bulanan/Triwulanan &rarr;</a>
                 </div>
                 @php $roList = $psn->roProyek()->whereNull('ro_induk_id')->with('anak')->orderBy('id')->get(); @endphp
@@ -42,7 +42,10 @@
                             </div>
                             @foreach ($ro->anak as $anak)
                                 <div class="py-2 pl-4 flex justify-between items-center text-gray-600">
-                                    <span>&#8618; {{ $anak->nama_ro }}</span>
+                                    <span>
+                                        &#8618; {{ $anak->nama_ro }}
+                                        @if ($anak->is_ro_kunci) <span class="ml-1 text-xs rounded-full bg-red-100 text-red-700 px-2 py-0.5">Critical Path</span> @endif
+                                    </span>
                                     <span class="text-gray-500">{{ $anak->target_akhir ?? '-' }} {{ $anak->satuan }}</span>
                                 </div>
                             @endforeach

@@ -133,4 +133,39 @@ class TrisulaMenuSplitTest extends TestCase
             'target' => 10,
         ]);
     }
+
+    /**
+     * Struktur Project Profile: "Kontribusi Terhadap Trisula Pembangunan
+     * (Target Tahunan/Agregat dari Target TW)" -- realisasi tahunan tahun
+     * berjalan harus otomatis mengikuti jumlah realisasi triwulanan, sama
+     * seperti realisasi RO/Proyek (RoProyekManager::agregasiRealisasiTahunan()).
+     */
+    public function test_realisasi_tahunan_trisula_tahun_berjalan_teragregasi_otomatis_dari_triwulanan(): void
+    {
+        $tahunIni = now()->year;
+        $this->actingAsSuperAdmin();
+        $psn = Psn::create(['nama_psn' => 'Bendungan Contoh']);
+        $kontribusi = TrisulaKontribusiPsn::create([
+            'psn_id' => $psn->id,
+            'kategori_trisula' => 'Sumber Daya Manusia',
+            'nama_indikator' => 'Indikator SDM Contoh',
+        ]);
+
+        $penjabaran = Livewire::test(AnnualTargetManager::class, ['psn' => $psn, 'type' => 'trisula', 'tampilan' => 'triwulanan'])
+            ->call('toggleYears', $kontribusi->id);
+
+        $penjabaran->set('twForm.tahun', $tahunIni)->set('twForm.triwulan', 1)->set('twForm.realisasi', 15)->call('saveTw');
+        $penjabaran->set('twForm.tahun', $tahunIni)->set('twForm.triwulan', 2)->set('twForm.realisasi', 25)->call('saveTw');
+
+        $tahunan = \App\Models\TrisulaTargetPeriode::where('kontribusi_id', $kontribusi->id)
+            ->where('tipe_periode', 'TAHUNAN')->where('tahun', $tahunIni)->firstOrFail();
+        $this->assertSame('40.00', (string) $tahunan->realisasi);
+
+        // Hapus salah satu TW -- agregat tahunan harus ikut turun.
+        $tw1 = \App\Models\TrisulaTargetPeriode::where('kontribusi_id', $kontribusi->id)
+            ->where('tipe_periode', 'TRIWULANAN')->where('triwulan', 1)->firstOrFail();
+        $penjabaran->call('deleteTw', $tw1->id);
+
+        $this->assertSame('25.00', (string) $tahunan->refresh()->realisasi);
+    }
 }
